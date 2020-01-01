@@ -5,7 +5,7 @@
 
 void dict::Loader::loadInto(Dictionary *dict) { return doLoadInto(dict); }
 
-std::future<void> dict::Loader::loadIntoAsync(dict::Dictionary *dict) {
+std::future<void> dict::Loader::loadIntoAsync(Dictionary *dict) {
   return std::async([=] {
     std::lock_guard(dict->mutex());
     doLoadInto(dict);
@@ -31,12 +31,9 @@ dict::DirectoryLoader::DirectoryLoader(const fs::path &path)
 void dict::DirectoryLoader::doLoadInto(Dictionary *dict) {
   auto iter = fs::directory_iterator(path_);
   for (auto &p : iter) {
-    try {
-      auto parser = Parser::getParser(dict, p);
-      parser->parseInto(dict);
-    } catch (std::exception &e) {
-      std::cout << e.what();
-    }
+    auto parser = Parser::getParser(dict, p);
+    parser->parseInto(dict);
+    delete parser;
   }
 }
 

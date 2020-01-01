@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 namespace dict {
 
 class Dictionary;
+class YomiDictionary;
 
 class Parser {
  public:
@@ -31,7 +32,7 @@ class DummyParser : public Parser {
   DummyParser();
 
  protected:
-  void doParseInto(Dictionary* dict) override;
+  void doParseInto(Dictionary*) override;
 };
 
 class YomiParser : public Parser {
@@ -42,6 +43,7 @@ class YomiParser : public Parser {
   virtual ~YomiParser();
 
   Json::Value getRoot();
+  static YomiDictionary* getYomi(Dictionary* dict);
 
  protected:
   std::istream* iss_;

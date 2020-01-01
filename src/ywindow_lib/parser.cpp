@@ -14,29 +14,26 @@ dict::Parser *dict::Parser::getParser(Dictionary *dict, const fs::path &path) {
   if (fs::is_directory(path)) {
     throw std::invalid_argument("Parser::getJsonParser: path is directory");
   }
-  if (path.extension() != ".json") {
-    throw std::invalid_argument("Parser::getParser: path is not .json file");
-  }
-  auto ifs = new std::ifstream(path);
-  if (path.filename() == "index.json") {
-    return new YomiIndexParser(ifs);
-  }
-  auto stem = path.stem().string();
-  if (stem.find("tag") != std::string::npos) {
-    if (dynamic_cast<YomiDictionary *>(dict) != nullptr) {
-      return new YomiTagParser(ifs);
+  if (YomiDictionary *yomi = dynamic_cast<YomiDictionary *>(dict); yomi) {
+    auto ifs = new std::ifstream(path);
+    if (path.filename() == "index.json") {
+      return new YomiIndexParser(ifs);
     }
-  } else if (stem.find("term") != std::string::npos) {
-    return new YomiTermParser(ifs);
-  } else if (stem.find("kanji") != std::string::npos) {
-    return new YomiKanjiParser(ifs);
+    auto stem = path.stem().string();
+    if (stem.find("tag") != std::string::npos) {
+      return new YomiTagParser(ifs);
+    } else if (stem.find("term") != std::string::npos) {
+      return new YomiTermParser(ifs);
+    } else if (stem.find("kanji") != std::string::npos) {
+      return new YomiKanjiParser(ifs);
+    }
   }
   return new DummyParser();
 }
 
 dict::DummyParser::DummyParser() {}
 
-void dict::DummyParser::doParseInto(dict::Dictionary *dict) {}
+void dict::DummyParser::doParseInto(Dictionary *) {}
 
 dict::YomiParser::YomiParser(std::istream *iss) : iss_(iss) {}
 
@@ -48,6 +45,10 @@ Json::Value dict::YomiParser::getRoot() {
   return root;
 }
 
+dict::YomiDictionary *dict::YomiParser::getYomi(dict::Dictionary *dict) {
+  return dynamic_cast<YomiDictionary *>(dict);
+}
+
 dict::YomiIndexParser::YomiIndexParser(std::istream *iss) : YomiParser(iss) {}
 
 dict::YomiTagParser::YomiTagParser(std::istream *iss) : YomiParser(iss) {}
@@ -56,15 +57,15 @@ dict::YomiTermParser::YomiTermParser(std::istream *iss) : YomiParser(iss) {}
 
 dict::YomiKanjiParser::YomiKanjiParser(std::istream *iss) : YomiParser(iss) {}
 
-void dict::YomiIndexParser::doParseInto(dict::Dictionary *dict) {
+void dict::YomiIndexParser::doParseInto(Dictionary *dict) {
+  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   string info = root.get("title", "").asString();
-  dict->updateInfo(info);
+  yomi->updateInfo(info);
 }
 
 void dict::YomiTagParser::doParseInto(Dictionary *dict) {
-  YomiDictionary *yomi = dynamic_cast<YomiDictionary *>(dict);
-
+  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     Tag tag;
@@ -76,10 +77,11 @@ void dict::YomiTagParser::doParseInto(Dictionary *dict) {
   }
 }
 
-void dict::YomiTermParser::doParseInto(dict::Dictionary *dict) {
+void dict::YomiTermParser::doParseInto(Dictionary *dict) {
+  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    JsonCard *card = new JsonCard(dict);
+    YomiTermCard *card = new YomiTermCard(dict);
     card->setName(root[i][0].asString());
 
     card->setReading(root[i][1].asString());
@@ -92,19 +94,21 @@ void dict::YomiTermParser::doParseInto(dict::Dictionary *dict) {
       card->addMeaning(root[i][5][j].asString());
     }
 
-    dict->addCard(card);
+    yomi->addCard(card);
   }
 }
 
-void dict::YomiKanjiParser::doParseInto(dict::Dictionary *dict) {
+void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
+  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    JsonCard *card = new JsonCard(dict);
+    YomiKanjiCard *card = new YomiKanjiCard(dict);
     card->setName(root[i][0].asString());
 
     std::vector<std::string> reading{root[i][1].asString(),
                                      root[i][2].asString()};
-    card->setReading(boost::join(reading, " "));
+    card->setKunReading(root[i][1].asString());
+    card->setOnReading(root[i][2].asString());
 
     std::vector<string> tags;
     boost::split(tags, root[i][3].asString(), boost::is_any_of(" "));
@@ -113,6 +117,6 @@ void dict::YomiKanjiParser::doParseInto(dict::Dictionary *dict) {
     for (int j = 0, j_max = root[i][4].size(); j != j_max; ++j) {
       card->addMeaning(root[i][4][j].asString());
     }
-    dict->addCard(card);
+    yomi->addCard(card);
   }
 }

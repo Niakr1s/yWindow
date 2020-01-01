@@ -25,7 +25,6 @@ using TagMap = std::map<string, Tag>;
 
 class Card {
  public:
-  Card(Dictionary* dict);
   virtual ~Card();
 
   virtual string name() const = 0;
@@ -33,36 +32,67 @@ class Card {
   virtual string meaning() const = 0;
   virtual string dictionaryInfo() const = 0;
   virtual string etc() const = 0;
+};
+
+class DefaultCard : public Card {
+ public:
+  DefaultCard(Dictionary* dict);
+
+  void setName(const string& name);
+  void addMeaning(const string& meaning);
 
   Dictionary* dict() const;
 
+  string name() const override;
+  string meaning() const override;
+
  protected:
   Dictionary* dict_;
+
+  string name_;
+  std::vector<string> meanings_;
 };
 
-class JsonCard : public Card {
- public:
-  JsonCard(Dictionary* dict);
+class YomiDictionary;
 
-  void setName(const string& name);
-  void setReading(const string& reading);
+class YomiCard : public DefaultCard {
+ public:
+  YomiCard(Dictionary* dict);
+
   void addTag(const string& tag);
   void setTags(std::vector<string>&& tags);
-  void addMeaning(const string& meaning);
 
- public:
-  string name_;
-  string reading_;  // kun + on for kanji
-  std::vector<string> tags_;
-  std::vector<string> meanings_;
-
-  // Card interface
- public:
-  string name() const override;
-  string reading() const override;
-  string meaning() const override;
   string dictionaryInfo() const override;
   string etc() const override;
+
+ protected:
+  YomiDictionary* yomi_dict_;
+  std::vector<string> tags_;
+};
+
+class YomiKanjiCard : public YomiCard {
+ public:
+  YomiKanjiCard(Dictionary* dict);
+
+  void setKunReading(const string& reading);
+  void setOnReading(const string& reading);
+
+  string reading() const override;
+
+ protected:
+  string kun_reading_, on_reading_;
+};
+
+class YomiTermCard : public YomiCard {
+ public:
+  YomiTermCard(Dictionary* dict);
+
+  void setReading(const string& reading);
+
+  string reading() const override;
+
+ protected:
+  string reading_;
 };
 
 using CardPtrMap = std::multimap<string, std::unique_ptr<Card>>;

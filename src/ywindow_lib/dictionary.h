@@ -16,7 +16,18 @@ class Dictionary {
   Dictionary();
   virtual ~Dictionary();
 
-  CardPtrList query(const string& text);
+  CardPtrList query(const string& text) const;
+
+  std::mutex& mutex();
+
+ protected:
+  virtual CardPtrList doQuery(const string& text) const = 0;
+  std::mutex mutex_;
+};
+
+class DefaultDictionary : public Dictionary {
+ public:
+  DefaultDictionary();
 
   void updateInfo(const string& info);
 
@@ -26,15 +37,14 @@ class Dictionary {
   const string& info() const;
   size_t size() const;
 
-  std::mutex& mutex();
-
  protected:
   string info_;
   CardPtrMap cards_;
-  std::mutex mutex_;
+
+  CardPtrList doQuery(const string& text) const override;
 };
 
-class YomiDictionary : public Dictionary {
+class YomiDictionary : public DefaultDictionary {
  public:
   YomiDictionary();
 

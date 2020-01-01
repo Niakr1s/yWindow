@@ -11,7 +11,7 @@ using namespace dict;
 TEST(defaultdict_query, test1) {
   auto loader = std::unique_ptr<Loader>(
       Loader::getFilesystemLoader("data/kanjidic_english"));
-  auto dictionary = new YomiDictionary();
+  YomiDictionary* dictionary = new YomiDictionary();
   loader->loadInto(dictionary);
 
   std::string to_query = "㝢";

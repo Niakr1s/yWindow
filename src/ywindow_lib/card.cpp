@@ -4,39 +4,38 @@
 
 #include "dictionary.h"
 
-dict::JsonCard::JsonCard(Dictionary* dict) : Card(dict) {}
+dict::YomiCard::YomiCard(Dictionary* dict)
+    : DefaultCard(dict), yomi_dict_(dynamic_cast<YomiDictionary*>(dict)) {}
 
-void dict::JsonCard::setReading(const string& reading) { reading_ = reading; }
+void dict::YomiCard::addTag(const dict::string& tag) { tags_.push_back(tag); }
 
-void dict::JsonCard::addTag(const dict::string& tag) { tags_.push_back(tag); }
+void dict::YomiCard::setTags(std::vector<dict::string>&& tags) { tags_ = tags; }
 
-void dict::JsonCard::setTags(std::vector<dict::string>&& tags) { tags_ = tags; }
+dict::string dict::YomiCard::dictionaryInfo() const {
+  return yomi_dict_->info();
+}
 
-void dict::JsonCard::addMeaning(const dict::string& meaning) {
+void dict::DefaultCard::addMeaning(const dict::string& meaning) {
   meanings_.push_back(meaning);
 }
 
-void dict::JsonCard::setName(const string& name) { name_ = name; }
+void dict::DefaultCard::setName(const string& name) { name_ = name; }
 
 dict::Tag::Tag() {}
 
-dict::Card::Card(dict::Dictionary* dict) : dict_(dict) {}
+dict::DefaultCard::DefaultCard(Dictionary* dict) : dict_(dict) {}
 
 dict::Card::~Card() {}
 
-dict::Dictionary* dict::Card::dict() const { return dict_; }
+dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 
-dict::string dict::JsonCard::name() const { return name_; }
+dict::string dict::DefaultCard::name() const { return name_; }
 
-dict::string dict::JsonCard::reading() const { return reading_; }
-
-dict::string dict::JsonCard::meaning() const {
-  return boost::join(meanings_, " ");
+dict::string dict::DefaultCard::meaning() const {
+  return boost::join(meanings_, "\n");
 }
 
-dict::string dict::JsonCard::dictionaryInfo() const { return dict_->info(); }
-
-dict::string dict::JsonCard::etc() const {
+dict::string dict::YomiCard::etc() const {
   string res;
 
   res.append("Tags:\n");
@@ -50,4 +49,29 @@ dict::string dict::JsonCard::etc() const {
   res.append(boost::join(to_append, "\n"));
 
   return res;
+}
+
+dict::YomiKanjiCard::YomiKanjiCard(dict::Dictionary* dict) : YomiCard(dict) {}
+
+void dict::YomiKanjiCard::setKunReading(const dict::string& reading) {
+  kun_reading_ = reading;
+}
+
+void dict::YomiKanjiCard::setOnReading(const dict::string& reading) {
+  on_reading_ = reading;
+}
+
+dict::string dict::YomiKanjiCard::reading() const {
+  return string("Kun reading: " + kun_reading_ +
+                "\nOn reading: " + on_reading_);
+}
+
+dict::YomiTermCard::YomiTermCard(dict::Dictionary* dict) : YomiCard(dict) {}
+
+void dict::YomiTermCard::setReading(const dict::string& reading) {
+  reading_ = reading;
+}
+
+dict::string dict::YomiTermCard::reading() const {
+  return string("Reading: " + reading_);
 }
