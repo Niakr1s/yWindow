@@ -10,7 +10,7 @@
 
 void dict::Parser::parseInto(Dictionary *dict) { return doParseInto(dict); }
 
-dict::Parser *dict::Parser::getParser(const fs::path &path) {
+dict::Parser *dict::Parser::getParser(Dictionary *dict, const fs::path &path) {
   if (fs::is_directory(path)) {
     throw std::invalid_argument("Parser::getJsonParser: path is directory");
   }
@@ -19,50 +19,52 @@ dict::Parser *dict::Parser::getParser(const fs::path &path) {
   }
   auto ifs = new std::ifstream(path);
   if (path.filename() == "index.json") {
-    return new JsonIndexParser(ifs);
+    return new YomiIndexParser(ifs);
   }
   auto stem = path.stem().string();
   if (stem.find("tag") != std::string::npos) {
-    return new JsonTagParser(ifs);
+    if (dynamic_cast<YomiDictionary *>(dict) != nullptr) {
+      return new YomiTagParser(ifs);
+    }
   } else if (stem.find("term") != std::string::npos) {
-    return new JsonTermParser(ifs);
+    return new YomiTermParser(ifs);
   } else if (stem.find("kanji") != std::string::npos) {
-    return new JsonKanjiParser(ifs);
+    return new YomiKanjiParser(ifs);
   }
-  return nullptr;
+  return new DummyParser();
 }
 
-dict::JsonParser::JsonParser(std::istream *iss) : iss_(iss) {}
+dict::DummyParser::DummyParser() {}
 
-dict::JsonParser::~JsonParser() { delete iss_; }
+void dict::DummyParser::doParseInto(dict::Dictionary *dict) {}
 
-Json::Value dict::JsonParser::getRoot() {
+dict::YomiParser::YomiParser(std::istream *iss) : iss_(iss) {}
+
+dict::YomiParser::~YomiParser() { delete iss_; }
+
+Json::Value dict::YomiParser::getRoot() {
   Json::Value root;
   *iss_ >> root;
   return root;
 }
 
-dict::JsonIndexParser::JsonIndexParser(std::istream *iss) : JsonParser(iss) {}
+dict::YomiIndexParser::YomiIndexParser(std::istream *iss) : YomiParser(iss) {}
 
-dict::JsonTagParser::JsonTagParser(std::istream *iss) : JsonParser(iss) {}
+dict::YomiTagParser::YomiTagParser(std::istream *iss) : YomiParser(iss) {}
 
-dict::JsonTermParser::JsonTermParser(std::istream *iss) : JsonParser(iss) {}
+dict::YomiTermParser::YomiTermParser(std::istream *iss) : YomiParser(iss) {}
 
-dict::JsonKanjiParser::JsonKanjiParser(std::istream *iss) : JsonParser(iss) {}
+dict::YomiKanjiParser::YomiKanjiParser(std::istream *iss) : YomiParser(iss) {}
 
-void dict::JsonIndexParser::doParseInto(dict::Dictionary *dict) {
+void dict::YomiIndexParser::doParseInto(dict::Dictionary *dict) {
   Json::Value root = getRoot();
-  Info index;
-
-  index.title = root.get("title", "").asString();
-  index.format = root.get("format", "0").asInt();
-  index.revision = root.get("revision", "").asString();
-  index.sequenced = root.get("sequenced", false).asBool();
-
-  dict->updateIndex(index);
+  string info = root.get("title", "").asString();
+  dict->updateInfo(info);
 }
 
-void dict::JsonTagParser::doParseInto(Dictionary *dict) {
+void dict::YomiTagParser::doParseInto(Dictionary *dict) {
+  YomiDictionary *yomi = dynamic_cast<YomiDictionary *>(dict);
+
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     Tag tag;
@@ -70,43 +72,46 @@ void dict::JsonTagParser::doParseInto(Dictionary *dict) {
     tag.keyword = root[i][1].asString();
     tag.rating = root[i][2].asInt();
     tag.description = root[i][3].asString();
-    dict->addTag(tag);
+    yomi->addTag(tag);
   }
 }
 
-void dict::JsonTermParser::doParseInto(dict::Dictionary *dict) {
+void dict::YomiTermParser::doParseInto(dict::Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    Card card;
-    card.text = root[i][0].asString();
+    JsonCard *card = new JsonCard(dict);
+    card->setName(root[i][0].asString());
 
-    card.reading = root[i][1].asString();
+    card->setReading(root[i][1].asString());
 
-    boost::split(card.tags, root[i][2].asString(), boost::is_any_of(" "));
-
-    card.rating = root[i][4].asInt();
+    std::vector<string> tags;
+    boost::split(tags, root[i][2].asString(), boost::is_any_of(" "));
+    card->setTags(std::move(tags));
 
     for (int j = 0, j_max = root[i][5].size(); j != j_max; ++j) {
-      card.meanings.push_back(root[i][5][j].asString());
+      card->addMeaning(root[i][5][j].asString());
     }
+
     dict->addCard(card);
   }
 }
 
-void dict::JsonKanjiParser::doParseInto(dict::Dictionary *dict) {
+void dict::YomiKanjiParser::doParseInto(dict::Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    Card card;
-    card.text = root[i][0].asString();
+    JsonCard *card = new JsonCard(dict);
+    card->setName(root[i][0].asString());
 
     std::vector<std::string> reading{root[i][1].asString(),
                                      root[i][2].asString()};
-    card.reading = boost::join(reading, " ");
+    card->setReading(boost::join(reading, " "));
 
-    boost::split(card.tags, root[i][3].asString(), boost::is_any_of(" "));
+    std::vector<string> tags;
+    boost::split(tags, root[i][3].asString(), boost::is_any_of(" "));
+    card->setTags(std::move(tags));
 
     for (int j = 0, j_max = root[i][4].size(); j != j_max; ++j) {
-      card.meanings.push_back(root[i][4][j].asString());
+      card->addMeaning(root[i][4][j].asString());
     }
     dict->addCard(card);
   }

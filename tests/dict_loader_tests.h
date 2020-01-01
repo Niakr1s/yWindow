@@ -14,35 +14,31 @@ namespace fs = std::filesystem;
 using namespace dict;
 
 TEST(fs_dict_loader, term) {
-  auto loader = std::unique_ptr<Loader>(
-      Loader::getFilesystemLoader("data/jmdict_english"));
-  auto dictionary =
-      std::unique_ptr<Dictionary>(Dictionary::makeDefaultDictionary());
-  loader->loadInto(dictionary.get());
-  ASSERT_EQ(dictionary->info().title, "JMdict (English)");
-  ASSERT_EQ(dictionary->tags().size(), 4);
+  Loader* loader = Loader::getFilesystemLoader("data/jmdict_english");
+  Dictionary* dictionary = new YomiDictionary();
+  loader->loadInto(dictionary);
+  ASSERT_EQ(dictionary->info(), "JMdict (English)");
+  ASSERT_EQ(dynamic_cast<YomiDictionary*>(dictionary)->tags().size(), 4);
   ASSERT_EQ(dictionary->cards().size(), 6);
 }
 
 TEST(fs_dict_loader, kanji) {
   auto loader = std::unique_ptr<Loader>(
       Loader::getFilesystemLoader("data/kanjidic_english"));
-  auto dictionary =
-      std::unique_ptr<Dictionary>(Dictionary::makeDefaultDictionary());
-  loader->loadInto(dictionary.get());
-  ASSERT_EQ(dictionary->info().title, "KANJIDIC (English)");
-  ASSERT_EQ(dictionary->tags().size(), 3);
+  Dictionary* dictionary = new YomiDictionary();
+  loader->loadInto(dictionary);
+  ASSERT_EQ(dictionary->info(), "KANJIDIC (English)");
+  ASSERT_EQ(dynamic_cast<YomiDictionary*>(dictionary)->tags().size(), 3);
   ASSERT_EQ(dictionary->cards().size(), 3);
 }
 
 TEST(fs_dict_loader, empty) {
   auto loader =
       std::unique_ptr<Loader>(Loader::getFilesystemLoader("data/empty_dir"));
-  auto dictionary =
-      std::unique_ptr<Dictionary>(Dictionary::makeDefaultDictionary());
-  loader->loadInto(dictionary.get());
-  ASSERT_EQ(dictionary->info().title, "");
-  ASSERT_EQ(dictionary->tags().size(), 0);
+  Dictionary* dictionary = new YomiDictionary();
+  loader->loadInto(dictionary);
+  ASSERT_EQ(dictionary->info(), "");
+  ASSERT_EQ(dynamic_cast<YomiDictionary*>(dictionary)->tags().size(), 0);
   ASSERT_EQ(dictionary->cards().size(), 0);
 }
 

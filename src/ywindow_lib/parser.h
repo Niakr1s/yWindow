@@ -18,16 +18,28 @@ class Parser {
 
   void parseInto(Dictionary* dict);
 
-  static Parser* getParser(const fs::path& path);
+  static Parser* getParser(Dictionary* dict, const fs::path& path);
 
  protected:
   virtual void doParseInto(Dictionary* dict) = 0;
 };
 
-class JsonParser : public Parser {
- public:
-  JsonParser(std::istream* iss);
-  virtual ~JsonParser();
+class DummyParser : public Parser {
+  friend Parser;
+
+ protected:
+  DummyParser();
+
+ protected:
+  void doParseInto(Dictionary* dict) override;
+};
+
+class YomiParser : public Parser {
+  friend Parser;
+
+ protected:
+  YomiParser(std::istream* iss);
+  virtual ~YomiParser();
 
   Json::Value getRoot();
 
@@ -35,33 +47,41 @@ class JsonParser : public Parser {
   std::istream* iss_;
 };
 
-class JsonIndexParser : public JsonParser {
- public:
-  JsonIndexParser(std::istream* iss);
+class YomiIndexParser : public YomiParser {
+  friend Parser;
+
+ protected:
+  YomiIndexParser(std::istream* iss);
 
  protected:
   void doParseInto(Dictionary* dict) override;
 };
 
-class JsonTagParser : public JsonParser {
- public:
-  JsonTagParser(std::istream* iss);
+class YomiTagParser : public YomiParser {
+  friend Parser;
+
+ protected:
+  YomiTagParser(std::istream* iss);
 
  protected:
   void doParseInto(Dictionary* dict) override;
 };
 
-class JsonTermParser : public JsonParser {
- public:
-  JsonTermParser(std::istream* iss);
+class YomiTermParser : public YomiParser {
+  friend Parser;
+
+ protected:
+  YomiTermParser(std::istream* iss);
 
  protected:
   void doParseInto(Dictionary* dict) override;
 };
 
-class JsonKanjiParser : public JsonParser {
- public:
-  JsonKanjiParser(std::istream* iss);
+class YomiKanjiParser : public YomiParser {
+  friend Parser;
+
+ protected:
+  YomiKanjiParser(std::istream* iss);
 
  protected:
   void doParseInto(Dictionary* dict) override;

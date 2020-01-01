@@ -38,6 +38,7 @@ endif()
 add_executable(tests
     tests.cpp
     dict_loader_tests.h
+    dict_query_tests.h
 )
 
 file(COPY data DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

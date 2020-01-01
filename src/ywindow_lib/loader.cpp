@@ -25,10 +25,21 @@ void dict::DirectoryLoader::doLoadInto(Dictionary *dict) {
   auto iter = fs::directory_iterator(path_);
   for (auto &p : iter) {
     try {
-      auto parser = Parser::getParser(p);
+      auto parser = Parser::getParser(dict, p);
       parser->parseInto(dict);
     } catch (std::exception &e) {
       std::cout << e.what();
     }
   }
+}
+
+dict::string dict::DirectoryLoader::getDictionaryInfo() {
+  string res;
+  auto iter = fs::directory_iterator(path_);
+  for (auto &p : iter) {
+    if (p.path().filename() == "index.json") {
+      // res = parse index
+    }
+  }
+  return res;
 }

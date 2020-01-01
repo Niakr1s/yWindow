@@ -3,6 +3,8 @@
 
 #include <filesystem>
 
+#include "card.h"
+
 namespace fs = std::filesystem;
 
 namespace dict {
@@ -37,6 +39,9 @@ class DirectoryLoader : public FilesystemLoader {
   DirectoryLoader(const fs::path& path);
 
   void doLoadInto(Dictionary* dict) override;
+
+ private:
+  string getDictionaryInfo();
 };
 
 // todo ZipLoader etc

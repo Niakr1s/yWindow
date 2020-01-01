@@ -10,14 +10,7 @@ namespace dict {
 
 using string = std::string;
 
-struct Info {
-  Info();
-
-  string title = "";
-  int format = 0;
-  string revision = "";
-  bool sequenced = false;
-};
+class Dictionary;
 
 struct Tag {
   Tag();
@@ -30,24 +23,50 @@ struct Tag {
 
 using TagMap = std::map<string, Tag>;
 
-struct Card {
-  Card();
+class Card {
+ public:
+  Card(Dictionary* dict);
+  virtual ~Card();
 
-  // card members from json
-  string text;
-  string reading;  // kun + on for kanji
-  std::vector<string> tags;
-  std::vector<string> meanings;
+  virtual string name() const = 0;
+  virtual string reading() const = 0;
+  virtual string meaning() const = 0;
+  virtual string dictionaryInfo() const = 0;
+  virtual string etc() const = 0;
 
-  // shared data from json
-  std::shared_ptr<Info> info_;
-  std::shared_ptr<TagMap> tag_map;
+  Dictionary* dict() const;
 
-  int rating = 0;
+ protected:
+  Dictionary* dict_;
 };
 
-using CardMap = std::multimap<string, Card>;
-using CardList = std::vector<Card>;
+class JsonCard : public Card {
+ public:
+  JsonCard(Dictionary* dict);
+
+  void setName(const string& name);
+  void setReading(const string& reading);
+  void addTag(const string& tag);
+  void setTags(std::vector<string>&& tags);
+  void addMeaning(const string& meaning);
+
+ public:
+  string name_;
+  string reading_;  // kun + on for kanji
+  std::vector<string> tags_;
+  std::vector<string> meanings_;
+
+  // Card interface
+ public:
+  string name() const override;
+  string reading() const override;
+  string meaning() const override;
+  string dictionaryInfo() const override;
+  string etc() const override;
+};
+
+using CardPtrMap = std::multimap<string, std::unique_ptr<Card>>;
+using CardPtrList = std::vector<Card*>;
 
 }  // namespace dict
 
