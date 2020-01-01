@@ -1,0 +1,30 @@
+[
+    [
+        "news",
+        "frequent",
+        -2,
+        "appears frequently in Mainichi Shimbun",
+        0
+    ],
+    [
+        "ichi",
+        "frequent",
+        -2,
+        "listed as common in Ichimango Goi Bunruishuu",
+        0
+    ],
+    [
+        "spec",
+        "frequent",
+        -2,
+        "common words not included in frequency lists",
+        0
+    ],
+    [
+        "gai",
+        "frequent",
+        -2,
+        "common loanword",
+        0
+    ]
+]

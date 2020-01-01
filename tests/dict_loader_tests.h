@@ -1,0 +1,54 @@
+#ifndef DICT_LOADER_TESTS_H
+#define DICT_LOADER_TESTS_H
+
+#include <gtest/gtest.h>
+
+#include <filesystem>
+#include <memory>
+
+#include "dictionary.h"
+#include "loader.h"
+
+namespace fs = std::filesystem;
+
+using namespace dict;
+
+TEST(fs_dict_loader, term) {
+  auto loader = std::unique_ptr<Loader>(
+      Loader::getFilesystemLoader("data/jmdict_english"));
+  auto dictionary =
+      std::unique_ptr<Dictionary>(Dictionary::makeDefaultDictionary());
+  loader->loadInto(dictionary.get());
+  ASSERT_EQ(dictionary->info().title, "JMdict (English)");
+  ASSERT_EQ(dictionary->tags().size(), 4);
+  ASSERT_EQ(dictionary->cards().size(), 6);
+}
+
+TEST(fs_dict_loader, kanji) {
+  auto loader = std::unique_ptr<Loader>(
+      Loader::getFilesystemLoader("data/kanjidic_english"));
+  auto dictionary =
+      std::unique_ptr<Dictionary>(Dictionary::makeDefaultDictionary());
+  loader->loadInto(dictionary.get());
+  ASSERT_EQ(dictionary->info().title, "KANJIDIC (English)");
+  ASSERT_EQ(dictionary->tags().size(), 3);
+  ASSERT_EQ(dictionary->cards().size(), 3);
+}
+
+TEST(fs_dict_loader, empty) {
+  auto loader =
+      std::unique_ptr<Loader>(Loader::getFilesystemLoader("data/empty_dir"));
+  auto dictionary =
+      std::unique_ptr<Dictionary>(Dictionary::makeDefaultDictionary());
+  loader->loadInto(dictionary.get());
+  ASSERT_EQ(dictionary->info().title, "");
+  ASSERT_EQ(dictionary->tags().size(), 0);
+  ASSERT_EQ(dictionary->cards().size(), 0);
+}
+
+TEST(fs_dict_loader, non_existent_dir) {
+  ASSERT_THROW(Loader::getFilesystemLoader("data/non_existent_dir"),
+               std::invalid_argument);
+}
+
+#endif  // DICT_LOADER_TESTS_H

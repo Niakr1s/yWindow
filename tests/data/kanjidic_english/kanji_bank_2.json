@@ -1,0 +1,51 @@
+[
+    [
+        "㝡",
+        "",
+        "",
+        "",
+        [
+            "very",
+            "exceedingly",
+            "most",
+            "superior"
+        ],
+        {
+            "jis213": "2-8-3",
+            "strokes": "11",
+            "ucs": "3761"
+        }
+    ],
+    [
+        "㝢",
+        "",
+        "",
+        "",
+        [
+            "a house",
+            "a roof",
+            "look",
+            "appearance",
+            "space"
+        ],
+        {
+            "jis213": "2-8-5",
+            "strokes": "12",
+            "ucs": "3762"
+        }
+    ],
+    [
+        "㝫",
+        "",
+        "",
+        "",
+        [
+            "shape of the sky"
+        ],
+        {
+            "jis213": "2-8-9",
+            "strokes": "14",
+            "ucs": "376B"
+        }
+    ]
+]

@@ -36,6 +36,7 @@ add_subdirectory(3rdparty/jsoncpp)
 
 add_subdirectory(src)
 
+option(WITH_TESTS OFF)
 if (WITH_TESTS)
     add_subdirectory(tests)
 endif ()

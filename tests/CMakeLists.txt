@@ -37,13 +37,12 @@ endif()
 
 add_executable(tests
     tests.cpp
+    dict_loader_tests.h
 )
 
-target_include_directories(tests PRIVATE
-    ../src
-    ../src/dict
-)
+file(COPY data DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 target_link_libraries(tests
     gtest_main
+    ywindow_lib
 )

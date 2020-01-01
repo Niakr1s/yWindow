@@ -4,4 +4,4 @@ dict::Card::Card() {}
 
 dict::Tag::Tag() {}
 
-dict::Index::Index() {}
+dict::Info::Info() {}

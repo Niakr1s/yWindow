@@ -1,9 +1,0 @@
-﻿target_sources(ywindow_lib 
-PRIVATE
-    dictionary.h
-    dictionary.cpp
-    jsonparser.h
-    jsonparser.cpp
-    card.h
-    card.cpp
-)

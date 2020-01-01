@@ -1,0 +1,23 @@
+[
+    [
+        "jouyou",
+        "frequent",
+        -5,
+        "included in list of regular-use characters",
+        0
+    ],
+    [
+        "jinmeiyou",
+        "frequent",
+        -5,
+        "included in list of characters for use in personal names",
+        0
+    ],
+    [
+        "freq",
+        "misc",
+        0,
+        "Frequency",
+        0
+    ]
+]

@@ -1,0 +1,38 @@
+[
+    [
+        "ヽ",
+        "",
+        "n",
+        "",
+        2,
+        [
+            "repetition mark in katakana"
+        ],
+        1000000,
+        ""
+    ],
+    [
+        "くりかえし",
+        "",
+        "n",
+        "",
+        2,
+        [
+            "repetition mark in katakana"
+        ],
+        1000000,
+        ""
+    ],
+    [
+        "ヾ",
+        "",
+        "n",
+        "",
+        1,
+        [
+            "voiced repetition mark in katakana"
+        ],
+        1000010,
+        ""
+    ]
+]

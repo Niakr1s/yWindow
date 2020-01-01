@@ -1,22 +1,22 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include <map>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace dict {
 
 using string = std::string;
 
-struct Index {
-  Index();
+struct Info {
+  Info();
 
-  string title;
-  int format;
-  string revision;
-  bool sequenced;
+  string title = "";
+  int format = 0;
+  string revision = "";
+  bool sequenced = false;
 };
 
 struct Tag {
@@ -28,7 +28,7 @@ struct Tag {
   string description;
 };
 
-using TagMap = std::unordered_map<string, Tag>;
+using TagMap = std::map<string, Tag>;
 
 struct Card {
   Card();
@@ -40,13 +40,13 @@ struct Card {
   std::vector<string> meanings;
 
   // shared data from json
-  std::shared_ptr<Index> index;
+  std::shared_ptr<Info> info_;
   std::shared_ptr<TagMap> tag_map;
 
   int rating = 0;
 };
 
-using CardMap = std::unordered_map<string, Card>;
+using CardMap = std::multimap<string, Card>;
 using CardList = std::vector<Card>;
 
 }  // namespace dict
