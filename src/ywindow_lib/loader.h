@@ -2,6 +2,7 @@
 #define LOADER_H
 
 #include <filesystem>
+#include <future>
 
 #include "card.h"
 
@@ -16,6 +17,7 @@ class Loader {
   virtual ~Loader() = default;
 
   void loadInto(Dictionary* dict);
+  std::future<void> loadIntoAsync(Dictionary* dict);
 
   static Loader* getFilesystemLoader(const fs::path& path);
 

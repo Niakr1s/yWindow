@@ -22,6 +22,16 @@ TEST(fs_dict_loader, term) {
   ASSERT_EQ(dictionary->cards().size(), 6);
 }
 
+TEST(fs_dict_loader, term_async) {
+  Loader* loader = Loader::getFilesystemLoader("data/jmdict_english");
+  Dictionary* dictionary = new YomiDictionary();
+  auto f = loader->loadIntoAsync(dictionary);
+  f.wait();
+  ASSERT_EQ(dictionary->info(), "JMdict (English)");
+  ASSERT_EQ(dynamic_cast<YomiDictionary*>(dictionary)->tags().size(), 4);
+  ASSERT_EQ(dictionary->cards().size(), 6);
+}
+
 TEST(fs_dict_loader, kanji) {
   auto loader = std::unique_ptr<Loader>(
       Loader::getFilesystemLoader("data/kanjidic_english"));

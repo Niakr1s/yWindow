@@ -2,6 +2,7 @@
 #define DICTIONARY_H
 
 #include <filesystem>
+#include <mutex>
 #include <string>
 
 #include "card.h"
@@ -25,9 +26,12 @@ class Dictionary {
   const string& info() const;
   size_t size() const;
 
+  std::mutex& mutex();
+
  protected:
   string info_;
   CardPtrMap cards_;
+  std::mutex mutex_;
 };
 
 class YomiDictionary : public Dictionary {

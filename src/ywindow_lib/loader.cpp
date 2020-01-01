@@ -5,6 +5,13 @@
 
 void dict::Loader::loadInto(Dictionary *dict) { return doLoadInto(dict); }
 
+std::future<void> dict::Loader::loadIntoAsync(dict::Dictionary *dict) {
+  return std::async([=] {
+    std::lock_guard(dict->mutex());
+    doLoadInto(dict);
+  });
+}
+
 dict::Loader *dict::Loader::getFilesystemLoader(const fs::path &path) {
   if (!fs::exists(path)) {
     throw std::invalid_argument(

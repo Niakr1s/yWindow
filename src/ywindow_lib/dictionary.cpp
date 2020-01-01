@@ -29,6 +29,8 @@ const dict::string &dict::Dictionary::info() const { return info_; }
 
 size_t dict::Dictionary::size() const { return cards_.size(); }
 
+std::mutex &dict::Dictionary::mutex() { return mutex_; }
+
 const dict::TagMap &dict::YomiDictionary::tags() const { return *tags_; }
 
 const dict::CardPtrMap &dict::Dictionary::cards() const { return cards_; }
