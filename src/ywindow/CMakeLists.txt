@@ -1,0 +1,22 @@
+﻿set(ywindow_src
+    extension.h
+    extension.cpp
+    stringconvert.h
+    stringconvert.cpp
+    ywindow.h
+    ywindow.cpp
+    display.h
+    display.cpp
+)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+add_library(ywindow SHARED ${ywindow_src})
+
+target_link_libraries(ywindow
+    ywindow_lib
+    Qt5::Widgets
+)
