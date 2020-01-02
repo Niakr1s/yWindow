@@ -7,6 +7,8 @@
     ywindow.cpp
     display.h
     display.cpp
+    status.h
+    status.cpp
 )
 
 set(CMAKE_AUTOMOC ON)

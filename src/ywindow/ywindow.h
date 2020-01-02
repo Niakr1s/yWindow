@@ -4,16 +4,18 @@
 #include <QLabel>
 #include <QObject>
 #include <QSettings>
+#include <QStatusBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
 
 #include "display.h"
+#include "status.h"
 
 class Ywindow : public QWidget {
   Q_OBJECT
  public:
-  Ywindow();
+  Ywindow(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~Ywindow() override;
 
  public slots:
@@ -21,12 +23,12 @@ class Ywindow : public QWidget {
 
  private:
   QSettings settings_{"Textractor.ini", QSettings::IniFormat, this};
+  Status* status_;
 
   QVBoxLayout* vbox_;
   Display* display_;
 
   void initWindow();
-  void initVbox();
 
   const QString TITLE = "yWindow";
 

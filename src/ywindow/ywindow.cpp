@@ -1,5 +1,7 @@
 #include "ywindow.h"
 
+#include <Windows.h>
+
 #include <QDebug>
 #include <QFile>
 #include <QSizeGrip>
@@ -7,13 +9,19 @@
 #include <QTextBlock>
 #include <QVBoxLayout>
 
-Ywindow::Ywindow() {
+Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   settings_.beginGroup(TITLE);
 
   initWindow();
-  initVbox();
+
+  vbox_ = new QVBoxLayout(this);
+  vbox_->setMargin(0);
+
   display_ = new Display(this);
   vbox_->addWidget(display_);
+
+  status_ = new Status(this);
+  vbox_->addWidget(status_);
 }
 
 Ywindow::~Ywindow() { saveSettings(); }
@@ -28,6 +36,7 @@ void Ywindow::insertEndl(int count) {
 
 void Ywindow::initWindow() {
   setWindowTitle(TITLE);
+  setWindowFlags(Qt::FramelessWindowHint);
 
   if (settings_.contains("geometry")) {
     setGeometry(settings_.value("geometry").toRect());
@@ -35,14 +44,7 @@ void Ywindow::initWindow() {
     resize(600, 100);
   }
   setWindowOpacity(0.8);
-  auto pal = palette();
-  pal.setColor(QPalette::Background, Qt::black);
-  setPalette(pal);
-}
-
-void Ywindow::initVbox() {
-  vbox_ = new QVBoxLayout(this);
-  vbox_->setMargin(0);
+  setStyleSheet("background: black; color: lightGray;");
 }
 
 void Ywindow::saveSettings() { settings_.setValue("geometry", geometry()); }

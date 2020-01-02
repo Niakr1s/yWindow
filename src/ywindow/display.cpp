@@ -7,7 +7,7 @@ Display::Display(QWidget* parent) : QTextEdit(parent) {
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   viewport()->setCursor(QCursor(Qt::ArrowCursor));
-  resize(size());
+  setFrameStyle(QFrame::NoFrame);
 
   QFont f = font();
   f.setPixelSize(40);
