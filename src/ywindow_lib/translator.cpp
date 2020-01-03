@@ -51,8 +51,8 @@ void dict::YomiTranslator::prepareDictionaries() {
 
 dict::TranslationChunk dict::DictionaryTranslator::translateAnyOfSubStr(
     const std::string &str, size_t begin, size_t count) {
-  for (size_t i = std::min(count, MAX_CHUNK_SIZE); i != 0; --i) {
-    auto chunk = translateFullSubStr(str, begin, i - begin);
+  for (size_t sz = std::min(count, MAX_CHUNK_SIZE); sz != 0; --sz) {
+    auto chunk = translateFullSubStr(str, begin, sz);
     if (chunk.translated()) return chunk;
   }
   return TranslationChunk{str.substr(begin, count), begin, begin + count - 1};
@@ -103,7 +103,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslate(
     res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
   } else {
     for (size_t i = 0, i_max = str.size(); i != i_max; ++i) {
-      auto chunk = translateAnyOfSubStr(str, i, str.size());
+      auto chunk = translateAnyOfSubStr(str, i, i_max - i);
       if (chunk.translated()) {
         res.chunks().push_back(chunk);
         i = chunk.orig_end();
