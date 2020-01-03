@@ -1,8 +1,6 @@
 ﻿set(ywindow_src
     extension.h
     extension.cpp
-    stringconvert.h
-    stringconvert.cpp
     ywindow.h
     ywindow.cpp
     display.h

@@ -7,6 +7,8 @@
     parser.cpp
     loader.h
     loader.cpp
+    stringconvert.h
+    stringconvert.cpp
 )
 
 add_library(ywindow_lib STATIC ${ywindow_lib_src})
