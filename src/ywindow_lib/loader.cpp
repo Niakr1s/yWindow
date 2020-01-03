@@ -33,10 +33,16 @@ dict::FileLoader::FileLoader(const fs::path &path) : FilesystemLoader(path) {}
 
 void dict::DirectoryLoader::doLoadInto(Dictionary *dict) {
   auto iter = fs::directory_iterator(path_);
+  std::vector<std::future<void>> futures;
   for (auto &p : iter) {
     auto parser = Parser::getParser(dict, p);
-    parser->parseInto(dict);
-    delete parser;
+    futures.push_back(std::async([=] {
+      parser->parseInto(dict);
+      delete parser;
+    }));
+  }
+  for (auto &f : futures) {
+    f.wait();
   }
 }
 
