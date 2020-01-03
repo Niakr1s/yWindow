@@ -55,17 +55,19 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
   }
   TranslationResult res{str};
   if (!all) {
-    const size_t begin = 0;
-    for (size_t i = std::min(str.size(), MAX_CHUNK_SIZE); i != 0; --i) {
-      auto chunk = translateFullSubStr(str, begin, i - begin);
-      if (chunk.translated()) {
-        chunk = translateFullSubStr(str, begin, i - begin);
-        res.chunks().push_back(chunk);
-      }
-    }
+    res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
   }
   // TODO
   return res;
+}
+
+dict::TranslationChunk dict::YomiTranslator::translateAnyOfSubStr(
+    const std::string &str, size_t begin, size_t count) {
+  for (size_t i = std::min(count, MAX_CHUNK_SIZE); i != 0; --i) {
+    auto chunk = translateFullSubStr(str, begin, i - begin);
+    if (chunk.translated()) return chunk;
+  }
+  return TranslationChunk{str.substr(begin, count), begin, begin + count - 1};
 }
 
 dict::TranslationChunk dict::YomiTranslator::translateFullSubStr(
