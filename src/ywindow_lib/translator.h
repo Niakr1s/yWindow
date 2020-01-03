@@ -8,22 +8,23 @@
 #include <vector>
 
 #include "dictionary.h"
+#include "translationresult.h"
 
 namespace fs = std::filesystem;
 
 namespace dict {
 
-class TranslateResult {};
-
 class Translator {
  public:
   virtual ~Translator();
 
-  TranslateResult translate(const std::wstring& wstr);
-  TranslateResult translate(const std::string& str);
+  TranslationResult translate(const std::wstring& wstr, bool all);
+  TranslationResult translate(const std::string& str, bool all);
 
  protected:
-  virtual TranslateResult doTranslate(const std::string& str) = 0;
+  virtual TranslationResult doTranslate(const std::string& str, bool all) = 0;
+
+  static size_t MAX_CHUNK_SIZE;
 };
 
 class YomiTranslator : public Translator {
@@ -38,7 +39,10 @@ class YomiTranslator : public Translator {
   void futuresToDicts();
 
  protected:
-  TranslateResult doTranslate(const std::string& str) override;
+  TranslationResult doTranslate(const std::string& str, bool all) override;
+
+  TranslationChunk translateSubStr(const std::string& str, size_t begin,
+                                   size_t count, bool all);
 };
 
 class TranslatorDecorator : public Translator {
@@ -54,7 +58,7 @@ class DeinflectTranslator : public TranslatorDecorator {
   DeinflectTranslator(Translator* translator);
 
  protected:
-  TranslateResult doTranslate(const std::string& str) override;
+  TranslationResult doTranslate(const std::string& str, bool all) override;
 };
 
 }  // namespace dict

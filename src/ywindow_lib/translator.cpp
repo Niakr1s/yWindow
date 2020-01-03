@@ -1,18 +1,24 @@
 #include "translator.h"
 
+#include <algorithm>
+
 #include "dictionary.h"
 #include "loader.h"
 #include "stringconvert.h"
 
 dict::Translator::~Translator() {}
 
-dict::TranslateResult dict::Translator::translate(const std::wstring &wstr) {
+dict::TranslationResult dict::Translator::translate(const std::wstring &wstr,
+                                                    bool all) {
   std::string str = WideStringToString(wstr);
-  return translate(str);
+  return translate(str, all);
 }
 
-dict::TranslateResult dict::Translator::translate(const std::string &str) {
-  return doTranslate(str);
+dict::TranslationResult dict::Translator::translate(const std::string &str,
+                                                    bool all) {
+  auto res = doTranslate(str, all);
+  res.normalize();
+  return res;
 }
 
 dict::YomiTranslator::YomiTranslator(const fs::path &root_dir) {
@@ -42,13 +48,47 @@ void dict::YomiTranslator::futuresToDicts() {
   }
 }
 
-dict::TranslateResult dict::YomiTranslator::doTranslate(
-    const std::string &str) {
+dict::TranslationResult dict::YomiTranslator::doTranslate(
+    const std::string &str, bool all) {
   if (!dicts_futures_.empty()) {
     futuresToDicts();
   }
+  TranslationResult res{str};
+  if (!all) {
+    const size_t begin = 0;
+    for (size_t i = std::min(str.size(), MAX_CHUNK_SIZE); i != 0; --i) {
+      auto chunk = translateSubStr(str, begin, i - begin, false);
+      if (chunk.translated()) {
+        chunk = translateSubStr(str, begin, i - begin, true);
+        res.chunks().push_back(chunk);
+      }
+    }
+  }
   // TODO
-  return TranslateResult{};
+  return res;
+}
+
+dict::TranslationChunk dict::YomiTranslator::translateSubStr(
+    const std::string &str, size_t begin, size_t count, bool all) {
+  string str_chunk = str.substr(begin, count);
+  TranslationChunk chunk{str_chunk, begin, begin + count - 1};
+  for (auto &dict : dicts_) {
+    auto query = dict->query(str_chunk);
+    for (auto &card : query) {
+      chunk.translations().push_back(card);
+    }
+  }
+  if (!all) return chunk;
+  while (--count != 0) {
+    str_chunk = str.substr(begin, count);
+    for (auto &dict : dicts_) {
+      auto query = dict->query(str_chunk);
+      for (auto &card : query) {
+        chunk.translations().push_back(card);
+      }
+    }
+  }
+  return chunk;
 }
 
 dict::TranslatorDecorator::TranslatorDecorator(dict::Translator *translator)
@@ -57,8 +97,10 @@ dict::TranslatorDecorator::TranslatorDecorator(dict::Translator *translator)
 dict::DeinflectTranslator::DeinflectTranslator(dict::Translator *translator)
     : TranslatorDecorator(translator) {}
 
-dict::TranslateResult dict::DeinflectTranslator::doTranslate(
-    const std::string &str) {
+dict::TranslationResult dict::DeinflectTranslator::doTranslate(
+    const std::string &str, bool all) {
   // TODO
-  return TranslateResult{};
+  return TranslationResult{str};
 }
+
+size_t dict::Translator::MAX_CHUNK_SIZE = 30;
