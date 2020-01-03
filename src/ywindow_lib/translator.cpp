@@ -38,7 +38,7 @@ dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs)
   }
 }
 
-void dict::YomiTranslator::futuresToDicts() {
+void dict::YomiTranslator::prepareDictionaries() {
   while (!dicts_futures_.empty()) {
     try {
       dicts_.push_back(
@@ -47,26 +47,6 @@ void dict::YomiTranslator::futuresToDicts() {
     }
     dicts_futures_.pop_back();
   }
-}
-
-dict::TranslationResult dict::YomiTranslator::doTranslate(
-    const std::string &str, bool all) {
-  if (!dicts_futures_.empty()) {
-    futuresToDicts();
-  }
-  TranslationResult res{str};
-  if (!all) {
-    res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
-  } else {
-    for (size_t i = 0, i_max = str.size(); i != i_max; ++i) {
-      auto chunk = translateAnyOfSubStr(str, i, str.size());
-      if (chunk.translated()) {
-        res.chunks().push_back(chunk);
-        i = chunk.orig_end() + 1;
-      }
-    }
-  }
-  return res;
 }
 
 dict::TranslationChunk dict::DictionaryTranslator::translateAnyOfSubStr(
@@ -107,16 +87,28 @@ dict::TranslatorDecorator::TranslatorDecorator(dict::Translator *translator)
 dict::DeinflectTranslator::DeinflectTranslator(dict::Translator *translator)
     : TranslatorDecorator(translator) {}
 
-dict::TranslationResult dict::DeinflectTranslator::doTranslate(
-    const std::string &str, bool all) {
-  // TODO
-  return TranslationResult{str};
-}
-
 size_t dict::Translator::MAX_CHUNK_SIZE = 30;
 
 dict::DictionaryTranslator::DictionaryTranslator() {}
 
 void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
   dicts_.push_back(std::unique_ptr<Dictionary>(dict));
+}
+
+dict::TranslationResult dict::DictionaryTranslator::doTranslate(
+    const std::string &str, bool all) {
+  prepareDictionaries();
+  TranslationResult res{str};
+  if (!all) {
+    res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
+  } else {
+    for (size_t i = 0, i_max = str.size(); i != i_max; ++i) {
+      auto chunk = translateAnyOfSubStr(str, i, str.size());
+      if (chunk.translated()) {
+        res.chunks().push_back(chunk);
+        i = chunk.orig_end() + 1;
+      }
+    }
+  }
+  return res;
 }
