@@ -33,10 +33,7 @@ TEST(fs_dict_loader, kanji) {
 
 TEST(fs_dict_loader, empty) {
   auto future = Loader::loadFromDirectory<YomiDictionary>("data/empty_dir");
-  auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
-  ASSERT_EQ(dictionary->info(), "");
-  ASSERT_EQ(dictionary->tags().size(), 0);
-  ASSERT_EQ(dictionary->cards().size(), 0);
+  ASSERT_THROW(future.get(), std::invalid_argument);
 }
 
 TEST(fs_dict_loader, non_existent_dir) {

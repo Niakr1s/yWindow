@@ -9,6 +9,10 @@ dict::Loader *dict::Loader::getFilesystemLoader(const fs::path &path) {
         "Loader::getFilesystemLoader: path doesn't exist");
   }
   if (fs::is_directory(path)) {
+    if (fs::is_empty(path)) {
+      throw std::invalid_argument(
+          "Loader::getFilesystemLoader: empty directory");
+    }
     return new DirectoryLoader(path);
   }  // todo else return ziploader etc
   return nullptr;
