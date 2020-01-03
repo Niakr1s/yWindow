@@ -30,4 +30,22 @@ TEST(yomi_translator, translation_result_all_false) {
   ASSERT_EQ(res.chunks()[1].text(), "etc９日etc９日etc");
 }
 
+TEST(yomi_translator, translation_result_all_true) {
+  auto yomi = new YomiTranslator("data");
+  auto res = yomi->translate("９日etc９日etc９日etc", true);
+  ASSERT_EQ(res.chunks().size(), 6);
+  ASSERT_TRUE(res.chunks()[0].translated());
+  ASSERT_FALSE(res.chunks()[1].translated());
+  ASSERT_TRUE(res.chunks()[2].translated());
+  ASSERT_FALSE(res.chunks()[3].translated());
+  ASSERT_TRUE(res.chunks()[4].translated());
+  ASSERT_FALSE(res.chunks()[5].translated());
+  ASSERT_EQ(res.chunks()[0].text(), "９日");
+  ASSERT_EQ(res.chunks()[1].text(), "etc");
+  ASSERT_EQ(res.chunks()[2].text(), "９日");
+  ASSERT_EQ(res.chunks()[3].text(), "etc");
+  ASSERT_EQ(res.chunks()[4].text(), "９日");
+  ASSERT_EQ(res.chunks()[5].text(), "etc");
+}
+
 #endif  // DICT_TRANSLATOR_TESTS_H

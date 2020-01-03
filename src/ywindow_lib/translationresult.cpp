@@ -34,8 +34,9 @@ void dict::TranslationResult::normalize() {
       break;
     }
     if (chunk.orig_begin() > curr) {
-      TranslationChunk new_chunk{orig_text_.substr(curr, chunk.orig_begin()),
-                                 curr, chunk.orig_begin() - 1};
+      TranslationChunk new_chunk{
+          orig_text_.substr(curr, chunk.orig_begin() - curr), curr,
+          chunk.orig_begin() - 1};
       new_chunks.push_back(new_chunk);
     }
     curr = chunk.orig_end() + 1;

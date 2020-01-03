@@ -58,14 +58,13 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
     res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
   } else {
     for (size_t i = 0, i_max = str.size(); i != i_max; ++i) {
-      auto chunk = translateAnyOfSubStr(str, 0, str.size());
+      auto chunk = translateAnyOfSubStr(str, i, str.size());
       if (chunk.translated()) {
         res.chunks().push_back(chunk);
         i = chunk.orig_end() + 1;
       }
     }
   }
-  // TODO
   return res;
 }
 
