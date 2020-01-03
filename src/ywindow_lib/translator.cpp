@@ -106,7 +106,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslate(
       auto chunk = translateAnyOfSubStr(str, i, str.size());
       if (chunk.translated()) {
         res.chunks().push_back(chunk);
-        i = chunk.orig_end() + 1;
+        i = chunk.orig_end();
       }
     }
   }

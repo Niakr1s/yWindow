@@ -19,7 +19,6 @@ TEST(fs_dict_loader, term) {
   auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
   ASSERT_EQ(dictionary->info(), "JMdict (English)");
   ASSERT_EQ(dictionary->tags().size(), 4);
-  ASSERT_EQ(dictionary->cards().size(), 6);
 }
 
 TEST(fs_dict_loader, kanji) {
@@ -27,14 +26,12 @@ TEST(fs_dict_loader, kanji) {
   auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
   ASSERT_EQ(dictionary->info(), "KANJIDIC (English)");
   ASSERT_EQ(dictionary->tags().size(), 3);
-  ASSERT_EQ(dictionary->cards().size(), 3);
 }
 
 TEST(fs_dict_loader, deinflect) {
   auto future = Loader::loadFromFS<DeinflectDictionary>("data/deinflect.json");
   auto dictionary = dynamic_cast<DeinflectDictionary*>(future.get());
   ASSERT_EQ(dictionary->info(), "deinflect.json");
-  ASSERT_EQ(dictionary->cards().size(), 6);
 }
 
 TEST(fs_dict_loader, empty) {

@@ -52,10 +52,10 @@ class YomiTranslator : public DictionaryTranslator {
   YomiTranslator(const fs::path& root_dir);
   YomiTranslator(std::initializer_list<fs::path> dicts_dirs);
 
+  void prepareDictionaries() override;
+
  private:
   std::vector<std::future<Dictionary*>> dicts_futures_;
-
-  void prepareDictionaries() override;
 };
 
 class TranslatorDecorator : public Translator {

@@ -18,17 +18,25 @@ class Dictionary {
 
   CardPtrList query(const string& text) const;
 
-  virtual void addCard(Card* card) = 0;
-  virtual const CardPtrMap& cards() const = 0;
+  virtual void addCard(Card* card) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    return doAddCard(card);
+  }
+
+  void updateInfo(const string& info) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    return doUpdateInfo(info);
+  }
 
   virtual const string& info() const = 0;
-  virtual void updateInfo(const string& info) = 0;
   virtual size_t size() const = 0;
 
   std::mutex& mutex();
 
  protected:
   virtual CardPtrList doQuery(const string& text) const = 0;
+  virtual void doAddCard(Card* card) = 0;
+  virtual void doUpdateInfo(const string& info) = 0;
   std::mutex mutex_;
 };
 
@@ -36,10 +44,6 @@ class DefaultDictionary : public Dictionary {
  public:
   DefaultDictionary();
 
-  virtual void addCard(Card* card) override;
-  const CardPtrMap& cards() const override;
-
-  void updateInfo(const string& info) override;
   const string& info() const override;
   size_t size() const override;
 
@@ -48,6 +52,8 @@ class DefaultDictionary : public Dictionary {
   CardPtrMap cards_;
 
   CardPtrList doQuery(const string& text) const override;
+  virtual void doAddCard(Card* card) override;
+  void doUpdateInfo(const string& info) override;
 };
 
 class YomiDictionary : public DefaultDictionary {

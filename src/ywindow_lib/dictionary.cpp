@@ -13,11 +13,14 @@ dict::DefaultDictionary::DefaultDictionary() : Dictionary() {}
 dict::YomiDictionary::YomiDictionary()
     : DefaultDictionary(), tags_(std::make_shared<TagMap>()) {}
 
-void dict::DefaultDictionary::updateInfo(const string &info) { info_ = info; }
+void dict::DefaultDictionary::doUpdateInfo(const string &info) { info_ = info; }
 
-void dict::YomiDictionary::addTag(const Tag &tag) { (*tags_)[tag.tag] = tag; }
+void dict::YomiDictionary::addTag(const Tag &tag) {
+  std::unique_lock<std::mutex> lock(mutex_);
+  (*tags_)[tag.tag] = tag;
+}
 
-void dict::DefaultDictionary::addCard(Card *card) {
+void dict::DefaultDictionary::doAddCard(Card *card) {
   auto card_to_insert = std::unique_ptr<Card>(card);
   cards_.insert({card_to_insert->name(), std::move(card_to_insert)});
 }
@@ -39,7 +42,3 @@ dict::CardPtrList dict::DefaultDictionary::doQuery(
 }
 
 const dict::TagMap &dict::YomiDictionary::tags() const { return *tags_; }
-
-const dict::CardPtrMap &dict::DefaultDictionary::cards() const {
-  return cards_;
-}
