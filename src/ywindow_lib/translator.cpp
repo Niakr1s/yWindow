@@ -56,6 +56,14 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
   TranslationResult res{str};
   if (!all) {
     res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
+  } else {
+    for (size_t i = 0, i_max = str.size(); i != i_max; ++i) {
+      auto chunk = translateAnyOfSubStr(str, 0, str.size());
+      if (chunk.translated()) {
+        res.chunks().push_back(chunk);
+        i = chunk.orig_end() + 1;
+      }
+    }
   }
   // TODO
   return res;
