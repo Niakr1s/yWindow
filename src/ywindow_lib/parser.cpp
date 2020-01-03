@@ -105,8 +105,6 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
     YomiKanjiCard *card = new YomiKanjiCard(dict);
     card->setName(root[i][0].asString());
 
-    std::vector<std::string> reading{root[i][1].asString(),
-                                     root[i][2].asString()};
     card->setKunReading(root[i][1].asString());
     card->setOnReading(root[i][2].asString());
 
