@@ -19,17 +19,20 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/a")
 
 add_definitions( -DBOOST_ALL_DYN_LINK )
 
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+option(Boost_x64 OFF)
+if(Boost_x64)
     set(Boost_ARCHITECTURE "-x64")
 else()
-    set(Boost_ARCHITECTURE "-x32")
+    set(Boost_ARCHITECTURE "-x86")
 endif()
 
 project ("yWindow")
 
+add_definitions(-DBOOST_ALL_DYN_LINK)
+
 find_package(Boost
-#    REQUIRED COMPONENTS
-#    log filesystem date_time
+    REQUIRED COMPONENTS
+    log
 )
 
 add_subdirectory(3rdparty/jsoncpp)
