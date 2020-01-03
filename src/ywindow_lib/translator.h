@@ -31,7 +31,10 @@ class YomiTranslator : public Translator {
   YomiTranslator(std::initializer_list<fs::path> dicts_dirs);
 
  private:
-  std::vector<std::future<Dictionary*>> dicts_;
+  std::vector<std::future<Dictionary*>> dicts_futures_;
+  std::vector<Dictionary*> dicts_;
+
+  void futuresToDicts();
 
  protected:
   TranslateResult doTranslate(const std::string& str) override;

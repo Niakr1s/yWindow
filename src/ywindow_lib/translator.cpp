@@ -20,18 +20,31 @@ dict::YomiTranslator::YomiTranslator(const fs::path &root_dir) {
     if (!path.is_directory()) {
       continue;
     }
-    dicts_.push_back(Loader::loadFromDirectory<YomiDictionary>(path));
+    dicts_futures_.push_back(Loader::loadFromDirectory<YomiDictionary>(path));
   }
 }
 
 dict::YomiTranslator::YomiTranslator(
     std::initializer_list<fs::path> dicts_dirs) {
   for (auto &dir : dicts_dirs) {
-    dicts_.push_back(Loader::loadFromDirectory<YomiDictionary>(dir));
+    dicts_futures_.push_back(Loader::loadFromDirectory<YomiDictionary>(dir));
+  }
+}
+
+void dict::YomiTranslator::futuresToDicts() {
+  while (!dicts_futures_.empty()) {
+    try {
+      dicts_.push_back(dicts_futures_.back().get());
+    } catch (...) {
+    }
+    dicts_futures_.pop_back();
   }
 }
 
 dict::TranslateResult dict::YomiTranslator::doTranslate(
     const std::string &str) {
+  if (!dicts_futures_.empty()) {
+    futuresToDicts();
+  }
   return TranslateResult{};
 }
