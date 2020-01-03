@@ -7,6 +7,8 @@
     parser.cpp
     loader.h
     loader.cpp
+    translator.h
+    translator.cpp
     stringconvert.h
     stringconvert.cpp
 )
