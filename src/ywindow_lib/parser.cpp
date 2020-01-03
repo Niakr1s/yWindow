@@ -47,10 +47,6 @@ Json::Value dict::JsonParser::getRoot() {
 
 dict::YomiParser::YomiParser(std::istream *iss) : JsonParser(iss) {}
 
-dict::YomiDictionary *dict::YomiParser::getYomi(dict::Dictionary *dict) {
-  return dynamic_cast<YomiDictionary *>(dict);
-}
-
 dict::YomiIndexParser::YomiIndexParser(std::istream *iss) : YomiParser(iss) {}
 
 dict::YomiTagParser::YomiTagParser(std::istream *iss) : YomiParser(iss) {}
@@ -60,14 +56,16 @@ dict::YomiTermParser::YomiTermParser(std::istream *iss) : YomiParser(iss) {}
 dict::YomiKanjiParser::YomiKanjiParser(std::istream *iss) : YomiParser(iss) {}
 
 void dict::YomiIndexParser::doParseInto(Dictionary *dict) {
-  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   string info = root.get("title", "").asString();
-  yomi->updateInfo(info);
+  dict->updateInfo(info);
 }
 
 void dict::YomiTagParser::doParseInto(Dictionary *dict) {
-  auto yomi = getYomi(dict);
+  auto yomi = dynamic_cast<YomiDictionary *>(dict);
+  if (!yomi) {
+    return;
+  }
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     Tag tag;
@@ -80,7 +78,6 @@ void dict::YomiTagParser::doParseInto(Dictionary *dict) {
 }
 
 void dict::YomiTermParser::doParseInto(Dictionary *dict) {
-  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     YomiTermCard *card = new YomiTermCard(dict);
@@ -96,12 +93,11 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
       card->addMeaning(root[i][5][j].asString());
     }
 
-    yomi->addCard(card);
+    dict->addCard(card);
   }
 }
 
 void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
-  auto yomi = getYomi(dict);
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     YomiKanjiCard *card = new YomiKanjiCard(dict);
@@ -117,7 +113,7 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
     for (int j = 0, j_max = root[i][4].size(); j != j_max; ++j) {
       card->addMeaning(root[i][4][j].asString());
     }
-    yomi->addCard(card);
+    dict->addCard(card);
   }
 }
 

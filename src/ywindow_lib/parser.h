@@ -51,8 +51,6 @@ class YomiParser : public JsonParser {
 
  protected:
   YomiParser(std::istream* iss);
-
-  static YomiDictionary* getYomi(Dictionary* dict);
 };
 
 class YomiIndexParser : public YomiParser {
