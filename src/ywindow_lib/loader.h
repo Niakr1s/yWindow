@@ -48,9 +48,6 @@ class DirectoryLoader : public FilesystemLoader {
   DirectoryLoader(const fs::path& path);
 
   void doLoadInto(Dictionary* dict) override;
-
- private:
-  string getDictionaryInfo();
 };
 
 // todo ZipLoader etc

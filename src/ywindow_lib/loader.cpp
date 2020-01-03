@@ -31,14 +31,3 @@ void dict::DirectoryLoader::doLoadInto(Dictionary *dict) {
     delete parser;
   }
 }
-
-dict::string dict::DirectoryLoader::getDictionaryInfo() {
-  string res;
-  auto iter = fs::directory_iterator(path_);
-  for (auto &p : iter) {
-    if (p.path().filename() == "index.json") {
-      // res = parse index
-    }
-  }
-  return res;
-}
