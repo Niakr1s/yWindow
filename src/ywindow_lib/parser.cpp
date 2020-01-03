@@ -35,15 +35,17 @@ dict::DummyParser::DummyParser() {}
 
 void dict::DummyParser::doParseInto(Dictionary *) {}
 
-dict::YomiParser::YomiParser(std::istream *iss) : iss_(iss) {}
+dict::JsonParser::JsonParser(std::istream *iss) : iss_(iss) {}
 
-dict::YomiParser::~YomiParser() { delete iss_; }
+dict::JsonParser::~JsonParser() { delete iss_; }
 
-Json::Value dict::YomiParser::getRoot() {
+Json::Value dict::JsonParser::getRoot() {
   Json::Value root;
   *iss_ >> root;
   return root;
 }
+
+dict::YomiParser::YomiParser(std::istream *iss) : JsonParser(iss) {}
 
 dict::YomiDictionary *dict::YomiParser::getYomi(dict::Dictionary *dict) {
   return dynamic_cast<YomiDictionary *>(dict);
@@ -117,4 +119,8 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
     }
     yomi->addCard(card);
   }
+}
+
+void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
+  // TODO
 }

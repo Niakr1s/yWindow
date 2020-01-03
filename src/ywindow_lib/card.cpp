@@ -15,7 +15,7 @@ dict::string dict::YomiCard::dictionaryInfo() const {
   return yomi_dict_->info();
 }
 
-void dict::DefaultCard::addMeaning(const dict::string& meaning) {
+void dict::YomiCard::addMeaning(const dict::string& meaning) {
   meanings_.push_back(meaning);
 }
 
@@ -31,7 +31,7 @@ dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 
 dict::string dict::DefaultCard::name() const { return name_; }
 
-dict::string dict::DefaultCard::meaning() const {
+dict::string dict::YomiCard::meaning() const {
   return boost::join(meanings_, "\n");
 }
 
@@ -75,3 +75,21 @@ void dict::YomiTermCard::setReading(const dict::string& reading) {
 dict::string dict::YomiTermCard::reading() const {
   return string("Reading: " + reading_);
 }
+
+dict::DeinflectCard::DeinflectCard(dict::Dictionary* dict)
+    : DefaultCard(dict),
+      deinflect_dict_(dynamic_cast<DeinflectDictionary*>(dict)) {}
+
+void dict::DeinflectCard::setReading(const dict::string& meaning) {
+  reading_ = meaning;
+}
+
+dict::string dict::DeinflectCard::reading() const { return reading_; }
+
+dict::string dict::DeinflectCard::meaning() const { return ""; }
+
+dict::string dict::DeinflectCard::dictionaryInfo() const {
+  return deinflect_dict_->info();
+}
+
+dict::string dict::DeinflectCard::etc() const { return ""; }

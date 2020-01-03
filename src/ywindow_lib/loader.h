@@ -50,6 +50,15 @@ class DirectoryLoader : public FilesystemLoader {
   void doLoadInto(Dictionary* dict) override;
 };
 
+class FileLoader : public FilesystemLoader {
+  friend class Loader;
+
+ protected:
+  FileLoader(const fs::path& path);
+
+  void doLoadInto(Dictionary* dict) override;
+};
+
 // todo ZipLoader etc
 
 }  // namespace dict

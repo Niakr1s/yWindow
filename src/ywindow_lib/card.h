@@ -39,18 +39,14 @@ class DefaultCard : public Card {
   DefaultCard(Dictionary* dict);
 
   void setName(const string& name);
-  void addMeaning(const string& meaning);
 
   Dictionary* dict() const;
 
   string name() const override;
-  string meaning() const override;
 
  protected:
   Dictionary* dict_;
-
   string name_;
-  std::vector<string> meanings_;
 };
 
 class YomiDictionary;
@@ -61,12 +57,15 @@ class YomiCard : public DefaultCard {
 
   void addTag(const string& tag);
   void setTags(std::vector<string>&& tags);
+  void addMeaning(const string& meaning);
 
+  string meaning() const override;
   string dictionaryInfo() const override;
   string etc() const override;
 
  protected:
   YomiDictionary* yomi_dict_;
+  std::vector<string> meanings_;
   std::vector<string> tags_;
 };
 
@@ -93,6 +92,24 @@ class YomiTermCard : public YomiCard {
 
  protected:
   string reading_;
+};
+
+class DeinflectDictionary;
+
+class DeinflectCard : public DefaultCard {
+ public:
+  DeinflectCard(Dictionary* dict);
+
+  void setReading(const string& meaning);
+
+  string reading() const override;
+  string meaning() const override;
+  string dictionaryInfo() const override;
+  string etc() const override;
+
+ private:
+  string reading_;
+  DeinflectDictionary* deinflect_dict_;
 };
 
 using CardPtrMap = std::multimap<string, std::unique_ptr<Card>>;

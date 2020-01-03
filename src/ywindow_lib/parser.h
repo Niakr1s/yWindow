@@ -35,18 +35,24 @@ class DummyParser : public Parser {
   void doParseInto(Dictionary*) override;
 };
 
-class YomiParser : public Parser {
+class JsonParser : public Parser {
+ protected:
+  JsonParser(std::istream* iss);
+  virtual ~JsonParser();
+
+  Json::Value getRoot();
+
+ protected:
+  std::istream* iss_;
+};
+
+class YomiParser : public JsonParser {
   friend Parser;
 
  protected:
   YomiParser(std::istream* iss);
-  virtual ~YomiParser();
 
-  Json::Value getRoot();
   static YomiDictionary* getYomi(Dictionary* dict);
-
- protected:
-  std::istream* iss_;
 };
 
 class YomiIndexParser : public YomiParser {
@@ -84,6 +90,18 @@ class YomiKanjiParser : public YomiParser {
 
  protected:
   YomiKanjiParser(std::istream* iss);
+
+ protected:
+  void doParseInto(Dictionary* dict) override;
+};
+
+class DeinflectDictionary;
+
+class DeinflectParser : public JsonParser {
+  friend Parser;
+
+ protected:
+  DeinflectParser(std::istream* iss) : JsonParser(iss) {}
 
  protected:
   void doParseInto(Dictionary* dict) override;
