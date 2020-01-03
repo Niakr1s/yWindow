@@ -1,17 +1,18 @@
 #include "loader.h"
 
 #include "dictionary.h"
+#include "exceptions.h"
 #include "parser.h"
 
 dict::Loader *dict::Loader::getFilesystemLoader(const fs::path &path) {
   if (!fs::exists(path)) {
-    throw std::invalid_argument(
-        "Loader::getFilesystemLoader: path doesn't exist");
+    throw FSPathException("Loader::getFilesystemLoader: path doesn't exist",
+                          path);
   }
   if (fs::is_directory(path)) {
     if (fs::is_empty(path)) {
-      throw std::invalid_argument(
-          "Loader::getFilesystemLoader: empty directory");
+      throw FSPathException("Loader::getFilesystemLoader: empty directory",
+                            path);
     }
     return new DirectoryLoader(path);
   }  // todo else return ziploader etc

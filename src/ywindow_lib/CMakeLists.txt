@@ -11,6 +11,8 @@
     translator.cpp
     stringconvert.h
     stringconvert.cpp
+    exceptions.h
+    exceptions.cpp
 )
 
 add_library(ywindow_lib STATIC ${ywindow_lib_src})

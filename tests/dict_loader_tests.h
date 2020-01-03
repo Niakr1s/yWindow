@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "dictionary.h"
+#include "exceptions.h"
 #include "loader.h"
 
 namespace fs = std::filesystem;
@@ -33,13 +34,13 @@ TEST(fs_dict_loader, kanji) {
 
 TEST(fs_dict_loader, empty) {
   auto future = Loader::loadFromDirectory<YomiDictionary>("data/empty_dir");
-  ASSERT_THROW(future.get(), std::invalid_argument);
+  ASSERT_THROW(future.get(), FSPathException);
 }
 
 TEST(fs_dict_loader, non_existent_dir) {
   ASSERT_THROW(
       Loader::loadFromDirectory<YomiDictionary>("data/non_existent_dir").get(),
-      std::invalid_argument);
+      FSPathException);
 }
 
 #endif  // DICT_LOADER_TESTS_H
