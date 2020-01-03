@@ -1,6 +1,7 @@
 #include "loader.h"
 
 #include "dictionary.h"
+#include "exceptions.h"
 #include "parser.h"
 
 dict::Loader *dict::Loader::getFilesystemLoader(const fs::path &path) {
