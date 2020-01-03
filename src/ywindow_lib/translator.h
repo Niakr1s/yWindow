@@ -3,14 +3,15 @@
 
 #include <filesystem>
 #include <future>
+#include <memory>
 #include <string>
 #include <vector>
+
+#include "dictionary.h"
 
 namespace fs = std::filesystem;
 
 namespace dict {
-
-class Dictionary;
 
 class TranslateResult {};
 
@@ -32,7 +33,7 @@ class YomiTranslator : public Translator {
 
  private:
   std::vector<std::future<Dictionary*>> dicts_futures_;
-  std::vector<Dictionary*> dicts_;
+  std::vector<std::unique_ptr<Dictionary>> dicts_;
 
   void futuresToDicts();
 

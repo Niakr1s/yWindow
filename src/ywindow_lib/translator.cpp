@@ -34,7 +34,8 @@ dict::YomiTranslator::YomiTranslator(
 void dict::YomiTranslator::futuresToDicts() {
   while (!dicts_futures_.empty()) {
     try {
-      dicts_.push_back(dicts_futures_.back().get());
+      dicts_.push_back(
+          std::unique_ptr<Dictionary>(dicts_futures_.back().get()));
     } catch (...) {
     }
     dicts_futures_.pop_back();
