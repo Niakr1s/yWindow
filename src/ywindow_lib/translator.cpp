@@ -47,5 +47,18 @@ dict::TranslateResult dict::YomiTranslator::doTranslate(
   if (!dicts_futures_.empty()) {
     futuresToDicts();
   }
+  // TODO
+  return TranslateResult{};
+}
+
+dict::TranslatorDecorator::TranslatorDecorator(dict::Translator *translator)
+    : next_translator_(translator) {}
+
+dict::DeinflectTranslator::DeinflectTranslator(dict::Translator *translator)
+    : TranslatorDecorator(translator) {}
+
+dict::TranslateResult dict::DeinflectTranslator::doTranslate(
+    const std::string &str) {
+  // TODO
   return TranslateResult{};
 }

@@ -41,6 +41,22 @@ class YomiTranslator : public Translator {
   TranslateResult doTranslate(const std::string& str) override;
 };
 
+class TranslatorDecorator : public Translator {
+ public:
+  TranslatorDecorator(Translator* translator);
+
+ protected:
+  Translator* next_translator_;
+};
+
+class DeinflectTranslator : public TranslatorDecorator {
+ public:
+  DeinflectTranslator(Translator* translator);
+
+ protected:
+  TranslateResult doTranslate(const std::string& str) override;
+};
+
 }  // namespace dict
 
 #endif  // TRANSLATOR_H
