@@ -9,10 +9,9 @@
 using namespace dict;
 
 TEST(defaultdict_query, test1) {
-  auto loader = std::unique_ptr<Loader>(
-      Loader::getFilesystemLoader("data/kanjidic_english"));
-  YomiDictionary* dictionary = new YomiDictionary();
-  loader->loadInto(dictionary);
+  auto future =
+      Loader::loadFromDirectory<YomiDictionary>("data/kanjidic_english");
+  auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
 
   std::string to_query = "㝢";
   auto cards = dictionary->query("㝢");

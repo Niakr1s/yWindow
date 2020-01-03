@@ -16,13 +16,20 @@ class Loader {
  public:
   virtual ~Loader() = default;
 
-  void loadInto(Dictionary* dict);
-  std::future<void> loadIntoAsync(Dictionary* dict);
-
-  static Loader* getFilesystemLoader(const fs::path& path);
+  template <class Dict>
+  static std::future<Dictionary*> loadFromDirectory(const fs::path& dir) {
+    return std::async([dir] {
+      Dictionary* dict = new Dict();
+      auto loader = getFilesystemLoader(dir);
+      loader->doLoadInto(dict);
+      return dict;
+    });
+  }
 
  protected:
   virtual void doLoadInto(Dictionary* dict) = 0;
+
+  static Loader* getFilesystemLoader(const fs::path& path);
 };
 
 class FilesystemLoader : public Loader {
