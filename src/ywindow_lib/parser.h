@@ -99,9 +99,11 @@ class DeinflectParser : public JsonParser {
   friend Parser;
 
  protected:
-  DeinflectParser(std::istream* iss) : JsonParser(iss) {}
+  DeinflectParser(std::istream* iss, const std::string& info);
 
  protected:
+  std::string info_;
+
   void doParseInto(Dictionary* dict) override;
 };
 

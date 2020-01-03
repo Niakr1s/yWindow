@@ -20,14 +20,14 @@ dict::YomiTranslator::YomiTranslator(const fs::path &root_dir) {
     if (!path.is_directory()) {
       continue;
     }
-    dicts_futures_.push_back(Loader::loadFromDirectory<YomiDictionary>(path));
+    dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(path));
   }
 }
 
 dict::YomiTranslator::YomiTranslator(
     std::initializer_list<fs::path> dicts_dirs) {
   for (auto &dir : dicts_dirs) {
-    dicts_futures_.push_back(Loader::loadFromDirectory<YomiDictionary>(dir));
+    dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
   }
 }
 

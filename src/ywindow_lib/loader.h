@@ -17,7 +17,7 @@ class Loader {
   virtual ~Loader() = default;
 
   template <class Dict>
-  static std::future<Dictionary*> loadFromDirectory(const fs::path& dir) {
+  static std::future<Dictionary*> loadFromFS(const fs::path& dir) {
     return std::async([dir] {
       Dictionary* dict = new Dict();
       auto loader = getFilesystemLoader(dir);

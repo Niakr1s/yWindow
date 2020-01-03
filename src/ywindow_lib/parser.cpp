@@ -27,6 +27,10 @@ dict::Parser *dict::Parser::getParser(Dictionary *dict, const fs::path &path) {
     } else if (stem.find("kanji") != std::string::npos) {
       return new YomiKanjiParser(ifs);
     }
+  } else if (auto deinflect = dynamic_cast<DeinflectDictionary *>(dict);
+             deinflect) {
+    auto ifs = new std::ifstream(path);
+    return new DeinflectParser(ifs, path.filename().string());
   }
   return new DummyParser();
 }
@@ -117,6 +121,19 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
   }
 }
 
+dict::DeinflectParser::DeinflectParser(std::istream *iss,
+                                       const std::string &info)
+    : JsonParser(iss), info_(info) {}
+
 void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
-  // TODO
+  Json::Value root = getRoot();
+  dict->updateInfo(info_);
+  for (auto it = root.begin(), it_max = root.end(); it != it_max; ++it) {
+    for (int i = 0, i_max = it->size(); i != i_max; ++i) {
+      DeinflectCard *card = new DeinflectCard(dict);
+      card->setName((*it)[i]["kanaIn"].asString());
+      card->setReading((*it)[i]["kanaOut"].asString());
+      dict->addCard(card);
+    }
+  }
 }

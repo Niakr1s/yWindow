@@ -10,7 +10,7 @@ using namespace dict;
 
 TEST(defaultdict_query, test1) {
   auto future =
-      Loader::loadFromDirectory<YomiDictionary>("data/kanjidic_english");
+      Loader::loadFromFS<YomiDictionary>("data/kanjidic_english");
   auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
 
   std::string to_query = "㝢";
