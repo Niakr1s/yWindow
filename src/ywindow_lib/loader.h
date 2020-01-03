@@ -21,7 +21,6 @@ class Loader {
     return std::async([dir] {
       Dictionary* dict = new Dict();
       auto loader = getFilesystemLoader(dir);
-
       loader->doLoadInto(dict);
       delete loader;
       return dict;
