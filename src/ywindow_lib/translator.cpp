@@ -57,9 +57,9 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
   if (!all) {
     const size_t begin = 0;
     for (size_t i = std::min(str.size(), MAX_CHUNK_SIZE); i != 0; --i) {
-      auto chunk = translateSubStr(str, begin, i - begin, false);
+      auto chunk = translateFullSubStr(str, begin, i - begin);
       if (chunk.translated()) {
-        chunk = translateSubStr(str, begin, i - begin, true);
+        chunk = translateFullSubStr(str, begin, i - begin);
         res.chunks().push_back(chunk);
       }
     }
@@ -68,8 +68,8 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
   return res;
 }
 
-dict::TranslationChunk dict::YomiTranslator::translateSubStr(
-    const std::string &str, size_t begin, size_t count, bool all) {
+dict::TranslationChunk dict::YomiTranslator::translateFullSubStr(
+    const std::string &str, size_t begin, size_t count) {
   string str_chunk = str.substr(begin, count);
   TranslationChunk chunk{str_chunk, begin, begin + count - 1};
   for (auto &dict : dicts_) {
@@ -78,7 +78,7 @@ dict::TranslationChunk dict::YomiTranslator::translateSubStr(
       chunk.translations().push_back(card);
     }
   }
-  if (!all) return chunk;
+  if (!chunk.translated()) return chunk;
   while (--count != 0) {
     str_chunk = str.substr(begin, count);
     for (auto &dict : dicts_) {
