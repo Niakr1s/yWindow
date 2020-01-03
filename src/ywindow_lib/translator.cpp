@@ -21,7 +21,8 @@ dict::TranslationResult dict::Translator::translate(const std::string &str,
   return res;
 }
 
-dict::YomiTranslator::YomiTranslator(const fs::path &root_dir) {
+dict::YomiTranslator::YomiTranslator(const fs::path &root_dir)
+    : DictionaryTranslator() {
   for (auto &path : fs::directory_iterator(root_dir)) {
     if (!path.is_directory()) {
       continue;
@@ -30,8 +31,8 @@ dict::YomiTranslator::YomiTranslator(const fs::path &root_dir) {
   }
 }
 
-dict::YomiTranslator::YomiTranslator(
-    std::initializer_list<fs::path> dicts_dirs) {
+dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs)
+    : DictionaryTranslator() {
   for (auto &dir : dicts_dirs) {
     dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
   }
@@ -68,7 +69,7 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
   return res;
 }
 
-dict::TranslationChunk dict::YomiTranslator::translateAnyOfSubStr(
+dict::TranslationChunk dict::DictionaryTranslator::translateAnyOfSubStr(
     const std::string &str, size_t begin, size_t count) {
   for (size_t i = std::min(count, MAX_CHUNK_SIZE); i != 0; --i) {
     auto chunk = translateFullSubStr(str, begin, i - begin);
@@ -77,7 +78,7 @@ dict::TranslationChunk dict::YomiTranslator::translateAnyOfSubStr(
   return TranslationChunk{str.substr(begin, count), begin, begin + count - 1};
 }
 
-dict::TranslationChunk dict::YomiTranslator::translateFullSubStr(
+dict::TranslationChunk dict::DictionaryTranslator::translateFullSubStr(
     const std::string &str, size_t begin, size_t count) {
   string str_chunk = str.substr(begin, count);
   TranslationChunk chunk{str_chunk, begin, begin + count - 1};
@@ -113,3 +114,9 @@ dict::TranslationResult dict::DeinflectTranslator::doTranslate(
 }
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 30;
+
+dict::DictionaryTranslator::DictionaryTranslator() {}
+
+void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
+  dicts_.push_back(std::unique_ptr<Dictionary>(dict));
+}

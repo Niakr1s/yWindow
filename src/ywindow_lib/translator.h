@@ -27,24 +27,33 @@ class Translator {
   static size_t MAX_CHUNK_SIZE;
 };
 
-class YomiTranslator : public Translator {
+class DictionaryTranslator : public Translator {
+ public:
+  DictionaryTranslator();
+
+  void addDict(Dictionary* dict);
+
+ protected:
+  std::vector<std::unique_ptr<Dictionary>> dicts_;
+
+  TranslationChunk translateAnyOfSubStr(const std::string& str, size_t begin,
+                                        size_t count);
+  TranslationChunk translateFullSubStr(const std::string& str, size_t begin,
+                                       size_t count);
+};
+
+class YomiTranslator : public DictionaryTranslator {
  public:
   YomiTranslator(const fs::path& root_dir);
   YomiTranslator(std::initializer_list<fs::path> dicts_dirs);
 
  private:
   std::vector<std::future<Dictionary*>> dicts_futures_;
-  std::vector<std::unique_ptr<Dictionary>> dicts_;
 
   void futuresToDicts();
 
  protected:
   TranslationResult doTranslate(const std::string& str, bool all) override;
-
-  TranslationChunk translateAnyOfSubStr(const std::string& str, size_t begin,
-                                        size_t count);
-  TranslationChunk translateFullSubStr(const std::string& str, size_t begin,
-                                       size_t count);
 };
 
 class TranslatorDecorator : public Translator {
