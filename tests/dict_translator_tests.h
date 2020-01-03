@@ -16,7 +16,7 @@ TEST(yomi_translator, test1) {
   auto res = yomi->translate("９日", false);
   ASSERT_EQ(res.orig_text(), "９日");
   ASSERT_EQ(res.chunks().size(), 1);
-  ASSERT_EQ(res.chunks()[0].translations().size(), 2);
+  ASSERT_EQ(res.chunks()[0].translations().size(), 3);
   ASSERT_TRUE(res.chunks()[0].translated());
 }
 
