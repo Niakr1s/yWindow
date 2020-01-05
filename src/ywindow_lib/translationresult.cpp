@@ -24,6 +24,14 @@ const dict::CardPtrMap &dict::TranslationChunk::translations() const {
   return translations_;
 }
 
+dict::CardPtrMap &dict::TranslationChunk::subTranslations() {
+  return sub_translations_;
+}
+
+const dict::CardPtrMap &dict::TranslationChunk::subTranslations() const {
+  return sub_translations_;
+}
+
 dict::TranslationResult::TranslationResult(const dict::string &orig_text)
     : orig_text_(orig_text) {}
 

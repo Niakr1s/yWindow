@@ -74,7 +74,7 @@ dict::TranslationChunk dict::DictionaryTranslator::translateFullSubStr(
     for (auto &dict : dicts_) {
       auto query = dict->query(str_chunk);
       for (auto &card : query) {
-        chunk.translations().insert(card);
+        chunk.subTranslations().insert(card);
       }
     }
   }

@@ -73,6 +73,17 @@ void Display::doDisplayTranslation(const dict::TranslationChunk& translation) {
     translation_display_->append(t.second->dictionaryInfo());
     translation_display_->append("------------");
   }
+
+  // TODO refactor
+  auto sub_tr = translation.subTranslations();
+  for (auto& t : sub_tr) {
+    qDebug() << "appending " << QString::fromStdString(t.second->meaning());
+    translation_display_->append(t.second->name());
+    translation_display_->append(t.second->reading());
+    translation_display_->append(t.second->meaning());
+    translation_display_->append(t.second->dictionaryInfo());
+    translation_display_->append("------------");
+  }
 }
 
 void Display::mouseMoveEvent(QMouseEvent* event) {
