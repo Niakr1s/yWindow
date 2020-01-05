@@ -15,8 +15,6 @@
     translationview.cpp
     textcontroller.h
     textcontroller.cpp
-    yomistyletextmodel.h
-    yomistyletextmodel.cpp
     translationdisplay.h
     translationdisplay.cpp
 )

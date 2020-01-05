@@ -10,10 +10,10 @@
 #include <QVBoxLayout>
 
 #include "textcontroller.h"
+#include "textmodel.h"
 #include "textview.h"
 #include "translationdisplay.h"
 #include "translator.h"
-#include "yomistyletextmodel.h"
 
 Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   settings_.beginGroup(TITLE);

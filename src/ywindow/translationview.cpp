@@ -14,10 +14,6 @@ TranslationView::TranslationView(QWidget *parent) : QTextEdit(parent) {
 
   // TODO merge common settings with Display
 
-  QFont f = font();
-  f.setPixelSize(40);
-  setFont(f);
-
   auto pal = palette();
   pal.setColor(QPalette::Text, Qt::lightGray);
   pal.setColor(QPalette::Base, Qt::black);
