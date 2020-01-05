@@ -66,11 +66,11 @@ void Display::doDisplayTranslation(const dict::TranslationChunk& translation) {
   qDebug() << "got " << tr.size() << " translations";
   translation_display_->clear();
   for (auto& t : tr) {
-    qDebug() << "appending " << QString::fromStdString(t->meaning());
-    translation_display_->append(t->name());
-    translation_display_->append(t->reading());
-    translation_display_->append(t->meaning());
-    translation_display_->append(t->dictionaryInfo());
+    qDebug() << "appending " << QString::fromStdString(t.second->meaning());
+    translation_display_->append(t.second->name());
+    translation_display_->append(t.second->reading());
+    translation_display_->append(t.second->meaning());
+    translation_display_->append(t.second->dictionaryInfo());
     translation_display_->append("------------");
   }
 }

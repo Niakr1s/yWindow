@@ -16,11 +16,11 @@ size_t dict::TranslationChunk::orig_begin() const { return orig_begin_; }
 
 size_t dict::TranslationChunk::orig_end() const { return orig_end_; }
 
-dict::CardPtrList &dict::TranslationChunk::translations() {
+dict::CardPtrMap &dict::TranslationChunk::translations() {
   return translations_;
 }
 
-const dict::CardPtrList &dict::TranslationChunk::translations() const {
+const dict::CardPtrMap &dict::TranslationChunk::translations() const {
   return translations_;
 }
 

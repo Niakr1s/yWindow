@@ -32,13 +32,11 @@ dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 dict::string dict::DefaultCard::name() const { return name_; }
 
 dict::string dict::YomiCard::meaning() const {
-  return boost::join(meanings_, "\n");
+  return boost::join(meanings_, "; ");
 }
 
 dict::string dict::YomiCard::etc() const {
   string res;
-
-  res.append("Tags:\n");
 
   std::vector<string> to_append;
   for (auto& tag : tags_) {
@@ -47,7 +45,7 @@ dict::string dict::YomiCard::etc() const {
     } catch (...) {
     }
   }
-  res.append(boost::join(to_append, "\n"));
+  res.append(boost::join(to_append, "; "));
 
   return res;
 }
@@ -63,8 +61,7 @@ void dict::YomiKanjiCard::setOnReading(const dict::string& reading) {
 }
 
 dict::string dict::YomiKanjiCard::reading() const {
-  return string("Kun reading: " + kun_reading_ +
-                "\nOn reading: " + on_reading_);
+  return string(kun_reading_ + "; " + on_reading_);
 }
 
 dict::YomiTermCard::YomiTermCard(dict::Dictionary* dict) : YomiCard(dict) {}
@@ -73,9 +70,7 @@ void dict::YomiTermCard::setReading(const dict::string& reading) {
   reading_ = reading;
 }
 
-dict::string dict::YomiTermCard::reading() const {
-  return string("Reading: " + reading_);
-}
+dict::string dict::YomiTermCard::reading() const { return string(reading_); }
 
 dict::DeinflectCard::DeinflectCard(dict::Dictionary* dict)
     : DefaultCard(dict),

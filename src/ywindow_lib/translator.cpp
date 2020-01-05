@@ -65,7 +65,7 @@ dict::TranslationChunk dict::DictionaryTranslator::translateFullSubStr(
   for (auto &dict : dicts_) {
     auto query = dict->query(str_chunk);
     for (auto &card : query) {
-      chunk.translations().push_back(card);
+      chunk.translations().insert(card);
     }
   }
   if (!chunk.translated()) return chunk;
@@ -74,7 +74,7 @@ dict::TranslationChunk dict::DictionaryTranslator::translateFullSubStr(
     for (auto &dict : dicts_) {
       auto query = dict->query(str_chunk);
       for (auto &card : query) {
-        chunk.translations().push_back(card);
+        chunk.translations().insert(card);
       }
     }
   }

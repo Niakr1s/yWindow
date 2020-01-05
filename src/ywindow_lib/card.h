@@ -27,6 +27,7 @@ class Card {
  public:
   virtual ~Card();
 
+  // please, separate separate readings by ";"
   virtual string name() const = 0;
   virtual string reading() const = 0;
   virtual string meaning() const = 0;
@@ -112,8 +113,8 @@ class DeinflectCard : public DefaultCard {
   DeinflectDictionary* deinflect_dict_;
 };
 
-using CardPtrMap = std::multimap<string, std::unique_ptr<Card>>;
-using CardPtrList = std::vector<Card*>;
+using CardUniquePtrMap = std::multimap<string, std::unique_ptr<Card>>;
+using CardPtrMap = std::multimap<string, Card*>;
 
 }  // namespace dict
 
