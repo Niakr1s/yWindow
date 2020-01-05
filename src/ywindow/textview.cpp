@@ -8,7 +8,7 @@
 #include "textcontroller.h"
 #include "textmodel.h"
 
-TextView::TextView(QWidget *parent) : QTextEdit(parent) {}
+TextView::TextView(QWidget *parent) : QTextBrowser(parent) {}
 
 TextView::~TextView() {}
 

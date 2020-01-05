@@ -2,11 +2,12 @@
 
 #include <QFont>
 #include <QPalette>
+#include <QTextBrowser>
 #include <QTextEdit>
 
 YStyler::YStyler() {}
 
-void YStyler::appendStyle(QTextEdit *text_edit, int pixel_size) {
+void YStyler::appendStyle(QTextBrowser *text_edit, int pixel_size) {
   text_edit->setAlignment(Qt::AlignTop | Qt::AlignLeft);
   text_edit->setWordWrapMode(QTextOption::WordWrap);
   text_edit->setReadOnly(true);

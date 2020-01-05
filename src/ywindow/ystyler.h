@@ -2,12 +2,13 @@
 #define YSTYLER_H
 
 class QTextEdit;
+class QTextBrowser;
 
 class YStyler {
  public:
   YStyler();
 
-  void appendStyle(QTextEdit* text_edit, int pixel_size);
+  void appendStyle(QTextBrowser* text_edit, int pixel_size);
 };
 
 #endif  // YSTYLER_H

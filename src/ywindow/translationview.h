@@ -1,13 +1,13 @@
 #ifndef TRANSLATIONVIEW_H
 #define TRANSLATIONVIEW_H
 
-#include <QTextEdit>
+#include <QTextBrowser>
 
 #include "translationresult.h"
 
 class TextModel;
 
-class TranslationView : public QTextEdit {
+class TranslationView : public QTextBrowser {
   Q_OBJECT
 
  public:

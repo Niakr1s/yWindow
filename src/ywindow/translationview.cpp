@@ -5,7 +5,7 @@
 
 #include "textmodel.h"
 
-TranslationView::TranslationView(QWidget* parent) : QTextEdit(parent) {
+TranslationView::TranslationView(QWidget* parent) : QTextBrowser(parent) {
   hide();
 }
 

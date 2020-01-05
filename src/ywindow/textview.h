@@ -2,7 +2,7 @@
 #define TEXTVIEW_H
 
 #include <QString>
-#include <QTextEdit>
+#include <QTextBrowser>
 
 #include "card.h"
 #include "translationresult.h"
@@ -10,7 +10,7 @@
 class TextController;
 class TextModel;
 
-class TextView : public QTextEdit {
+class TextView : public QTextBrowser {
   Q_OBJECT
 
  public:
