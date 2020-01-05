@@ -3,8 +3,6 @@
     extension.cpp
     ywindow.h
     ywindow.cpp
-    display.h
-    display.cpp
     status.h
     status.cpp
     textmodel.h

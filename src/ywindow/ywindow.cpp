@@ -55,7 +55,7 @@ void Ywindow::initTextMVC() {
   text_controller_ = new TextController();
   text_controller_->setModel(text_model_);
 
-  text_view_ = new Display(this);
+  text_view_ = new DefaultTextView(this);
   text_view_->setModel(text_model_);
   text_view_->setController(text_controller_);
 

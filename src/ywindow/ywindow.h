@@ -9,7 +9,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "display.h"
 #include "status.h"
 #include "textview.h"
 #include "translationview.h"
@@ -32,7 +31,7 @@ class Ywindow : public QWidget {
   QVBoxLayout* vbox_;
 
   TextModel* text_model_;
-  Display* text_view_;
+  DefaultTextView* text_view_;
   TranslationView* translation_view_;
   TextController* text_controller_;
 
