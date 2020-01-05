@@ -38,14 +38,14 @@ void TranslationView::displayTranslation(
   return doDisplayTranslation(translation, pos);
 }
 
-TranslationDisplay::TranslationDisplay(QWidget* widget)
+DefaultTranslationView::DefaultTranslationView(QWidget* widget)
     : TranslationView(widget) {}
 
-void TranslationDisplay::append(const std::string& str) {
+void DefaultTranslationView::append(const std::string& str) {
   return QTextEdit::append(QString::fromStdString(str));
 }
 
-void TranslationDisplay::doDisplayTranslation(
+void DefaultTranslationView::doDisplayTranslation(
     const dict::TranslationChunk& translation, QPoint pos) {
   qDebug() << "TranslationDisplay: got pos " << pos << "height " << height();
   pos.setY(pos.y() - height());

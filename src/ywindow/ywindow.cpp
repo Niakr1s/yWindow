@@ -58,7 +58,7 @@ void Ywindow::initTextMVC() {
   text_view_->setModel(text_model_);
   text_view_->setController(text_controller_);
 
-  translation_view_ = new TranslationDisplay();
+  translation_view_ = new DefaultTranslationView();
   translation_view_->setModel(text_model_);
 }
 

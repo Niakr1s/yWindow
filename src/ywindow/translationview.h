@@ -28,9 +28,9 @@ class TranslationView : public QTextEdit {
                                     QPoint pos) = 0;
 };
 
-class TranslationDisplay : public TranslationView {
+class DefaultTranslationView : public TranslationView {
  public:
-  TranslationDisplay(QWidget* widget = nullptr);
+  DefaultTranslationView(QWidget* widget = nullptr);
 
   void append(const std::string& str);
 
