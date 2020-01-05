@@ -9,9 +9,7 @@
 
 #include "textmodel.h"
 
-Display::Display(QWidget* parent)
-    : TextView(parent),
-      translation_display_(std::make_unique<TranslationDisplay>()) {
+Display::Display(QWidget* parent) : TextView(parent) {
   setAlignment(Qt::AlignTop | Qt::AlignLeft);
   setWordWrapMode(QTextOption::WordWrap);
   setReadOnly(true);
@@ -31,8 +29,6 @@ Display::Display(QWidget* parent)
   pal.setColor(QPalette::Base, Qt::black);
   pal.setColor(QPalette::Window, Qt::black);
   setPalette(pal);
-
-  translation_display_->show();
 }
 
 void Display::doDisplayText() {
@@ -60,38 +56,16 @@ void Display::doDisplayText() {
   scrollToAnchor(anchor_);
 }
 
-void Display::doDisplayTranslation(const dict::TranslationChunk& translation) {
-  auto tr = translation.translations();
-  qDebug() << "got " << tr.size() << " translations";
-  translation_display_->clear();
-  for (auto& t : tr) {
-    qDebug() << "appending " << QString::fromStdString(t.second->meaning());
-    translation_display_->append(t.second->name());
-    translation_display_->append(t.second->reading());
-    translation_display_->append(t.second->meaning());
-    translation_display_->append(t.second->dictionaryInfo());
-    translation_display_->append("------------");
-  }
-
-  // TODO refactor
-  auto sub_tr = translation.subTranslations();
-  for (auto& t : sub_tr) {
-    qDebug() << "appending " << QString::fromStdString(t.second->meaning());
-    translation_display_->append(t.second->name());
-    translation_display_->append(t.second->reading());
-    translation_display_->append(t.second->meaning());
-    translation_display_->append(t.second->dictionaryInfo());
-    translation_display_->append("------------");
-  }
-}
-
 void Display::mouseMoveEvent(QMouseEvent* event) {
-  int pos = cursorForPosition(event->pos()).position();
+  auto curs = cursorForPosition(event->pos());
+  int col = curs.position();
+  auto pos = cursorRect(curs).topLeft();
+  pos = mapToGlobal(pos);
   try {
-    auto new_line_and_pos = posToLineAndPos(pos);
+    auto new_line_and_pos = posToLineAndPos(col);
     if (new_line_and_pos != last_line_and_pos_) {
-      emit charHovered(new_line_and_pos);
       qDebug() << "mouse hovered: " << new_line_and_pos;
+      emit charHovered(new_line_and_pos, pos);
       last_line_and_pos_ = new_line_and_pos;
       event->accept();
     }

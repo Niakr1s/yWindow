@@ -11,6 +11,7 @@
 
 #include "textcontroller.h"
 #include "textview.h"
+#include "translationdisplay.h"
 #include "translator.h"
 #include "yomistyletextmodel.h"
 
@@ -57,6 +58,9 @@ void Ywindow::initTextMVC() {
   text_view_ = new Display(this);
   text_view_->setModel(text_model_);
   text_view_->setController(text_controller_);
+
+  translation_view_ = new TranslationDisplay();
+  translation_view_->setModel(text_model_);
 }
 
 void Ywindow::resizeEvent(QResizeEvent *event) {

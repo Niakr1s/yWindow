@@ -11,6 +11,8 @@
     textmodel.cpp
     textview.h
     textview.cpp
+    translationview.h
+    translationview.cpp
     textcontroller.h
     textcontroller.cpp
     yomistyletextmodel.h

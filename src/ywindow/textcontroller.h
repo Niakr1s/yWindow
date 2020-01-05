@@ -2,6 +2,7 @@
 #define TEXTCONTROLLER_H
 
 #include <QObject>
+#include <QPoint>
 #include <QString>
 #include <string>
 
@@ -21,7 +22,7 @@ class TextController : public QObject {
 
  signals:
   void newText(QString);
-  void posChanged(std::pair<int, int> line_and_col);
+  void charChanged(std::pair<int, int> line_and_col, QPoint pos);
 
  protected:
   TextModel* model_;

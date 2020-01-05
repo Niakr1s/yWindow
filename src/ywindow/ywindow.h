@@ -12,6 +12,7 @@
 #include "display.h"
 #include "status.h"
 #include "textview.h"
+#include "translationview.h"
 
 class Ywindow : public QWidget {
   Q_OBJECT
@@ -32,6 +33,7 @@ class Ywindow : public QWidget {
 
   TextModel* text_model_;
   Display* text_view_;
+  TranslationView* translation_view_;
   TextController* text_controller_;
 
   void initWindow();

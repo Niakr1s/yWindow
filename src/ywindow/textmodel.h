@@ -2,6 +2,7 @@
 #define TEXTMODEL_H
 
 #include <QObject>
+#include <QPoint>
 
 #include "card.h"
 #include "translationresult.h"
@@ -17,10 +18,10 @@ class TextModel : public QObject {
 
  signals:
   void textChanged();
-  void gotTranslation(dict::TranslationChunk);
+  void gotTranslation(dict::TranslationChunk, QPoint pos);
 
  public slots:
-  void translate(std::pair<int, int> line_and_col);
+  void translate(std::pair<int, int> line_and_col, QPoint pos);
   void addText(QString text);
 
  protected:
