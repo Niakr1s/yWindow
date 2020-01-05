@@ -7,6 +7,7 @@ namespace dict {
 
 class TranslationChunk {
  public:
+  TranslationChunk();
   TranslationChunk(const string& text, size_t orig_begin, size_t orig_end);
 
   string text() const;

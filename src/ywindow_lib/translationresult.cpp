@@ -6,6 +6,8 @@ bool dict::TranslationChunk::translated() const {
   return !translations_.empty();
 }
 
+dict::TranslationChunk::TranslationChunk() : TranslationChunk("", 0, 0) {}
+
 dict::TranslationChunk::TranslationChunk(const string &text, size_t orig_begin,
                                          size_t orig_end)
     : text_(text), orig_begin_(orig_begin), orig_end_(orig_end) {}

@@ -38,6 +38,9 @@ class DefaultTranslationView : public TranslationView {
   void doDisplayTranslation(const dict::TranslationChunk& translation,
                             QPoint pos) override;
   void leaveEvent(QEvent* event) override;
+
+ private:
+  dict::TranslationChunk translation_;
 };
 
 #endif  // TRANSLATIONVIEW_H

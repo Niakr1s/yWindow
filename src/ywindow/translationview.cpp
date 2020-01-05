@@ -38,11 +38,12 @@ void DefaultTranslationView::append(const std::string& str) {
 
 void DefaultTranslationView::doDisplayTranslation(
     const dict::TranslationChunk& translation, QPoint pos) {
+  translation_ = translation;
   qDebug() << "TranslationDisplay: got pos " << pos << "height " << height();
   pos.setY(pos.y() - height());
   move(pos);
 
-  auto tr = translation.translations();
+  auto tr = translation_.translations();
   qDebug() << "got " << tr.size() << " translations";
   clear();
   for (auto& t : tr) {
@@ -54,7 +55,7 @@ void DefaultTranslationView::doDisplayTranslation(
   }
 
   // TODO refactor
-  auto sub_tr = translation.subTranslations();
+  auto sub_tr = translation_.subTranslations();
   for (auto& t : sub_tr) {
     append(t.second->name());
     append(t.second->reading());
