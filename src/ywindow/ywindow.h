@@ -11,6 +11,7 @@
 
 #include "display.h"
 #include "status.h"
+#include "textview.h"
 
 class Ywindow : public QWidget {
   Q_OBJECT
@@ -19,22 +20,26 @@ class Ywindow : public QWidget {
   ~Ywindow() override;
 
  public slots:
-  void insertText(QString text);
+  void newText(QString text);  // entry point
 
  private:
   QSettings settings_{"Textractor.ini", QSettings::IniFormat, this};
   Status* status_;
 
-  QVBoxLayout* vbox_;
-  Display* display_;
-
-  void initWindow();
-
   const QString TITLE = "yWindow";
 
-  void saveSettings();
+  QVBoxLayout* vbox_;
 
-  void insertEndl(int count);
+  TextModel* text_model_;
+  Display* text_view_;
+  TextController* text_controller_;
+
+  void initWindow();
+  void saveSettings();
+  void initTextMVC();
+
+  void resizeEvent(QResizeEvent* event) override;
+  void fitToTextView();
 };
 
 #endif  // YWINDOW_H

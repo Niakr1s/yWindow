@@ -7,6 +7,14 @@
     display.cpp
     status.h
     status.cpp
+    textmodel.h
+    textmodel.cpp
+    textview.h
+    textview.cpp
+    textcontroller.h
+    textcontroller.cpp
+    yomistyletextmodel.h
+    yomistyletextmodel.cpp
 )
 
 set(CMAKE_AUTOMOC ON)

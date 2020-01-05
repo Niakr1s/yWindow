@@ -41,7 +41,7 @@ bool ProcessSentence(std::wstring& sentence, SentenceInfo sentenceInfo) {
   if (sentenceInfo["current select"] && sentenceInfo["text number"] != 0)
     QMetaObject::invokeMethod(ywindow,
                               [sentence = QString::fromStdWString(sentence)] {
-                                ywindow->insertText(sentence);
+                                ywindow->newText(sentence);
                               });
   return false;
 }

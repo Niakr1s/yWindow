@@ -9,6 +9,10 @@
 #include <QTextBlock>
 #include <QVBoxLayout>
 
+#include "textcontroller.h"
+#include "textview.h"
+#include "yomistyletextmodel.h"
+
 Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   settings_.beginGroup(TITLE);
 
@@ -17,8 +21,8 @@ Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   vbox_ = new QVBoxLayout(this);
   vbox_->setMargin(0);
 
-  display_ = new Display(this);
-  vbox_->addWidget(display_);
+  initTextMVC();
+  vbox_->addWidget(text_view_);
 
   status_ = new Status(this);
   vbox_->addWidget(status_);
@@ -26,13 +30,7 @@ Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
 
 Ywindow::~Ywindow() { saveSettings(); }
 
-void Ywindow::insertText(QString text) { return display_->insertText(text); }
-
-void Ywindow::insertEndl(int count) {
-  while (count--) {
-    display_->insertPlainText("\n");
-  }
-}
+void Ywindow::newText(QString text) { return text_controller_->addText(text); }
 
 void Ywindow::initWindow() {
   setWindowTitle(TITLE);
@@ -48,3 +46,27 @@ void Ywindow::initWindow() {
 }
 
 void Ywindow::saveSettings() { settings_.setValue("geometry", geometry()); }
+
+void Ywindow::initTextMVC() {
+  text_model_ = new YomiStyleTextModel();
+
+  text_controller_ = new TextController();
+  text_controller_->setModel(text_model_);
+
+  text_view_ = new Display(this);
+  text_view_->setModel(text_model_);
+  text_view_->setController(text_controller_);
+}
+
+void Ywindow::resizeEvent(QResizeEvent *event) {
+  fitToTextView();
+  event->accept();
+}
+
+void Ywindow::fitToTextView() {
+  int font_h = text_view_->fontHeight();
+  auto sz = size();
+  auto diff_h = sz.height() - text_view_->height();
+  sz.setHeight((text_view_->height() / font_h) * font_h + diff_h);
+  resize(sz);
+}
