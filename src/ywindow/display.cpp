@@ -91,7 +91,7 @@ void Display::mouseMoveEvent(QMouseEvent* event) {
   try {
     auto new_line_and_pos = posToLineAndPos(pos);
     if (new_line_and_pos != last_line_and_pos_) {
-      emit mouseHovered(new_line_and_pos);
+      emit charHovered(new_line_and_pos);
       qDebug() << "mouse hovered: " << new_line_and_pos;
       last_line_and_pos_ = new_line_and_pos;
       event->accept();

@@ -23,7 +23,7 @@ class TextView : public QObject {
   virtual int fontHeight() = 0;
 
  signals:
-  void mouseHovered(std::pair<int, int> line_and_col);
+  void charHovered(std::pair<int, int> line_and_col);
 
  public slots:
   void displayText();

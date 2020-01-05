@@ -9,7 +9,7 @@ TextView::~TextView() {}
 
 void TextView::setController(TextController *controller) {
   controller_ = controller;
-  connect(this, &TextView::mouseHovered, controller_,
+  connect(this, &TextView::charHovered, controller_,
           &TextController::posChanged);
 }
 
