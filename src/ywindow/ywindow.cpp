@@ -13,6 +13,7 @@
 #include "textmodel.h"
 #include "textview.h"
 #include "translator.h"
+#include "ystyler.h"
 
 Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   settings_.beginGroup(TITLE);
@@ -60,6 +61,10 @@ void Ywindow::initTextMVC() {
 
   translation_view_ = new DefaultTranslationView();
   translation_view_->setModel(text_model_);
+
+  Ystyler ystyler;
+  ystyler.appendStyle(text_view_, 40);
+  ystyler.appendStyle(translation_view_, 12);
 }
 
 void Ywindow::resizeEvent(QResizeEvent *event) {

@@ -27,27 +27,7 @@ void TextView::displayText() { return doDisplayText(); }
 
 #include "textmodel.h"
 
-DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
-  setAlignment(Qt::AlignTop | Qt::AlignLeft);
-  setWordWrapMode(QTextOption::WordWrap);
-  setReadOnly(true);
-  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  viewport()->setCursor(QCursor(Qt::ArrowCursor));
-  setFrameStyle(QFrame::NoFrame);
-  setMouseTracking(true);
-  resize(parent->size());
-
-  QFont f = font();
-  f.setPixelSize(40);
-  setFont(f);
-
-  auto pal = palette();
-  pal.setColor(QPalette::Text, Qt::lightGray);
-  pal.setColor(QPalette::Base, Qt::black);
-  pal.setColor(QPalette::Window, Qt::black);
-  setPalette(pal);
-}
+DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {}
 
 void DefaultTextView::doDisplayText() {
   auto list = model_->getText();
