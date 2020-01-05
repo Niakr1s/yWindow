@@ -13,8 +13,6 @@
     translationview.cpp
     textcontroller.h
     textcontroller.cpp
-    translationdisplay.h
-    translationdisplay.cpp
 )
 
 set(CMAKE_AUTOMOC ON)

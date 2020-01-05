@@ -28,4 +28,15 @@ class TranslationView : public QTextEdit {
                                     QPoint pos) = 0;
 };
 
+class TranslationDisplay : public TranslationView {
+ public:
+  TranslationDisplay(QWidget* widget = nullptr);
+
+  void append(const std::string& str);
+
+ protected:
+  void doDisplayTranslation(const dict::TranslationChunk& translation,
+                            QPoint pos) override;
+};
+
 #endif  // TRANSLATIONVIEW_H

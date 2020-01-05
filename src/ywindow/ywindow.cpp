@@ -12,7 +12,6 @@
 #include "textcontroller.h"
 #include "textmodel.h"
 #include "textview.h"
-#include "translationdisplay.h"
 #include "translator.h"
 
 Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
