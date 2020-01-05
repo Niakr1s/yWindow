@@ -13,11 +13,11 @@
 #include "textview.h"
 #include "translationview.h"
 
-class Ywindow : public QWidget {
+class YWindow : public QWidget {
   Q_OBJECT
  public:
-  Ywindow(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-  ~Ywindow() override;
+  YWindow(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  ~YWindow() override;
 
  public slots:
   void newText(QString text);  // entry point

@@ -15,7 +15,7 @@
 #include "translator.h"
 #include "ystyler.h"
 
-Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
+YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   settings_.beginGroup(TITLE);
 
   initWindow();
@@ -30,11 +30,11 @@ Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   vbox_->addWidget(status_);
 }
 
-Ywindow::~Ywindow() { saveSettings(); }
+YWindow::~YWindow() { saveSettings(); }
 
-void Ywindow::newText(QString text) { return text_controller_->addText(text); }
+void YWindow::newText(QString text) { return text_controller_->addText(text); }
 
-void Ywindow::initWindow() {
+void YWindow::initWindow() {
   setWindowTitle(TITLE);
   //  setWindowFlags(Qt::FramelessWindowHint);
 
@@ -47,9 +47,9 @@ void Ywindow::initWindow() {
   setStyleSheet("background: black; color: lightGray;");
 }
 
-void Ywindow::saveSettings() { settings_.setValue("geometry", geometry()); }
+void YWindow::saveSettings() { settings_.setValue("geometry", geometry()); }
 
-void Ywindow::initTextMVC() {
+void YWindow::initTextMVC() {
   text_model_ = new YomiStyleTextModel(new dict::YomiTranslator("yomi_dicts"));
 
   text_controller_ = new TextController();
@@ -62,17 +62,17 @@ void Ywindow::initTextMVC() {
   translation_view_ = new DefaultTranslationView();
   translation_view_->setModel(text_model_);
 
-  Ystyler ystyler;
+  YStyler ystyler;
   ystyler.appendStyle(text_view_, 40);
   ystyler.appendStyle(translation_view_, 12);
 }
 
-void Ywindow::resizeEvent(QResizeEvent *event) {
+void YWindow::resizeEvent(QResizeEvent *event) {
   fitToTextView();
   event->accept();
 }
 
-void Ywindow::fitToTextView() {
+void YWindow::fitToTextView() {
   int font_h = text_view_->fontHeight();
   auto sz = size();
   auto diff_h = sz.height() - text_view_->height();

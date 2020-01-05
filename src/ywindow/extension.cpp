@@ -5,13 +5,13 @@
 
 #include "ywindow.h"
 
-static Ywindow* ywindow;
+static YWindow* ywindow;
 
 BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call,
                     LPVOID lpReserved) {
   switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
-      ywindow = new Ywindow();
+      ywindow = new YWindow();
       QMetaObject::invokeMethod(
           ywindow, [] { ywindow->show(); }, Qt::QueuedConnection);
       //      MessageBoxW(NULL, L"Extension Loaded", L"Example", MB_OK);

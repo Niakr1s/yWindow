@@ -3,9 +3,9 @@
 
 class QTextEdit;
 
-class Ystyler {
+class YStyler {
  public:
-  Ystyler();
+  YStyler();
 
   void appendStyle(QTextEdit* text_edit, int pixel_size);
 };
