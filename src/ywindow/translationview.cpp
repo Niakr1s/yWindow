@@ -30,7 +30,9 @@ void DefaultTranslationView::leaveEvent(QEvent* event) {
 }
 
 DefaultTranslationView::DefaultTranslationView(QWidget* widget)
-    : TranslationView(widget) {}
+    : TranslationView(widget) {
+  resize(400, 200);
+}
 
 void DefaultTranslationView::append(const std::string& str) {
   return QTextEdit::append(QString::fromStdString(str));
@@ -38,6 +40,9 @@ void DefaultTranslationView::append(const std::string& str) {
 
 void DefaultTranslationView::doDisplayTranslation(
     const dict::TranslationChunk& translation, QPoint pos) {
+  if (!translation.translated()) {
+    return;
+  }
   translation_ = translation;
   qDebug() << "TranslationDisplay: got pos " << pos << "height " << height();
   pos.setY(pos.y() - height());
@@ -63,5 +68,6 @@ void DefaultTranslationView::doDisplayTranslation(
     append(t.second->dictionaryInfo());
     append("------------");
   }
+  moveCursor(QTextCursor::Start);
   show();
 }
