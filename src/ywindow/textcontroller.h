@@ -21,7 +21,7 @@ class TextController : public QObject {
 
  signals:
   void newText(QString);
-  void posChanged(int pos);
+  void posChanged(std::pair<int, int> line_and_col);
 
  protected:
   TextModel* model_;

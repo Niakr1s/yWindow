@@ -20,6 +20,10 @@ dict::CardPtrList &dict::TranslationChunk::translations() {
   return translations_;
 }
 
+const dict::CardPtrList &dict::TranslationChunk::translations() const {
+  return translations_;
+}
+
 dict::TranslationResult::TranslationResult(const dict::string &orig_text)
     : orig_text_(orig_text) {}
 

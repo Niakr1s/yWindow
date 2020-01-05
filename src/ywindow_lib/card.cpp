@@ -42,9 +42,10 @@ dict::string dict::YomiCard::etc() const {
 
   std::vector<string> to_append;
   for (auto& tag : tags_) {
-    to_append.push_back(
-        tag + ": " +
-        dynamic_cast<YomiDictionary*>(dict_)->tags().at(tag).description);
+    try {
+      to_append.push_back(tag + ": " + yomi_dict_->tags().at(tag).description);
+    } catch (...) {
+    }
   }
   res.append(boost::join(to_append, "\n"));
 

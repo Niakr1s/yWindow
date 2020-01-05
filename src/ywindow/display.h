@@ -4,6 +4,8 @@
 #include <QTextEdit>
 
 #include "textview.h"
+#include "translationdisplay.h"
+#include "translationresult.h"
 
 class Display : public TextView, public QTextEdit {
  public:
@@ -20,11 +22,12 @@ class Display : public TextView, public QTextEdit {
 
  protected:
   void doDisplayText() override;
-  void doDisplayTranslation(const dict::CardPtrList &translation) override;
+  void doDisplayTranslation(const dict::TranslationChunk &translation) override;
 
   void mouseMoveEvent(QMouseEvent *event) override;
 
  private:
+  std::unique_ptr<TranslationDisplay> translation_display_;
   QStringList current_text_;
   std::pair<int, int> last_line_and_pos_ = {-1, -1};
 

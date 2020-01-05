@@ -15,6 +15,8 @@
     textcontroller.cpp
     yomistyletextmodel.h
     yomistyletextmodel.cpp
+    translationdisplay.h
+    translationdisplay.cpp
 )
 
 set(CMAKE_AUTOMOC ON)

@@ -9,7 +9,10 @@
 
 #include "textmodel.h"
 
-Display::Display(QWidget* widg, QObject* obj) : TextView(obj), QTextEdit(widg) {
+Display::Display(QWidget* widg, QObject* obj)
+    : TextView(obj),
+      QTextEdit(widg),
+      translation_display_(std::make_unique<TranslationDisplay>()) {
   setAlignment(Qt::AlignTop | Qt::AlignLeft);
   setWordWrapMode(QTextOption::WordWrap);
   setReadOnly(true);
@@ -29,6 +32,8 @@ Display::Display(QWidget* widg, QObject* obj) : TextView(obj), QTextEdit(widg) {
   pal.setColor(QPalette::Base, Qt::black);
   pal.setColor(QPalette::Window, Qt::black);
   setPalette(pal);
+
+  translation_display_->show();
 }
 
 void Display::doDisplayText() {
@@ -56,14 +61,26 @@ void Display::doDisplayText() {
   scrollToAnchor(anchor_);
 }
 
-void Display::doDisplayTranslation(const dict::CardPtrList& translation) {}
+void Display::doDisplayTranslation(const dict::TranslationChunk& translation) {
+  auto tr = translation.translations();
+  qDebug() << "got " << tr.size() << " translations";
+  translation_display_->clear();
+  for (auto& t : tr) {
+    qDebug() << "appending " << QString::fromStdString(t->meaning());
+    translation_display_->append(t->name());
+    translation_display_->append(t->reading());
+    translation_display_->append(t->meaning());
+    translation_display_->append(t->dictionaryInfo());
+    translation_display_->append("------------");
+  }
+}
 
 void Display::mouseMoveEvent(QMouseEvent* event) {
   int pos = cursorForPosition(event->pos()).position();
   try {
     auto new_line_and_pos = posToLineAndPos(pos);
     if (new_line_and_pos != last_line_and_pos_) {
-      emit mouseHovered(pos);
+      emit mouseHovered(new_line_and_pos);
       qDebug() << "mouse hovered: " << new_line_and_pos;
       last_line_and_pos_ = new_line_and_pos;
       event->accept();

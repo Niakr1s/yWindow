@@ -11,6 +11,7 @@
 
 #include "textcontroller.h"
 #include "textview.h"
+#include "translator.h"
 #include "yomistyletextmodel.h"
 
 Ywindow::Ywindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
@@ -34,7 +35,7 @@ void Ywindow::newText(QString text) { return text_controller_->addText(text); }
 
 void Ywindow::initWindow() {
   setWindowTitle(TITLE);
-  setWindowFlags(Qt::FramelessWindowHint);
+  //  setWindowFlags(Qt::FramelessWindowHint);
 
   if (settings_.contains("geometry")) {
     setGeometry(settings_.value("geometry").toRect());
@@ -48,7 +49,7 @@ void Ywindow::initWindow() {
 void Ywindow::saveSettings() { settings_.setValue("geometry", geometry()); }
 
 void Ywindow::initTextMVC() {
-  text_model_ = new YomiStyleTextModel();
+  text_model_ = new YomiStyleTextModel(new dict::YomiTranslator("yomi_dicts"));
 
   text_controller_ = new TextController();
   text_controller_->setModel(text_model_);

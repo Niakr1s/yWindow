@@ -8,11 +8,8 @@ TextModel::~TextModel() {}
 
 QStringList TextModel::getText() { return doGetText(); }
 
-void TextModel::translate(int pos) {
-  if (pos == current_pos_) {
-    return;
-  }
-  emit gotTranslation(doTranslate(pos));
+void TextModel::translate(std::pair<int, int> line_and_col) {
+  emit gotTranslation(doTranslate(line_and_col));
 }
 
 void TextModel::addText(QString text) {

@@ -22,6 +22,6 @@ void TextView::setModel(TextModel *model) {
 
 void TextView::displayText() { return doDisplayText(); }
 
-void TextView::displayTranslation(dict::CardPtrList translation) {
+void TextView::displayTranslation(dict::TranslationChunk translation) {
   return doDisplayTranslation(translation);
 }

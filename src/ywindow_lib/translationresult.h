@@ -17,6 +17,7 @@ class TranslationChunk {
   bool translated() const;
 
   CardPtrList& translations();
+  const CardPtrList& translations() const;
 
  private:
   string text_;

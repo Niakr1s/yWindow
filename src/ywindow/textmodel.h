@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "card.h"
+#include "translationresult.h"
 
 class TextModel : public QObject {
   Q_OBJECT
@@ -16,17 +17,18 @@ class TextModel : public QObject {
 
  signals:
   void textChanged();
-  void gotTranslation(dict::CardPtrList);
+  void gotTranslation(dict::TranslationChunk);
 
  public slots:
-  void translate(int pos);
+  void translate(std::pair<int, int> line_and_col);
   void addText(QString text);
 
  protected:
   int current_pos_ = -1;
 
   virtual QStringList doGetText() = 0;
-  virtual dict::CardPtrList doTranslate(int pos) = 0;
+  virtual dict::TranslationChunk doTranslate(
+      std::pair<int, int> line_and_col) = 0;
   virtual void doAddText(const QString& text) = 0;
 };
 
