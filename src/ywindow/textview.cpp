@@ -3,7 +3,7 @@
 #include "textcontroller.h"
 #include "textmodel.h"
 
-TextView::TextView(QObject *parent) : QObject(parent) {}
+TextView::TextView(QWidget *parent) : QTextEdit(parent) {}
 
 TextView::~TextView() {}
 

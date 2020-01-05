@@ -1,8 +1,8 @@
 #ifndef TEXTVIEW_H
 #define TEXTVIEW_H
 
-#include <QObject>
 #include <QString>
+#include <QTextEdit>
 
 #include "card.h"
 #include "translationresult.h"
@@ -10,11 +10,11 @@
 class TextController;
 class TextModel;
 
-class TextView : public QObject {
+class TextView : public QTextEdit {
   Q_OBJECT
 
  public:
-  TextView(QObject* parent = nullptr);
+  TextView(QWidget* parent = nullptr);
   virtual ~TextView();
 
   void setController(TextController* controller);

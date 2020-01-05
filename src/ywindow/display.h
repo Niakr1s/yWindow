@@ -7,9 +7,9 @@
 #include "translationdisplay.h"
 #include "translationresult.h"
 
-class Display : public TextView, public QTextEdit {
+class Display : public TextView {
  public:
-  Display(QWidget *widg = nullptr, QObject *obj = nullptr);
+  Display(QWidget *parent = nullptr);
 
   class WrongPosException : public std::exception {
     using std::exception::exception;

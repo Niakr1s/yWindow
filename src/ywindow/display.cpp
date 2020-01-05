@@ -9,9 +9,8 @@
 
 #include "textmodel.h"
 
-Display::Display(QWidget* widg, QObject* obj)
-    : TextView(obj),
-      QTextEdit(widg),
+Display::Display(QWidget* parent)
+    : TextView(parent),
       translation_display_(std::make_unique<TranslationDisplay>()) {
   setAlignment(Qt::AlignTop | Qt::AlignLeft);
   setWordWrapMode(QTextOption::WordWrap);
@@ -21,7 +20,7 @@ Display::Display(QWidget* widg, QObject* obj)
   viewport()->setCursor(QCursor(Qt::ArrowCursor));
   setFrameStyle(QFrame::NoFrame);
   setMouseTracking(true);
-  resize(widg->size());
+  resize(parent->size());
 
   QFont f = font();
   f.setPixelSize(40);
