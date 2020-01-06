@@ -61,14 +61,14 @@ void DefaultTextView::doDisplayText() {
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto curs = cursorForPosition(event->pos());
   auto current_col = curs.position();
-  if (current_col != prev_hovered_col_) {
+  if (current_col != last_hovered_col_) {
     highlighter_->reset();
-    prev_hovered_col_ = current_col;
+    last_hovered_col_ = current_col;
   }
   auto pos = cursorRect(curs).topLeft();
   pos = mapToGlobal(pos);
   try {
-    auto new_line_and_pos = posToLineAndPos(prev_hovered_col_);
+    auto new_line_and_pos = posToLineAndPos(last_hovered_col_);
     if (new_line_and_pos != last_line_and_pos_) {
       qDebug() << "mouse hovered: " << new_line_and_pos;
       emit charHovered(new_line_and_pos, pos);
@@ -86,7 +86,7 @@ int DefaultTextView::fontHeight() {
 }
 
 void DefaultTextView::highlightTranslated(int length) {
-  highlighter_->highlightSubstr(document(), prev_hovered_col_, length);
+  highlighter_->highlightSubstr(document(), last_hovered_col_, length);
 }
 
 int DefaultTextView::rowsAvailable() {
