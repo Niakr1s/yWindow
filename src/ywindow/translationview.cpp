@@ -71,23 +71,6 @@ void DefaultTranslationView::doDisplayTranslation(
 
   setHtml(QString::fromStdString(converter_->convert(translation)));
 
-  //  for (auto& t : tr) {
-  //    append(t.second->name());
-  //    append(t.second->reading());
-  //    append(t.second->meaning());
-  //    append(t.second->dictionaryInfo());
-  //    append("------------");
-  //  }
-
-  //  // TODO refactor
-  //  auto sub_tr = translation_.subTranslations();
-  //  for (auto& t : sub_tr) {
-  //    append(t.second->name());
-  //    append(t.second->reading());
-  //    append(t.second->meaning());
-  //    append(t.second->dictionaryInfo());
-  //    append("------------");
-  //  }
   moveCursor(QTextCursor::Start);
   show();
 }
