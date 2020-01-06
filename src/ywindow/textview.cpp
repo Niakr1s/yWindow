@@ -21,13 +21,17 @@ void TextView::setController(TextController *controller) {
 void TextView::setModel(TextModel *model) {
   model_ = model;
   connect(model_, &TextModel::textChanged, this, &TextView::displayText);
+  connect(model_, &TextModel::gotTranslationLength, this,
+          &TextView::highlightTranslated);
 }
 
 void TextView::displayText() { return doDisplayText(); }
 
 #include "textmodel.h"
 
-DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {}
+DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
+  highlighter_ = new HoverSyntaxHighlighter(document());
+}
 
 void DefaultTextView::doDisplayText() {
   auto list = model_->getText();
@@ -56,11 +60,15 @@ void DefaultTextView::doDisplayText() {
 
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto curs = cursorForPosition(event->pos());
-  int col = curs.position();
+  auto current_col = curs.position();
+  if (current_col != prev_hovered_col_) {
+    highlighter_->reset();
+    prev_hovered_col_ = current_col;
+  }
   auto pos = cursorRect(curs).topLeft();
   pos = mapToGlobal(pos);
   try {
-    auto new_line_and_pos = posToLineAndPos(col);
+    auto new_line_and_pos = posToLineAndPos(prev_hovered_col_);
     if (new_line_and_pos != last_line_and_pos_) {
       qDebug() << "mouse hovered: " << new_line_and_pos;
       emit charHovered(new_line_and_pos, pos);
@@ -75,6 +83,10 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
 int DefaultTextView::fontHeight() {
   QFontMetrics fm(font());
   return fm.height();
+}
+
+void DefaultTextView::highlightTranslated(int length) {
+  highlighter_->highlightSubstr(document(), prev_hovered_col_, length);
 }
 
 int DefaultTextView::rowsAvailable() {

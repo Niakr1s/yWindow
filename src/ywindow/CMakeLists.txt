@@ -15,6 +15,8 @@
     textcontroller.cpp
     ystyler.h
     ystyler.cpp
+    hoversyntaxhighlighter.h
+    hoversyntaxhighlighter.cpp
 )
 
 set(CMAKE_AUTOMOC ON)

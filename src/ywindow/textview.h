@@ -5,6 +5,7 @@
 #include <QTextBrowser>
 
 #include "card.h"
+#include "hoversyntaxhighlighter.h"
 #include "translationresult.h"
 
 class TextController;
@@ -27,6 +28,7 @@ class TextView : public QTextBrowser {
 
  public slots:
   void displayText();
+  virtual void highlightTranslated(int length) = 0;
 
  protected:
   TextController* controller_;
@@ -36,6 +38,8 @@ class TextView : public QTextBrowser {
 };
 
 class DefaultTextView : public TextView {
+  Q_OBJECT
+
  public:
   DefaultTextView(QWidget* parent = nullptr);
 
@@ -44,6 +48,9 @@ class DefaultTextView : public TextView {
   };
 
   int fontHeight() override;
+
+ public slots:
+  void highlightTranslated(int length) override;
 
  private:
   const QString anchor_ = "last";
@@ -56,6 +63,8 @@ class DefaultTextView : public TextView {
  private:
   QStringList current_text_;
   std::pair<int, int> last_line_and_pos_ = {-1, -1};
+  HoverSyntaxHighlighter* highlighter_;
+  int prev_hovered_col_ = -1;
 
   int rowsAvailable();
   std::pair<int, int> posToLineAndPos(int pos);

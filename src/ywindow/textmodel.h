@@ -23,6 +23,7 @@ class TextModel : public QObject {
  signals:
   void textChanged();
   void gotTranslation(dict::TranslationChunk, QPoint pos);
+  void gotTranslationLength(int);
 
  public slots:
   void translate(std::pair<int, int> line_and_col, QPoint pos);
