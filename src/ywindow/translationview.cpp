@@ -1,6 +1,8 @@
 #include "translationview.h"
 
+#include <QApplication>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QTimer>
 
@@ -9,6 +11,7 @@
 
 TranslationView::TranslationView(QWidget* parent) : QTextBrowser(parent) {
   hide();
+  setMaximumHeight(400);
 }
 
 TranslationView::~TranslationView() {}
@@ -24,9 +27,9 @@ void TranslationView::setModel(TextModel* model) {
 void TranslationView::move(QPoint pos) { return QWidget::move(pos); }
 
 void TranslationView::displayTranslation(
-    const dict::TranslationChunk& translation, QPoint pos) {
+    const dict::TranslationChunk& translation, QPoint point) {
   active_ = true;
-  return doDisplayTranslation(translation, pos);
+  return doDisplayTranslation(translation, point);
 }
 
 void TranslationView::cancelTranslation() {
@@ -59,19 +62,23 @@ void DefaultTranslationView::tryHideOnTimer() {
 }
 
 void DefaultTranslationView::doDisplayTranslation(
-    const dict::TranslationChunk& translation, QPoint pos) {
+    const dict::TranslationChunk& translation, QPoint point) {
   translation_ = translation;
-  qDebug() << "TranslationDisplay: got pos " << pos << "height " << height();
-  pos.setY(pos.y() - height());
-  move(pos);
+  qDebug() << "TranslationDisplay: got pos " << point << "height " << height();
 
   auto tr = translation_.translations();
   qDebug() << "got " << tr.size() << " translations";
+
   clear();
-
-  setHtml(QString::fromStdString(converter_->convert(translation)));
-
+  setHtml(QString::fromStdString(converter_->toHtml(translation)));
   moveCursor(QTextCursor::Start);
+
+  adjustHeight(document()->size().height());
+  point.setY(point.y() - height());
+  point.setX(point.x() - 50);
+  move(point);
+  setGeometry(fittedToDisplay(geometry()));
+
   show();
 }
 
@@ -82,4 +89,26 @@ void DefaultTranslationView::doCancelTranslation() {
   connect(auto_hide_timer, &QTimer::timeout, this,
           &DefaultTranslationView::tryHideOnTimer);
   auto_hide_timer->start(2000);
+}
+
+QRect DefaultTranslationView::fittedToDisplay(const QRect& rect) {
+  auto desktop = QApplication::desktop()->screenGeometry();
+  QRect res(rect);
+  if (auto diff_right = res.right() - desktop.right(); diff_right > 0) {
+    res.moveRight(desktop.right());
+  } else if (auto diff_left = desktop.left() - res.left(); diff_left > 0) {
+    res.moveLeft(desktop.left());
+  }
+  if (auto diff_bot = res.bottom() - desktop.bottom(); diff_bot > 0) {
+    res.moveBottom(desktop.bottom());
+  } else if (auto diff_top = desktop.top() - res.top(); diff_top > 0) {
+    res.moveTop(desktop.top());
+  }
+  return res;
+}
+
+void DefaultTranslationView::adjustHeight(int h) {
+  auto g = geometry();
+  g.setHeight(h);
+  setGeometry(g);
 }
