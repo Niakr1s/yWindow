@@ -31,6 +31,7 @@ class TextModel : public QObject {
   void addText(QString text);
 
  protected:
+  std::pair<int, int> last_line_and_col_ = {-1, -1};
   int current_pos_ = -1;
 
   virtual QStringList doGetText() = 0;

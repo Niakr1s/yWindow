@@ -16,8 +16,6 @@ void TextView::setController(TextController *controller) {
   controller_ = controller;
   connect(this, &TextView::charHovered, controller_,
           &TextController::charHovered);
-  connect(this, &TextView::charLeaved, controller_,
-          &TextController::charLeaved);
 }
 
 void TextView::setModel(TextModel *model) {
@@ -63,27 +61,27 @@ void DefaultTextView::doDisplayText() {
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto curs = cursorForPosition(event->pos());
   auto current_col = curs.position();
-  if (current_col != last_hovered_col_) {
-    highlighter_->reset();
-    last_hovered_col_ = current_col;
-    emit charLeaved();
-  }
+  if (current_col == last_hovered_col_) return;
+
+  highlighter_->reset();
+  last_hovered_col_ = current_col;
+
   auto pos = cursorRect(curs).topLeft();
   pos = mapToGlobal(pos);
-  try {
-    auto new_line_and_pos = posToLineAndPos(last_hovered_col_);
-    if (new_line_and_pos != last_line_and_pos_) {
-      qDebug() << "mouse hovered: " << new_line_and_pos;
-      emit charHovered(new_line_and_pos, pos);
-      last_line_and_pos_ = new_line_and_pos;
-      event->accept();
-    }
-  } catch (WrongPosException) {
-    event->ignore();
+
+  auto new_line_and_pos = posToLineAndPos(last_hovered_col_);
+  if (new_line_and_pos != last_line_and_pos_) {
+    qDebug() << "mouse hovered: " << new_line_and_pos;
+    emit charHovered(new_line_and_pos, pos);
+    last_line_and_pos_ = new_line_and_pos;
+    event->accept();
   }
 }
 
-void DefaultTextView::leaveEvent(QEvent *event) { emit charLeaved(); }
+void DefaultTextView::leaveEvent(QEvent *event) {
+  emit charHovered({-1, -1}, QPoint());
+  event->ignore();
+}
 
 int DefaultTextView::fontHeight() {
   QFontMetrics fm(font());
@@ -121,7 +119,7 @@ std::pair<int, int> DefaultTextView::posToLineAndPos(int pos) {
     col = 0;
   }
   if (line >= current_text_.size() || col >= current_text_[line].size()) {
-    throw WrongPosException();
+    return {-1, -1};
   }
   return {line, col};
 }

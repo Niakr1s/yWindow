@@ -25,7 +25,6 @@ class TextView : public QTextBrowser {
 
  signals:
   void charHovered(std::pair<int, int> line_and_col, QPoint pos);
-  void charLeaved();
 
  public slots:
   void displayText();

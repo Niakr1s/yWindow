@@ -11,9 +11,18 @@ TextModel::~TextModel() {}
 QStringList TextModel::getText() { return doGetText(); }
 
 void TextModel::translate(std::pair<int, int> line_and_col, QPoint pos) {
-  auto res = doTranslate(line_and_col);
-  emit gotTranslation(res, pos);
+  qDebug() << "got line_and_col" << line_and_col;
+  if (line_and_col == last_line_and_col_) return;
+  qDebug() << "TextModel::translate got new " << line_and_col;
+  if (line_and_col == std::pair{-1, -1} && line_and_col != last_line_and_col_) {
+    qDebug() << "TextModel::emitting cancelTranslation ";
+    emit cancelTranslation();
+    return;
+  }
+  last_line_and_col_ = line_and_col;
+  auto res = doTranslate(last_line_and_col_);
   if (res.translated()) {
+    emit gotTranslation(res, pos);
     emit gotTranslationLength(QString::fromStdString(res.text()).size());
   }
 }

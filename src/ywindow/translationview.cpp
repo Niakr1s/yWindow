@@ -24,12 +24,8 @@ void TranslationView::move(QPoint pos) { return QWidget::move(pos); }
 
 void TranslationView::displayTranslation(
     const dict::TranslationChunk& translation, QPoint pos) {
-  if (translation.translated()) {
-    active_ = true;
-    return doDisplayTranslation(translation, pos);
-  } else {
-    active_ = false;
-  }
+  active_ = true;
+  return doDisplayTranslation(translation, pos);
 }
 
 void TranslationView::cancelTranslation() {
@@ -38,7 +34,7 @@ void TranslationView::cancelTranslation() {
 }
 
 void DefaultTranslationView::leaveEvent(QEvent* event) {
-  hide();
+  doCancelTranslation();
   event->ignore();
 }
 
@@ -53,6 +49,7 @@ void DefaultTranslationView::append(const std::string& str) {
 
 void DefaultTranslationView::tryHideOnTimer() {
   if (!underMouse() && !active_) {
+    qDebug() << "hiding on timer";
     hide();
   }
 }
@@ -89,8 +86,10 @@ void DefaultTranslationView::doDisplayTranslation(
 }
 
 void DefaultTranslationView::doCancelTranslation() {
+  qDebug() << "Cancel translation timer started";
   QTimer* auto_hide_timer = new QTimer(this);
+  auto_hide_timer->setSingleShot(true);
   connect(auto_hide_timer, &QTimer::timeout, this,
           &DefaultTranslationView::tryHideOnTimer);
-  auto_hide_timer->start(500);
+  auto_hide_timer->start(2000);
 }
