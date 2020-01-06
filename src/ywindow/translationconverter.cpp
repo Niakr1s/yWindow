@@ -6,7 +6,7 @@
 
 TranslationConverter::~TranslationConverter() {}
 
-std::string YTranslationToHtmlConverter::doConvert(
+std::string YTranslationToHtmlConverter::doToHtml(
     const dict::TranslationChunk& translation) {
   auto cards = toDictCardPtrMap(translation.translations());
   auto sub_cards = toDictCardPtrMap(translation.subTranslations());

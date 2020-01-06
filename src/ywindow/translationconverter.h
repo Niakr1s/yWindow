@@ -15,12 +15,12 @@ class TranslationConverter {
  public:
   virtual ~TranslationConverter();
 
-  std::string convert(const dict::TranslationChunk& translation) {
-    return doConvert(translation);
+  std::string toHtml(const dict::TranslationChunk& translation) {
+    return doToHtml(translation);
   }
 
  protected:
-  virtual std::string doConvert(const dict::TranslationChunk& translation) = 0;
+  virtual std::string doToHtml(const dict::TranslationChunk& translation) = 0;
 };
 
 class YTranslationToHtmlConverter : public TranslationConverter {
@@ -31,7 +31,7 @@ class YTranslationToHtmlConverter : public TranslationConverter {
       std::map<dict::string, std::map<dict::string, std::vector<dict::Card*>>>;
 
  protected:
-  std::string doConvert(const dict::TranslationChunk& translation) override;
+  std::string doToHtml(const dict::TranslationChunk& translation) override;
 
  private:
   static DictCardPtrMap toDictCardPtrMap(const dict::CardPtrMultiMap& input);
