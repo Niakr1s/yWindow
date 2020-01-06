@@ -17,16 +17,16 @@ class TranslationChunk {
 
   bool translated() const;
 
-  CardPtrMap& translations();
-  const CardPtrMap& translations() const;
+  CardPtrMultiMap& translations();
+  const CardPtrMultiMap& translations() const;
 
-  CardPtrMap& subTranslations();
-  const CardPtrMap& subTranslations() const;
+  CardPtrMultiMap& subTranslations();
+  const CardPtrMultiMap& subTranslations() const;
 
  private:
   string text_;
   size_t orig_begin_, orig_end_;
-  CardPtrMap translations_, sub_translations_;
+  CardPtrMultiMap translations_, sub_translations_;
 };
 
 using TranslationChunks = std::vector<TranslationChunk>;

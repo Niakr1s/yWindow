@@ -17,7 +17,15 @@
     ystyler.cpp
     hoversyntaxhighlighter.h
     hoversyntaxhighlighter.cpp
+    translationtohtmlconverter.h
+    translationtohtmlconverter.cpp
+    NLTemplate.h
+    NLTemplate.cpp
 )
+
+file(COPY templates DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+configure_file(templates/ytranslation.html
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/templates/ytranslation.html COPYONLY)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -30,3 +38,5 @@ target_link_libraries(ywindow
     ywindow_lib
     Qt5::Widgets
 )
+
+

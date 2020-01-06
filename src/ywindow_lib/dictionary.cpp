@@ -4,7 +4,7 @@ dict::Dictionary::Dictionary() {}
 
 dict::Dictionary::~Dictionary() {}
 
-dict::CardPtrMap dict::Dictionary::query(const dict::string &text) const {
+dict::CardPtrMultiMap dict::Dictionary::query(const dict::string &text) const {
   return doQuery(text);
 }
 
@@ -31,9 +31,9 @@ size_t dict::DefaultDictionary::size() const { return cards_.size(); }
 
 std::mutex &dict::Dictionary::mutex() { return mutex_; }
 
-dict::CardPtrMap dict::DefaultDictionary::doQuery(
+dict::CardPtrMultiMap dict::DefaultDictionary::doQuery(
     const dict::string &text) const {
-  CardPtrMap res;
+  CardPtrMultiMap res;
   auto range = cards_.equal_range(text);
   for (auto card = range.first; card != range.second; ++card) {
     res.insert({text, card->second.get()});

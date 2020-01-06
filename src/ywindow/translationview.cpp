@@ -5,6 +5,7 @@
 #include <QTimer>
 
 #include "textmodel.h"
+#include "translationtohtmlconverter.h"
 
 TranslationView::TranslationView(QWidget* parent) : QTextBrowser(parent) {
   hide();
@@ -43,6 +44,7 @@ void DefaultTranslationView::leaveEvent(QEvent* event) {
 DefaultTranslationView::DefaultTranslationView(QWidget* widget)
     : TranslationView(widget) {
   resize(400, 200);
+  converter_ = std::make_unique<YTranslationToHtmlConverter>();
 }
 
 void DefaultTranslationView::append(const std::string& str) {
@@ -66,23 +68,26 @@ void DefaultTranslationView::doDisplayTranslation(
   auto tr = translation_.translations();
   qDebug() << "got " << tr.size() << " translations";
   clear();
-  for (auto& t : tr) {
-    append(t.second->name());
-    append(t.second->reading());
-    append(t.second->meaning());
-    append(t.second->dictionaryInfo());
-    append("------------");
-  }
 
-  // TODO refactor
-  auto sub_tr = translation_.subTranslations();
-  for (auto& t : sub_tr) {
-    append(t.second->name());
-    append(t.second->reading());
-    append(t.second->meaning());
-    append(t.second->dictionaryInfo());
-    append("------------");
-  }
+  setHtml(QString::fromStdString(converter_->convert(translation)));
+
+  //  for (auto& t : tr) {
+  //    append(t.second->name());
+  //    append(t.second->reading());
+  //    append(t.second->meaning());
+  //    append(t.second->dictionaryInfo());
+  //    append("------------");
+  //  }
+
+  //  // TODO refactor
+  //  auto sub_tr = translation_.subTranslations();
+  //  for (auto& t : sub_tr) {
+  //    append(t.second->name());
+  //    append(t.second->reading());
+  //    append(t.second->meaning());
+  //    append(t.second->dictionaryInfo());
+  //    append("------------");
+  //  }
   moveCursor(QTextCursor::Start);
   show();
 }

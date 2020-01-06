@@ -16,7 +16,6 @@ void TextModel::translate(std::pair<int, int> line_and_col, QPoint pos) {
   last_line_and_col_ = line_and_col;
   qDebug() << "TextModel::translate got new " << line_and_col;
   if (last_line_and_col_ == std::pair{-1, -1}) {
-    qDebug() << "TextModel::emitting cancelTranslation ";
     emit cancelTranslation();
     return;
   }
@@ -45,6 +44,8 @@ dict::TranslationChunk YomiStyleTextModel::doTranslate(
     std::pair<int, int> line_and_col) {
   QString to_translate = text_[line_and_col.first].mid(line_and_col.second);
   auto res = translator_->translate(to_translate.toStdString(), false);
+  qDebug() << "YomiStyleTextModel::doTranslate: transl.size"
+           << res.chunks().front().translations().size();
   return res.chunks().front();
 }
 

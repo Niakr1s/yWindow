@@ -16,7 +16,7 @@ class Dictionary {
   Dictionary();
   virtual ~Dictionary();
 
-  CardPtrMap query(const string& text) const;
+  CardPtrMultiMap query(const string& text) const;
 
   virtual void addCard(Card* card) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -34,7 +34,7 @@ class Dictionary {
   std::mutex& mutex();
 
  protected:
-  virtual CardPtrMap doQuery(const string& text) const = 0;
+  virtual CardPtrMultiMap doQuery(const string& text) const = 0;
   virtual void doAddCard(Card* card) = 0;
   virtual void doUpdateInfo(const string& info) = 0;
   std::mutex mutex_;
@@ -51,7 +51,7 @@ class DefaultDictionary : public Dictionary {
   string info_;
   CardUniquePtrMap cards_;
 
-  CardPtrMap doQuery(const string& text) const override;
+  CardPtrMultiMap doQuery(const string& text) const override;
   virtual void doAddCard(Card* card) override;
   void doUpdateInfo(const string& info) override;
 };

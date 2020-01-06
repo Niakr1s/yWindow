@@ -18,19 +18,19 @@ size_t dict::TranslationChunk::orig_begin() const { return orig_begin_; }
 
 size_t dict::TranslationChunk::orig_end() const { return orig_end_; }
 
-dict::CardPtrMap &dict::TranslationChunk::translations() {
+dict::CardPtrMultiMap &dict::TranslationChunk::translations() {
   return translations_;
 }
 
-const dict::CardPtrMap &dict::TranslationChunk::translations() const {
+const dict::CardPtrMultiMap &dict::TranslationChunk::translations() const {
   return translations_;
 }
 
-dict::CardPtrMap &dict::TranslationChunk::subTranslations() {
+dict::CardPtrMultiMap &dict::TranslationChunk::subTranslations() {
   return sub_translations_;
 }
 
-const dict::CardPtrMap &dict::TranslationChunk::subTranslations() const {
+const dict::CardPtrMultiMap &dict::TranslationChunk::subTranslations() const {
   return sub_translations_;
 }
 

@@ -114,7 +114,7 @@ class DeinflectCard : public DefaultCard {
 };
 
 using CardUniquePtrMap = std::multimap<string, std::unique_ptr<Card>>;
-using CardPtrMap = std::multimap<string, Card*>;
+using CardPtrMultiMap = std::multimap<string, Card*>;
 
 }  // namespace dict
 

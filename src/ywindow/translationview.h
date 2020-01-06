@@ -6,6 +6,7 @@
 #include "translationresult.h"
 
 class TextModel;
+class TranslationToHtmlConverter;
 
 class TranslationView : public QTextBrowser {
   Q_OBJECT
@@ -51,6 +52,7 @@ class DefaultTranslationView : public TranslationView {
 
  private:
   dict::TranslationChunk translation_;
+  std::unique_ptr<TranslationToHtmlConverter> converter_;
 };
 
 #endif  // TRANSLATIONVIEW_H

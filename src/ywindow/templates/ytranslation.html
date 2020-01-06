@@ -1,0 +1,18 @@
+{% block word %}
+<p>{{ name }}</p>
+{% block dict %}
+<p>{{ dict_info }}</p>
+<table>
+	{% block row %}
+	<tr>
+		<td width="70%">
+			{{ meaning }}
+		</td>
+		<td width="30%" align="right">
+			{{ reading }}
+		</td>
+	</tr>
+	{% endblock %}
+</table>
+{% endblock %}
+{% endblock %}
