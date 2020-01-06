@@ -17,6 +17,8 @@ void YStyler::appendStyle(QTextBrowser *text_edit, int pixel_size) {
   text_edit->setFrameStyle(QFrame::NoFrame);
   text_edit->setMouseTracking(true);
   text_edit->setWindowFlags(Qt::FramelessWindowHint);
+  text_edit->setWindowOpacity(0.8);
+  text_edit->setStyleSheet("background: black; color: lightGray;");
 
   QFont f = text_edit->font();
   f.setPixelSize(pixel_size);

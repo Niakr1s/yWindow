@@ -36,7 +36,6 @@ void YWindow::newText(QString text) { return text_controller_->addText(text); }
 
 void YWindow::initWindow() {
   setWindowTitle(TITLE);
-  //  setWindowFlags(Qt::FramelessWindowHint);
 
   if (settings_.contains("geometry")) {
     setGeometry(settings_.value("geometry").toRect());
