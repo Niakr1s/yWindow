@@ -60,20 +60,20 @@ void DefaultTextView::doDisplayText() {
 
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto curs = cursorForPosition(event->pos());
-  auto current_col = curs.position();
-  if (current_col == last_hovered_col_) return;
+  auto current_inner_col = curs.position();
+  if (current_inner_col == last_hovered_inner_col_) return;
 
   highlighter_->reset();
-  last_hovered_col_ = current_col;
+  last_hovered_inner_col_ = current_inner_col;
 
-  auto pos = cursorRect(curs).topLeft();
-  pos = mapToGlobal(pos);
+  auto global_pos = cursorRect(curs).topLeft();
+  global_pos = mapToGlobal(global_pos);
 
-  auto new_line_and_pos = posToLineAndPos(last_hovered_col_);
-  if (new_line_and_pos != last_line_and_pos_) {
-    qDebug() << "mouse hovered: " << new_line_and_pos;
-    emitCharHovered(new_line_and_pos, pos);
-    last_line_and_pos_ = new_line_and_pos;
+  auto current_line_and_col = colToLineAndCol(last_hovered_inner_col_);
+  if (current_line_and_col != last_line_and_col_) {
+    qDebug() << "mouse hovered: " << current_line_and_col;
+    emitCharHovered(current_line_and_col, global_pos);
+    last_line_and_col_ = current_line_and_col;
     event->accept();
   }
 }
@@ -89,7 +89,7 @@ int DefaultTextView::fontHeight() {
 }
 
 void DefaultTextView::highlightTranslated(int length) {
-  highlighter_->highlightSubstr(document(), last_hovered_col_, length);
+  highlighter_->highlightSubstr(document(), last_hovered_inner_col_, length);
 }
 
 int DefaultTextView::rowsAvailable() {
@@ -101,7 +101,7 @@ int DefaultTextView::rowsAvailable() {
   return res;
 }
 
-std::pair<int, int> DefaultTextView::posToLineAndPos(int pos) {
+std::pair<int, int> DefaultTextView::colToLineAndCol(int pos) {
   int line = 0, col = 0, counter = 0;
   for (int i = 0, i_max = current_text_.size(); i != i_max; ++i) {
     for (int j = 0, j_max = current_text_[i].size(); j != j_max; ++j) {
@@ -126,6 +126,6 @@ std::pair<int, int> DefaultTextView::posToLineAndPos(int pos) {
 
 void DefaultTextView::emitCharHovered(std::pair<int, int> line_and_col,
                                       QPoint pos) {
-  last_line_and_pos_ = line_and_col;
-  emit charHovered(last_line_and_pos_, pos);
+  last_line_and_col_ = line_and_col;
+  emit charHovered(last_line_and_col_, pos);
 }
