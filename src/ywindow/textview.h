@@ -64,6 +64,7 @@ class DefaultTextView : public TextView {
  private:
   QStringList current_text_;
   std::pair<int, int> last_line_and_col_ = {-1, -1};
+  std::pair<int, int> last_inner_line_and_col_ = {-1, -1};
   int last_hovered_inner_col_ = -1;
   HoverSyntaxHighlighter* highlighter_;
 

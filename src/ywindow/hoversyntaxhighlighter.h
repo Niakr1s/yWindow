@@ -8,14 +8,16 @@ class HoverSyntaxHighlighter : public QSyntaxHighlighter {
   HoverSyntaxHighlighter(QObject* parent);
   HoverSyntaxHighlighter(QTextDocument* parent);
 
-  void highlightSubstr(QTextDocument* doc, int pos, int length);
+  void highlightSubstr(QTextDocument* doc,
+                       std::pair<int, int> inner_line_and_col, int length);
   void reset();
 
  protected:
   void highlightBlock(const QString&) override;
 
  private:
-  int pos_ = -1, length_ = -1;
+  std::pair<int, int> last_inner_line_and_col_ = {-1, -1};
+  int length_ = -1;
 };
 
 #endif  // HOVERSYNTAXHIGHLIGHTER_H

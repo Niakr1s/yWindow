@@ -8,25 +8,23 @@ HoverSyntaxHighlighter::HoverSyntaxHighlighter(QObject *parent)
 HoverSyntaxHighlighter::HoverSyntaxHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent) {}
 
-void HoverSyntaxHighlighter::highlightSubstr(QTextDocument *doc, int pos,
-                                             int length) {
-  qDebug() << "HoverSyntaxHighlighter::highlightSubstr: got pos " << pos
-           << ", length " << length;
-  pos_ = pos;
+void HoverSyntaxHighlighter::highlightSubstr(
+    QTextDocument *doc, std::pair<int, int> inner_line_and_col, int length) {
+  last_inner_line_and_col_ = inner_line_and_col;
   length_ = length;
   setDocument(doc);
 }
 
 void HoverSyntaxHighlighter::highlightBlock(const QString &) {
-  if (pos_ == -1 || length_ == -1) return;
-
+  if (last_inner_line_and_col_ == std::pair{-1, -1} || length_ == -1) return;
+  if (currentBlock().blockNumber() != last_inner_line_and_col_.first) return;
   QTextCharFormat format;
   format.setBackground(Qt::blue);
-  setFormat(pos_, length_, format);
+  setFormat(last_inner_line_and_col_.second, length_, format);
 }
 
 void HoverSyntaxHighlighter::reset() {
-  pos_ = -1;
+  last_inner_line_and_col_ = {-1, -1};
   length_ = -1;
   setDocument(nullptr);
 }

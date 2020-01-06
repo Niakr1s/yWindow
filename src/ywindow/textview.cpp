@@ -65,6 +65,7 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
 
   highlighter_->reset();
   last_hovered_inner_col_ = current_inner_col;
+  last_inner_line_and_col_ = {curs.blockNumber(), curs.positionInBlock()};
 
   auto global_pos = cursorRect(curs).topLeft();
   global_pos = mapToGlobal(global_pos);
@@ -89,7 +90,8 @@ int DefaultTextView::fontHeight() {
 }
 
 void DefaultTextView::highlightTranslated(int length) {
-  highlighter_->highlightSubstr(document(), last_hovered_inner_col_, length);
+  qDebug() << "highlightint " << last_hovered_inner_col_ << length;
+  highlighter_->highlightSubstr(document(), last_inner_line_and_col_, length);
 }
 
 int DefaultTextView::rowsAvailable() {
