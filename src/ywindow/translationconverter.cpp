@@ -6,7 +6,7 @@
 
 TranslationConverter::~TranslationConverter() {}
 
-std::string YTranslationToHtmlConverter::doToHtml(
+std::string YTranslationConverter::doToHtml(
     const dict::TranslationChunk& translation) {
   auto cards = toDictCardPtrMap(translation.translations());
   auto sub_cards = toDictCardPtrMap(translation.subTranslations());
@@ -31,8 +31,7 @@ std::string YTranslationToHtmlConverter::doToHtml(
   return res;
 }
 
-YTranslationToHtmlConverter::DictCardPtrMap
-YTranslationToHtmlConverter::toDictCardPtrMap(
+YTranslationConverter::DictCardPtrMap YTranslationConverter::toDictCardPtrMap(
     const dict::CardPtrMultiMap& input) {
   std::set<dict::string> keys;
   for (auto& it : input) {
@@ -55,8 +54,8 @@ YTranslationToHtmlConverter::toDictCardPtrMap(
   return res;
 }
 
-void YTranslationToHtmlConverter::appendDictCardPtrMap(
-    Block& word_block, const YTranslationToHtmlConverter::DictCardPtrMap& cards,
+void YTranslationConverter::appendDictCardPtrMap(
+    Block& word_block, const YTranslationConverter::DictCardPtrMap& cards,
     size_t start) {
   size_t word_c = start;
   for (auto words_it = cards.cbegin(), words_it_max = cards.cend();

@@ -23,9 +23,9 @@ class TranslationConverter {
   virtual std::string doToHtml(const dict::TranslationChunk& translation) = 0;
 };
 
-class YTranslationToHtmlConverter : public TranslationConverter {
+class YTranslationConverter : public TranslationConverter {
  public:
-  YTranslationToHtmlConverter() {}
+  YTranslationConverter() {}
 
   using DictCardPtrMap =
       std::map<dict::string, std::map<dict::string, std::vector<dict::Card*>>>;

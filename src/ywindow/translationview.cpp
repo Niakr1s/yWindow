@@ -47,7 +47,7 @@ void DefaultTranslationView::leaveEvent(QEvent* event) {
 DefaultTranslationView::DefaultTranslationView(QWidget* widget)
     : TranslationView(widget) {
   resize(400, 200);
-  converter_ = std::make_unique<YTranslationToHtmlConverter>();
+  converter_ = std::make_unique<YTranslationConverter>();
 }
 
 void DefaultTranslationView::append(const std::string& str) {
