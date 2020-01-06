@@ -92,17 +92,18 @@ void DefaultTranslationView::doCancelTranslation() {
 }
 
 QRect DefaultTranslationView::fittedToDisplay(const QRect& rect) {
+  const int offset = 5;
   auto desktop = QApplication::desktop()->screenGeometry();
   QRect res(rect);
   if (auto diff_right = res.right() - desktop.right(); diff_right > 0) {
-    res.moveRight(desktop.right());
+    res.moveRight(desktop.right() - offset);
   } else if (auto diff_left = desktop.left() - res.left(); diff_left > 0) {
-    res.moveLeft(desktop.left());
+    res.moveLeft(desktop.left() + offset);
   }
   if (auto diff_bot = res.bottom() - desktop.bottom(); diff_bot > 0) {
-    res.moveBottom(desktop.bottom());
+    res.moveBottom(desktop.bottom() - offset);
   } else if (auto diff_top = desktop.top() - res.top(); diff_top > 0) {
-    res.moveTop(desktop.top());
+    res.moveTop(desktop.top() + offset);
   }
   return res;
 }
