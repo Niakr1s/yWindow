@@ -76,12 +76,12 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
     emitCharHovered(current_line_and_col, global_pos);
     last_hovered_.model_pos = current_line_and_col;
   }
-  event->ignore();
+  return QTextBrowser::mouseMoveEvent(event);
 }
 
 void DefaultTextView::leaveEvent(QEvent *event) {
   emitCharHovered({-1, -1}, QPoint());
-  event->ignore();
+  QTextBrowser::leaveEvent(event);
 }
 
 int DefaultTextView::fontHeight() {
