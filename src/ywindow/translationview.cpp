@@ -29,8 +29,10 @@ void TranslationView::displayTranslation(
 }
 
 void TranslationView::cancelTranslation() {
-  active_ = false;
-  return doCancelTranslation();
+  if (active_) {
+    active_ = false;
+    return doCancelTranslation();
+  }
 }
 
 void DefaultTranslationView::leaveEvent(QEvent* event) {
