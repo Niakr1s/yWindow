@@ -72,14 +72,14 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto new_line_and_pos = posToLineAndPos(last_hovered_col_);
   if (new_line_and_pos != last_line_and_pos_) {
     qDebug() << "mouse hovered: " << new_line_and_pos;
-    emit charHovered(new_line_and_pos, pos);
+    emitCharHovered(new_line_and_pos, pos);
     last_line_and_pos_ = new_line_and_pos;
     event->accept();
   }
 }
 
 void DefaultTextView::leaveEvent(QEvent *event) {
-  emit charHovered({-1, -1}, QPoint());
+  emitCharHovered({-1, -1}, QPoint());
   event->ignore();
 }
 
@@ -122,4 +122,10 @@ std::pair<int, int> DefaultTextView::posToLineAndPos(int pos) {
     return {-1, -1};
   }
   return {line, col};
+}
+
+void DefaultTextView::emitCharHovered(std::pair<int, int> line_and_col,
+                                      QPoint pos) {
+  last_line_and_pos_ = line_and_col;
+  emit charHovered(last_line_and_pos_, pos);
 }

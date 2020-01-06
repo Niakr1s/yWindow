@@ -69,6 +69,8 @@ class DefaultTextView : public TextView {
 
   int rowsAvailable();
   std::pair<int, int> posToLineAndPos(int pos);
+
+  void emitCharHovered(std::pair<int, int> line_and_col, QPoint pos);
 };
 
 #endif  // TEXTVIEW_H

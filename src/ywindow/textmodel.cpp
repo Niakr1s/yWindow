@@ -13,13 +13,13 @@ QStringList TextModel::getText() { return doGetText(); }
 void TextModel::translate(std::pair<int, int> line_and_col, QPoint pos) {
   qDebug() << "got line_and_col" << line_and_col;
   if (line_and_col == last_line_and_col_) return;
+  last_line_and_col_ = line_and_col;
   qDebug() << "TextModel::translate got new " << line_and_col;
-  if (line_and_col == std::pair{-1, -1} && line_and_col != last_line_and_col_) {
+  if (last_line_and_col_ == std::pair{-1, -1}) {
     qDebug() << "TextModel::emitting cancelTranslation ";
     emit cancelTranslation();
     return;
   }
-  last_line_and_col_ = line_and_col;
   auto res = doTranslate(last_line_and_col_);
   if (res.translated()) {
     emit gotTranslation(res, pos);
