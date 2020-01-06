@@ -17,8 +17,8 @@
     ystyler.cpp
     hoversyntaxhighlighter.h
     hoversyntaxhighlighter.cpp
-    translationtohtmlconverter.h
-    translationtohtmlconverter.cpp
+    translationconverter.h
+    translationconverter.cpp
     NLTemplate.h
     NLTemplate.cpp
 )

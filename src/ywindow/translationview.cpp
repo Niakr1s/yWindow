@@ -5,7 +5,7 @@
 #include <QTimer>
 
 #include "textmodel.h"
-#include "translationtohtmlconverter.h"
+#include "translationconverter.h"
 
 TranslationView::TranslationView(QWidget* parent) : QTextBrowser(parent) {
   hide();

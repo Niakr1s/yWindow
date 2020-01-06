@@ -1,10 +1,10 @@
-#include "translationtohtmlconverter.h"
+#include "translationconverter.h"
 
 #include <QDebug>
 #include <set>
 #include <sstream>
 
-TranslationToHtmlConverter::~TranslationToHtmlConverter() {}
+TranslationConverter::~TranslationConverter() {}
 
 std::string YTranslationToHtmlConverter::doConvert(
     const dict::TranslationChunk& translation) {

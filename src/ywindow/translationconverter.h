@@ -1,5 +1,5 @@
-#ifndef TRANSLATIONTOHTMLCONVERTER_H
-#define TRANSLATIONTOHTMLCONVERTER_H
+#ifndef TRANSLATIONCONVERTER_H
+#define TRANSLATIONCONVERTER_H
 
 #include <QString>
 #include <map>
@@ -11,9 +11,9 @@
 
 using namespace NL::Template;
 
-class TranslationToHtmlConverter {
+class TranslationConverter {
  public:
-  virtual ~TranslationToHtmlConverter();
+  virtual ~TranslationConverter();
 
   std::string convert(const dict::TranslationChunk& translation) {
     return doConvert(translation);
@@ -23,7 +23,7 @@ class TranslationToHtmlConverter {
   virtual std::string doConvert(const dict::TranslationChunk& translation) = 0;
 };
 
-class YTranslationToHtmlConverter : public TranslationToHtmlConverter {
+class YTranslationToHtmlConverter : public TranslationConverter {
  public:
   YTranslationToHtmlConverter() {}
 
@@ -39,4 +39,4 @@ class YTranslationToHtmlConverter : public TranslationToHtmlConverter {
                                    const DictCardPtrMap& cards, size_t start);
 };
 
-#endif  // TRANSLATIONTOHTMLCONVERTER_H
+#endif  // TRANSLATIONCONVERTER_H
