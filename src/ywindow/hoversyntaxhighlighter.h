@@ -8,8 +8,8 @@ class HoverSyntaxHighlighter : public QSyntaxHighlighter {
   HoverSyntaxHighlighter(QObject* parent);
   HoverSyntaxHighlighter(QTextDocument* parent);
 
-  void highlightSubstr(QTextDocument* doc,
-                       std::pair<int, int> inner_line_and_col, int length);
+  void highlightSubstr(QTextDocument* doc, std::pair<int, int> inner_pos,
+                       int length);
   void reset();
 
  protected:

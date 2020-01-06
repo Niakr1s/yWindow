@@ -24,7 +24,7 @@ class TextView : public QTextBrowser {
   virtual int fontHeight() = 0;
 
  signals:
-  void charHovered(std::pair<int, int> line_and_col, QPoint pos);
+  void charHovered(std::pair<int, int> model_pos, QPoint point);
 
  public slots:
   void displayText();
@@ -42,6 +42,12 @@ class DefaultTextView : public TextView {
 
  public:
   DefaultTextView(QWidget* parent = nullptr);
+
+  struct LastHovered {
+    std::pair<int, int> model_pos = {-1, -1};
+    std::pair<int, int> inner_pos = {-1, -1};
+    int inner_col = -1;
+  };
 
   class WrongPosException : public std::exception {
     using std::exception::exception;
@@ -63,15 +69,13 @@ class DefaultTextView : public TextView {
 
  private:
   QStringList current_text_;
-  std::pair<int, int> last_line_and_col_ = {-1, -1};
-  std::pair<int, int> last_inner_line_and_col_ = {-1, -1};
-  int last_hovered_inner_col_ = -1;
+  LastHovered last_hovered_;
   HoverSyntaxHighlighter* highlighter_;
 
   int rowsAvailable();
-  std::pair<int, int> colToLineAndCol(int pos);
+  std::pair<int, int> innerColToModelPos(int pos);
 
-  void emitCharHovered(std::pair<int, int> line_and_col, QPoint pos);
+  void emitCharHovered(std::pair<int, int> model_pos, QPoint point);
 };
 
 #endif  // TEXTVIEW_H

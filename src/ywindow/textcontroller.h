@@ -22,7 +22,7 @@ class TextController : public QObject {
 
  signals:
   void newText(QString);
-  void charHovered(std::pair<int, int> line_and_col, QPoint pos);
+  void charHovered(std::pair<int, int> model_pos, QPoint point);
 
  protected:
   TextModel* model_;

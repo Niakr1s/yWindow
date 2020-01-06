@@ -8,9 +8,10 @@ HoverSyntaxHighlighter::HoverSyntaxHighlighter(QObject *parent)
 HoverSyntaxHighlighter::HoverSyntaxHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent) {}
 
-void HoverSyntaxHighlighter::highlightSubstr(
-    QTextDocument *doc, std::pair<int, int> inner_line_and_col, int length) {
-  last_inner_line_and_col_ = inner_line_and_col;
+void HoverSyntaxHighlighter::highlightSubstr(QTextDocument *doc,
+                                             std::pair<int, int> inner_pos,
+                                             int length) {
+  last_inner_line_and_col_ = inner_pos;
   length_ = length;
   setDocument(doc);
 }

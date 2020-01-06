@@ -61,20 +61,20 @@ void DefaultTextView::doDisplayText() {
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto curs = cursorForPosition(event->pos());
   auto current_inner_col = curs.position();
-  if (current_inner_col == last_hovered_inner_col_) return;
+  if (current_inner_col == last_hovered_.inner_col) return;
 
   highlighter_->reset();
-  last_hovered_inner_col_ = current_inner_col;
-  last_inner_line_and_col_ = {curs.blockNumber(), curs.positionInBlock()};
+  last_hovered_.inner_col = current_inner_col;
+  last_hovered_.inner_pos = {curs.blockNumber(), curs.positionInBlock()};
 
   auto global_pos = cursorRect(curs).topLeft();
   global_pos = mapToGlobal(global_pos);
 
-  auto current_line_and_col = colToLineAndCol(last_hovered_inner_col_);
-  if (current_line_and_col != last_line_and_col_) {
+  auto current_line_and_col = innerColToModelPos(last_hovered_.inner_col);
+  if (current_line_and_col != last_hovered_.model_pos) {
     qDebug() << "mouse hovered: " << current_line_and_col;
     emitCharHovered(current_line_and_col, global_pos);
-    last_line_and_col_ = current_line_and_col;
+    last_hovered_.model_pos = current_line_and_col;
     event->accept();
   }
 }
@@ -90,8 +90,7 @@ int DefaultTextView::fontHeight() {
 }
 
 void DefaultTextView::highlightTranslated(int length) {
-  qDebug() << "highlightint " << last_hovered_inner_col_ << length;
-  highlighter_->highlightSubstr(document(), last_inner_line_and_col_, length);
+  highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
 }
 
 int DefaultTextView::rowsAvailable() {
@@ -103,7 +102,7 @@ int DefaultTextView::rowsAvailable() {
   return res;
 }
 
-std::pair<int, int> DefaultTextView::colToLineAndCol(int pos) {
+std::pair<int, int> DefaultTextView::innerColToModelPos(int pos) {
   int line = 0, col = 0, counter = 0;
   for (int i = 0, i_max = current_text_.size(); i != i_max; ++i) {
     for (int j = 0, j_max = current_text_[i].size(); j != j_max; ++j) {
@@ -126,8 +125,8 @@ std::pair<int, int> DefaultTextView::colToLineAndCol(int pos) {
   return {line, col};
 }
 
-void DefaultTextView::emitCharHovered(std::pair<int, int> line_and_col,
-                                      QPoint pos) {
-  last_line_and_col_ = line_and_col;
-  emit charHovered(last_line_and_col_, pos);
+void DefaultTextView::emitCharHovered(std::pair<int, int> model_pos,
+                                      QPoint point) {
+  last_hovered_.model_pos = model_pos;
+  emit charHovered(last_hovered_.model_pos, point);
 }

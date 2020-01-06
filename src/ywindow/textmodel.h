@@ -22,21 +22,20 @@ class TextModel : public QObject {
 
  signals:
   void textChanged();
-  void gotTranslation(dict::TranslationChunk, QPoint pos);
+  void gotTranslation(dict::TranslationChunk, QPoint point);
   void gotTranslationLength(int);
   void cancelTranslation();
 
  public slots:
-  void translate(std::pair<int, int> line_and_col, QPoint pos);
+  void translate(std::pair<int, int> pos, QPoint point);
   void addText(QString text);
 
  protected:
-  std::pair<int, int> last_line_and_col_ = {-1, -1};
+  std::pair<int, int> last_pos_ = {-1, -1};
   int current_pos_ = -1;
 
   virtual QStringList doGetText() = 0;
-  virtual dict::TranslationChunk doTranslate(
-      std::pair<int, int> line_and_col) = 0;
+  virtual dict::TranslationChunk doTranslate(std::pair<int, int> pos) = 0;
   virtual void doAddText(const QString& text) = 0;
 };
 
@@ -46,7 +45,7 @@ class YomiStyleTextModel : public TextModel {
 
  protected:
   QStringList doGetText() override;
-  dict::TranslationChunk doTranslate(std::pair<int, int> line_and_col) override;
+  dict::TranslationChunk doTranslate(std::pair<int, int> pos) override;
   void doAddText(const QString& text) override;
 
  private:
