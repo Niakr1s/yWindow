@@ -25,6 +25,7 @@ class TextView : public QTextBrowser {
 
  signals:
   void charHovered(std::pair<int, int> line_and_col, QPoint pos);
+  void charLeaved();
 
  public slots:
   void displayText();
@@ -59,6 +60,7 @@ class DefaultTextView : public TextView {
   void doDisplayText() override;
 
   void mouseMoveEvent(QMouseEvent* event) override;
+  void leaveEvent(QEvent* event) override;
 
  private:
   QStringList current_text_;

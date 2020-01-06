@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QMouseEvent>
+#include <QTimer>
 
 #include "textmodel.h"
 
@@ -15,13 +16,25 @@ void TranslationView::setModel(TextModel* model) {
   model_ = model;
   connect(model_, &TextModel::gotTranslation, this,
           &TranslationView::displayTranslation);
+  connect(model_, &TextModel::cancelTranslation, this,
+          &TranslationView::cancelTranslation);
 }
 
 void TranslationView::move(QPoint pos) { return QWidget::move(pos); }
 
 void TranslationView::displayTranslation(
     const dict::TranslationChunk& translation, QPoint pos) {
-  return doDisplayTranslation(translation, pos);
+  if (translation.translated()) {
+    active_ = true;
+    return doDisplayTranslation(translation, pos);
+  } else {
+    active_ = false;
+  }
+}
+
+void TranslationView::cancelTranslation() {
+  active_ = false;
+  return doCancelTranslation();
 }
 
 void DefaultTranslationView::leaveEvent(QEvent* event) {
@@ -38,11 +51,14 @@ void DefaultTranslationView::append(const std::string& str) {
   return QTextEdit::append(QString::fromStdString(str));
 }
 
+void DefaultTranslationView::tryHideOnTimer() {
+  if (!underMouse() && !active_) {
+    hide();
+  }
+}
+
 void DefaultTranslationView::doDisplayTranslation(
     const dict::TranslationChunk& translation, QPoint pos) {
-  if (!translation.translated()) {
-    return;
-  }
   translation_ = translation;
   qDebug() << "TranslationDisplay: got pos " << pos << "height " << height();
   pos.setY(pos.y() - height());
@@ -70,4 +86,11 @@ void DefaultTranslationView::doDisplayTranslation(
   }
   moveCursor(QTextCursor::Start);
   show();
+}
+
+void DefaultTranslationView::doCancelTranslation() {
+  QTimer* auto_hide_timer = new QTimer(this);
+  connect(auto_hide_timer, &QTimer::timeout, this,
+          &DefaultTranslationView::tryHideOnTimer);
+  auto_hide_timer->start(500);
 }

@@ -22,5 +22,7 @@ void TextController::addText(const QString &str) {
 void TextController::setModel(TextModel *model) {
   model_ = model;
   connect(this, &TextController::newText, model_, &TextModel::addText);
-  connect(this, &TextController::charChanged, model_, &TextModel::translate);
+  connect(this, &TextController::charHovered, model_, &TextModel::translate);
+  connect(this, &TextController::charLeaved, model_,
+          &TextModel::cancelTranslation);
 }

@@ -15,7 +15,9 @@ TextView::~TextView() {}
 void TextView::setController(TextController *controller) {
   controller_ = controller;
   connect(this, &TextView::charHovered, controller_,
-          &TextController::charChanged);
+          &TextController::charHovered);
+  connect(this, &TextView::charLeaved, controller_,
+          &TextController::charLeaved);
 }
 
 void TextView::setModel(TextModel *model) {
@@ -64,6 +66,7 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   if (current_col != last_hovered_col_) {
     highlighter_->reset();
     last_hovered_col_ = current_col;
+    emit charLeaved();
   }
   auto pos = cursorRect(curs).topLeft();
   pos = mapToGlobal(pos);
@@ -79,6 +82,8 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
     event->ignore();
   }
 }
+
+void DefaultTextView::leaveEvent(QEvent *event) { emit charLeaved(); }
 
 int DefaultTextView::fontHeight() {
   QFontMetrics fm(font());
