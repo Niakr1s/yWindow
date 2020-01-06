@@ -36,7 +36,7 @@ class YTranslationConverter : public TranslationConverter {
  private:
   static DictCardPtrMap toDictCardPtrMap(const dict::CardPtrMultiMap& input);
   static void appendDictCardPtrMap(Block& word_block,
-                                   const DictCardPtrMap& cards, size_t start);
+                                   const DictCardPtrMap& cards);
 };
 
 #endif  // TRANSLATIONCONVERTER_H

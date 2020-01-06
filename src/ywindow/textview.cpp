@@ -75,8 +75,8 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
     qDebug() << "mouse hovered: " << current_line_and_col;
     emitCharHovered(current_line_and_col, global_pos);
     last_hovered_.model_pos = current_line_and_col;
-    event->accept();
   }
+  event->ignore();
 }
 
 void DefaultTextView::leaveEvent(QEvent *event) {

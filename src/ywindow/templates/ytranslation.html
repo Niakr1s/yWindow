@@ -1,18 +1,67 @@
-{% block word %}
-<p>{{ name }}</p>
+<style type="text/css">
+    * {
+        font-size: 16px;
+    }
+
+    .word {
+        font-size: 20px;
+        color: rgb(211, 31, 46);
+    }
+
+    .dict {
+        font-size: 12px;
+        font-style: italic;
+        color: pink;
+    }
+
+    .meaning {
+        color: rgb(141, 197, 141);
+    }
+
+    .reading {
+        color: rgb(116, 95, 236);
+
+    }
+</style>
+
+{% block cards %}
+<div class="word">{{ name }}</div>
 {% block dict %}
-<p>{{ dict_info }}</p>
+<div class="dict">{{ dict }}</div>
 <table>
-	{% block row %}
-	<tr>
-		<td width="70%">
-			{{ meaning }}
-		</td>
-		<td width="30%" align="right">
-			{{ reading }}
-		</td>
-	</tr>
-	{% endblock %}
-</table>
+    {% block row %}
+    <tr>
+        <td class="meaning" width="{{ width }}%" colspan="{{ colspan }}">
+            {{ meaning }}
+        </td>
+        {% block reading %}
+        <td class="reading" width="20%" align="right">
+            {{ reading }}
+        </td>
+        {% endblock %}
+    </tr>
+    {% endblock %}
+</table><br>
+{% endblock %}
+{% endblock %}
+
+{% block sub_cards %}
+<div class="word">{{ name }}</div>
+{% block dict %}
+<div class="dict">{{ dict }}</div>
+<table>
+    {% block row %}
+    <tr>
+        <td class="meaning" width="{{ width }}%" colspan="{{ colspan }}">
+            {{ meaning }}
+        </td>
+        {% block reading %}
+        <td class="reading" width="20%" align="right">
+            {{ reading }}
+        </td>
+        {% endblock %}
+    </tr>
+    {% endblock %}
+</table><br>
 {% endblock %}
 {% endblock %}
