@@ -23,6 +23,7 @@ class Translator {
 
  protected:
   virtual TranslationResult doTranslate(const std::string& str, bool all) = 0;
+  virtual void prepareDictionaries() = 0;
 
   static size_t MAX_CHUNK_SIZE;
 };
@@ -34,13 +35,14 @@ class DictionaryTranslator : public Translator {
   void addDict(Dictionary* dict);
 
  protected:
+  // in children provide dicts via dicts_futures_ or dicts_
   std::vector<std::unique_ptr<Dictionary>> dicts_;
+  std::vector<std::future<Dictionary*>> dicts_futures_;
 
-  // called before actual translation, use it for initializing dicts_ variable
-  virtual void prepareDictionaries() = 0;
-
+  void prepareDictionaries() final;
   TranslationResult doTranslate(const std::string& str, bool all) override;
 
+ private:
   TranslationChunk translateAnyOfSubStr(const std::string& str, size_t begin,
                                         size_t count);
   TranslationChunk translateFullSubStr(const std::string& str, size_t begin,
@@ -51,11 +53,6 @@ class YomiTranslator : public DictionaryTranslator {
  public:
   YomiTranslator(const fs::path& root_dir);
   YomiTranslator(std::initializer_list<fs::path> dicts_dirs);
-
-  void prepareDictionaries() override;
-
- private:
-  std::vector<std::future<Dictionary*>> dicts_futures_;
 };
 
 class DeinflectTranslator : public DictionaryTranslator {
@@ -63,12 +60,10 @@ class DeinflectTranslator : public DictionaryTranslator {
   DeinflectTranslator(const fs::path& file, Translator* next_translator);
 
  protected:
-  void prepareDictionaries() override;
   TranslationResult doTranslate(const std::string& str, bool all) override;
 
  private:
   Translator* next_translator_;
-  std::future<Dictionary*> future_;
 };
 
 }  // namespace dict

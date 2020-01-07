@@ -16,6 +16,7 @@ dict::TranslationResult dict::Translator::translate(const std::wstring &wstr,
 
 dict::TranslationResult dict::Translator::translate(const std::string &str,
                                                     bool all) {
+  prepareDictionaries();
   auto res = doTranslate(str, all);
   res.normalize();
   return res;
@@ -38,7 +39,7 @@ dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs)
   }
 }
 
-void dict::YomiTranslator::prepareDictionaries() {
+void dict::DictionaryTranslator::prepareDictionaries() {
   while (!dicts_futures_.empty()) {
     try {
       dicts_.push_back(
@@ -91,7 +92,6 @@ void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
 
 dict::TranslationResult dict::DictionaryTranslator::doTranslate(
     const std::string &str, bool all) {
-  prepareDictionaries();
   TranslationResult res{str};
   if (!all) {
     res.chunks().push_back(translateAnyOfSubStr(str, 0, str.size()));
@@ -110,13 +110,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslate(
 dict::DeinflectTranslator::DeinflectTranslator(
     const fs::path &file, dict::Translator *next_translator)
     : DictionaryTranslator(), next_translator_(next_translator) {
-  future_ = Loader::loadFromFS<DeinflectDictionary>(file);
-}
-
-void dict::DeinflectTranslator::prepareDictionaries() {
-  if (dicts_.empty()) {
-    dicts_.push_back(std::unique_ptr<Dictionary>(future_.get()));
-  }
+  dicts_futures_.push_back(Loader::loadFromFS<DeinflectDictionary>(file));
 }
 
 dict::TranslationResult dict::DeinflectTranslator::doTranslate(
