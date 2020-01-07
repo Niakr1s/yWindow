@@ -1,57 +1,43 @@
 {
-    "-ed": [
+    "-ba": [
         {
-            "kanaIn": "ed",
-            "kanaOut": "",
+            "kanaIn": "れば",
+            "kanaOut": "る",
             "rulesIn": [],
             "rulesOut": [
-                "v5"
-            ]
-        },
-        {
-            "kanaIn": "けば",
-            "kanaOut": "く",
-            "rulesIn": [],
-            "rulesOut": [
-                "v5"
-            ]
-        },
-        {
-            "kanaIn": "げば",
-            "kanaOut": "ぐ",
-            "rulesIn": [],
-            "rulesOut": [
-                "v5"
+                "v1",
+                "v5",
+                "vk",
+                "vs"
             ]
         }
     ],
-    "-ing": [
+    "-te": [
         {
-            "kanaIn": "ing",
-            "kanaOut": "",
+            "kanaIn": "って",
+            "kanaOut": "う",
             "rulesIn": [
-                "v5"
-            ],
-            "rulesOut": [
-                "v1",
-                "vk"
-            ]
-        },
-        {
-            "kanaIn": "いじゃう",
-            "kanaOut": "ぐ",
-            "rulesIn": [
-                "v5"
+                "iru"
             ],
             "rulesOut": [
                 "v5"
             ]
         },
         {
-            "kanaIn": "いちゃう",
-            "kanaOut": "く",
+            "kanaIn": "って",
+            "kanaOut": "つ",
             "rulesIn": [
+                "iru"
+            ],
+            "rulesOut": [
                 "v5"
+            ]
+        },
+        {
+            "kanaIn": "って",
+            "kanaOut": "る",
+            "rulesIn": [
+                "iru"
             ],
             "rulesOut": [
                 "v5"
