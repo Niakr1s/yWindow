@@ -45,18 +45,18 @@ const dict::TranslationChunkPtrs &dict::TranslationResult::chunks() const {
   return chunks_;
 }
 
-std::pair<dict::TranslationChunkPtr, size_t> dict::TranslationResult::chunk(
-    size_t orig_text_pos) const {
-  size_t counter = 0;
-  for (auto &chunk : chunks_) {
-    for (size_t i = 0, i_max = chunk->text().size(); i != i_max; ++i) {
-      if (counter++ == orig_text_pos) {
-        return {chunk, i};
-      }
-    }
-  }
-  return {nullptr, 0};
-}
+// std::pair<dict::TranslationChunkPtr, size_t> dict::TranslationResult::chunk(
+//    size_t orig_text_pos) const {
+//  size_t counter = 0;
+//  for (auto &chunk : chunks_) {
+//    for (size_t i = 0, i_max = chunk->text().size(); i != i_max; ++i) {
+//      if (counter++ == orig_text_pos) {
+//        return {chunk, i};
+//      }
+//    }
+//  }
+//  return {nullptr, 0};
+//}
 
 void dict::TranslationResult::normalize() {
   sort();
@@ -99,8 +99,12 @@ dict::TranslationResult dict::TranslatedText::mergeWith(
   for (auto ch : rhs.chunks()) {
     auto beg_ch = chunk(ch->orig_begin());
     auto end_ch = chunk(ch->orig_end());
-    auto orig_begin = beg_ch.first->orig_begin() /*+ beg_ch.second*/;
-    auto orig_end = end_ch.first->orig_end() /* + end_ch.second*/;
+
+    auto orig_begin = beg_ch.first->chunk->orig_begin() + beg_ch.second;
+
+    auto diff = end_ch.first->translated_text.size() - end_ch.second - 1;
+    auto orig_end = end_ch.first->chunk->orig_end() - (diff > 0 ? diff : 0);
+
     auto subst = orig_text.substr(orig_begin, orig_end - orig_begin + 1);
     auto new_chunk =
         std::make_shared<TranslationChunk>(subst, orig_begin, orig_end);
@@ -112,13 +116,13 @@ dict::TranslationResult dict::TranslatedText::mergeWith(
   return res;
 }
 
-std::pair<dict::TranslationChunkPtr, size_t> dict::TranslatedText::chunk(
-    size_t orig_text_pos) const {
+std::pair<const dict::TranslatedTextChunk *, size_t>
+dict::TranslatedText::chunk(size_t orig_text_pos) const {
   size_t counter = 0;
   for (auto &chunk : text) {
     for (size_t i = 0, i_max = chunk.translated_text.size(); i != i_max; ++i) {
       if (counter++ == orig_text_pos) {
-        return {chunk.chunk, i};
+        return {&chunk, i};
       }
     }
   }
