@@ -97,13 +97,16 @@ dict::TranslationResult dict::TranslatedText::mergeWith(
     const dict::TranslationResult &rhs) {
   TranslationResult res{orig_text};
   for (auto ch : rhs.chunks()) {
-    auto beg_ch = chunk(ch->orig_begin());
-    auto end_ch = chunk(ch->orig_end());
+    auto beg_this_ch = chunk(ch->orig_begin());
+    auto end_this_ch = chunk(ch->orig_end());
 
-    auto orig_begin = beg_ch.first->chunk->orig_begin() + beg_ch.second;
+    auto orig_begin =
+        beg_this_ch.first->chunk->orig_begin() + beg_this_ch.second;
 
-    auto diff = end_ch.first->translated_text.size() - end_ch.second - 1;
-    auto orig_end = end_ch.first->chunk->orig_end() - (diff > 0 ? diff : 0);
+    auto diff =
+        end_this_ch.first->translated_text.size() - end_this_ch.second - 1;
+    auto orig_end =
+        end_this_ch.first->chunk->orig_end() - (diff > 0 ? diff : 0);
 
     auto subst = orig_text.substr(orig_begin, orig_end - orig_begin + 1);
     auto new_chunk =
