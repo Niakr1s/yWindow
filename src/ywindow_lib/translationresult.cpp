@@ -37,28 +37,30 @@ const dict::CardPtrMultiMap &dict::TranslationChunk::subTranslations() const {
 dict::TranslationResult::TranslationResult(const std::string &orig_text)
     : orig_text_(orig_text) {}
 
-dict::TranslationChunks &dict::TranslationResult::chunks() { return chunks_; }
+dict::TranslationChunkPtrs &dict::TranslationResult::chunks() {
+  return chunks_;
+}
 
 void dict::TranslationResult::normalize() {
   sort();
-  TranslationChunks new_chunks;
+  TranslationChunkPtrs new_chunks;
   size_t curr = 0;
   for (auto &chunk : chunks_) {
     if (curr >= orig_text_.size()) {
       break;
     }
-    if (chunk.orig_begin() > curr) {
-      TranslationChunk new_chunk{
-          orig_text_.substr(curr, chunk.orig_begin() - curr), curr,
-          chunk.orig_begin() - 1};
+    if (chunk->orig_begin() > curr) {
+      auto new_chunk = std::shared_ptr<TranslationChunk>(new TranslationChunk{
+          orig_text_.substr(curr, chunk->orig_begin() - curr), curr,
+          chunk->orig_begin() - 1});
       new_chunks.push_back(new_chunk);
     }
-    curr = chunk.orig_end() + 1;
+    curr = chunk->orig_end() + 1;
   }
   if (curr != orig_text_.size()) {
-    TranslationChunk new_chunk{
-        orig_text_.substr(curr, orig_text_.size() - curr), curr,
-        orig_text_.size() - 1};
+    auto new_chunk = std::shared_ptr<TranslationChunk>(
+        new TranslationChunk{orig_text_.substr(curr, orig_text_.size() - curr),
+                             curr, orig_text_.size() - 1});
     new_chunks.push_back(new_chunk);
   }
   for (auto &new_chunk : new_chunks) {
@@ -69,8 +71,8 @@ void dict::TranslationResult::normalize() {
 
 void dict::TranslationResult::sort() {
   std::sort(chunks_.begin(), chunks_.end(),
-            [](const TranslationChunk &lhs, const TranslationChunk &rhs) {
-              return lhs.orig_begin() < rhs.orig_begin();
+            [](TranslationChunkPtr lhs, TranslationChunkPtr rhs) {
+              return lhs->orig_begin() < rhs->orig_begin();
             });
 }
 
@@ -108,18 +110,18 @@ dict::TranslationResult::translated_texts_inner(TranslationResult input) {
   };
 
   auto chunk = input.chunks().back();
-  if (!chunk.translated()) {
+  if (!chunk->translated()) {
     TranslatedTextChunk last_part_chunk;
-    auto last_part = chunk.text();
+    auto last_part = chunk->text();
     last_part_chunk.translated_text = last_part;
-    last_part_chunk.chunk = &chunk;  // TODO  WARNING, NEED SHARED_PTR
+    last_part_chunk.chunk = chunk;
     append_to_res(last_part_chunk);
   } else {
-    for (auto [s, card] : chunk.translations()) {
+    for (auto [s, card] : chunk->translations()) {
       for (auto &last_part : card->readings()) {
         TranslatedTextChunk last_part_chunk;
         last_part_chunk.translated_text = last_part;
-        last_part_chunk.chunk = &chunk;  // TODO  WARNING, NEED SHARED_PTR
+        last_part_chunk.chunk = chunk;
         last_part_chunk.card = card;
         append_to_res(last_part_chunk);
       }

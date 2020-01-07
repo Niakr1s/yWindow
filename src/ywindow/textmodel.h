@@ -35,7 +35,7 @@ class TextModel : public QObject {
   int current_pos_ = -1;
 
   virtual QStringList doGetText() = 0;
-  virtual dict::TranslationChunk doTranslate(std::pair<int, int> pos) = 0;
+  virtual dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) = 0;
   virtual void doAddText(const QString& text) = 0;
 };
 
@@ -45,7 +45,7 @@ class YomiStyleTextModel : public TextModel {
 
  protected:
   QStringList doGetText() override;
-  dict::TranslationChunk doTranslate(std::pair<int, int> pos) override;
+  dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) override;
   void doAddText(const QString& text) override;
 
  private:

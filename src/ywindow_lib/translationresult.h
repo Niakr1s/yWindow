@@ -1,6 +1,8 @@
 #ifndef TRANSLATIONRESULT_H
 #define TRANSLATIONRESULT_H
 
+#include <memory>
+
 #include "card.h"
 
 namespace dict {
@@ -29,7 +31,8 @@ class TranslationChunk {
   CardPtrMultiMap translations_, sub_translations_;
 };
 
-using TranslationChunks = std::vector<TranslationChunk>;
+using TranslationChunkPtr = std::shared_ptr<TranslationChunk>;
+using TranslationChunkPtrs = std::vector<TranslationChunkPtr>;
 
 class TranslationResult {
  public:
@@ -37,7 +40,7 @@ class TranslationResult {
 
   struct TranslatedTextChunk {
     std::string translated_text;
-    TranslationChunk* chunk;
+    TranslationChunkPtr chunk;
     Card* card;
   };
 
@@ -49,7 +52,7 @@ class TranslationResult {
   std::string orig_text() const;
   std::vector<TranslatedText> translated_texts() const;
 
-  TranslationChunks& chunks();
+  TranslationChunkPtrs& chunks();
 
   // creating chunks for not translated parts of orig_text
   void normalize();
@@ -59,7 +62,7 @@ class TranslationResult {
 
  private:
   std::string orig_text_;
-  TranslationChunks chunks_;
+  TranslationChunkPtrs chunks_;
 
   static std::vector<TranslatedText> translated_texts_inner(
       TranslationResult input);

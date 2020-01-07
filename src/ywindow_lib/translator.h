@@ -43,10 +43,10 @@ class DictionaryTranslator : public Translator {
   TranslationResult doTranslate(const std::string& str, bool all) override;
 
  private:
-  TranslationChunk translateAnyOfSubStr(const std::string& str, size_t begin,
+  TranslationChunk* translateAnyOfSubStr(const std::string& str, size_t begin,
+                                         size_t count);
+  TranslationChunk* translateFullSubStr(const std::string& str, size_t begin,
                                         size_t count);
-  TranslationChunk translateFullSubStr(const std::string& str, size_t begin,
-                                       size_t count);
 };
 
 class YomiTranslator : public DictionaryTranslator {

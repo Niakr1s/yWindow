@@ -19,9 +19,9 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point) {
     return;
   }
   auto res = doTranslate(last_pos_);
-  if (res.translated()) {
-    emit gotTranslation(res, point);
-    emit gotTranslationLength(QString::fromStdString(res.text()).size());
+  if (res->translated()) {
+    emit gotTranslation(*res, point);
+    emit gotTranslationLength(QString::fromStdString(res->text()).size());
   }
 }
 
@@ -39,12 +39,12 @@ YomiStyleTextModel::YomiStyleTextModel(dict::Translator *translator,
 
 QStringList YomiStyleTextModel::doGetText() { return text_; }
 
-dict::TranslationChunk YomiStyleTextModel::doTranslate(
+dict::TranslationChunkPtr YomiStyleTextModel::doTranslate(
     std::pair<int, int> pos) {
   QString to_translate = text_[pos.first].mid(pos.second);
   auto res = translator_->translate(to_translate.toStdString(), false);
   qDebug() << "YomiStyleTextModel::doTranslate: transl.size"
-           << res.chunks().front().translations().size();
+           << res.chunks().front()->translations().size();
   return res.chunks().front();
 }
 
