@@ -58,39 +58,18 @@ class YomiCard : public DefaultCard {
   void setTags(std::vector<std::string>&& tags);
   void addMeaning(const std::string& meaning);
 
+  std::string reading() const override;
   std::string meaning() const override;
   std::string dictionaryInfo() const override;
   std::string etc() const override;
+
+  void setReading(const std::string& reading);
 
  protected:
   YomiDictionary* yomi_dict_;
   std::vector<std::string> meanings_;
   std::vector<std::string> tags_;
-};
-
-class YomiKanjiCard : public YomiCard {
- public:
-  YomiKanjiCard(Dictionary* dict);
-
-  void setKunReading(const std::string& reading);
-  void setOnReading(const std::string& reading);
-
-  std::string reading() const override;
-
- protected:
-  std::string kun_reading_, on_reading_;
-};
-
-class YomiTermCard : public YomiCard {
- public:
-  YomiTermCard(Dictionary* dict);
-
-  void setReading(const std::string& reading);
-
-  std::string reading() const override;
-
- protected:
-  std::string reading_;
+  std::string readings_;
 };
 
 class DeinflectDictionary;

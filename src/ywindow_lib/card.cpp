@@ -19,6 +19,8 @@ void dict::YomiCard::addMeaning(const std::string& meaning) {
   meanings_.push_back(meaning);
 }
 
+std::string dict::YomiCard::reading() const { return readings_; }
+
 void dict::DefaultCard::setName(const std::string& name) { name_ = name; }
 
 dict::Tag::Tag() {}
@@ -50,28 +52,8 @@ std::string dict::YomiCard::etc() const {
   return res;
 }
 
-dict::YomiKanjiCard::YomiKanjiCard(dict::Dictionary* dict) : YomiCard(dict) {}
-
-void dict::YomiKanjiCard::setKunReading(const std::string& reading) {
-  kun_reading_ = reading;
-}
-
-void dict::YomiKanjiCard::setOnReading(const std::string& reading) {
-  on_reading_ = reading;
-}
-
-std::string dict::YomiKanjiCard::reading() const {
-  return std::string(kun_reading_ + "; " + on_reading_);
-}
-
-dict::YomiTermCard::YomiTermCard(dict::Dictionary* dict) : YomiCard(dict) {}
-
-void dict::YomiTermCard::setReading(const std::string& reading) {
-  reading_ = reading;
-}
-
-std::string dict::YomiTermCard::reading() const {
-  return std::string(reading_);
+void dict::YomiCard::setReading(const std::string& reading) {
+  readings_ = reading;
 }
 
 dict::DeinflectCard::DeinflectCard(dict::Dictionary* dict)

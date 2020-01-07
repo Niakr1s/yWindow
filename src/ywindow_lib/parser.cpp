@@ -84,7 +84,7 @@ void dict::YomiTagParser::doParseInto(Dictionary *dict) {
 void dict::YomiTermParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    YomiTermCard *card = new YomiTermCard(dict);
+    YomiCard *card = new YomiCard(dict);
     card->setName(root[i][0].asString());
 
     card->setReading(root[i][1].asString());
@@ -104,11 +104,12 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    YomiKanjiCard *card = new YomiKanjiCard(dict);
+    YomiCard *card = new YomiCard(dict);
     card->setName(root[i][0].asString());
 
-    card->setKunReading(root[i][1].asString());
-    card->setOnReading(root[i][2].asString());
+    std::vector<std::string> reading;
+
+    card->setReading(root[i][1].asString() + " " + root[i][2].asString());
 
     std::vector<std::string> tags;
     boost::split(tags, root[i][3].asString(), boost::is_any_of(" "));
