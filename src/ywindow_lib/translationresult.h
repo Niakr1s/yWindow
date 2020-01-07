@@ -44,8 +44,10 @@ class TranslationResult;
 
 struct TranslatedText {
   std::vector<TranslatedTextChunk> text;
+  std::string orig_text;
   std::string string() const;
   TranslationResult mergeWith(const TranslationResult& rhs);
+  std::pair<TranslationChunkPtr, size_t> chunk(size_t orig_text_pos) const;
 };
 
 class TranslationResult {
@@ -56,13 +58,12 @@ class TranslationResult {
   std::vector<TranslatedText> translated_texts() const;
 
   TranslationChunkPtrs& chunks();
+  const TranslationChunkPtrs& chunks() const;
   std::pair<TranslationChunkPtr, size_t> chunk(size_t orig_text_pos) const;
 
   // creating chunks for not translated parts of orig_text
   void normalize();
   void sort();
-
-  TranslationResult mergeWith(const TranslationResult& rhs);
 
  private:
   std::string orig_text_;
