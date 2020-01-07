@@ -19,7 +19,7 @@ void dict::YomiCard::addMeaning(const std::string& meaning) {
   meanings_.push_back(meaning);
 }
 
-std::string dict::YomiCard::reading() const { return readings_; }
+std::vector<std::string> dict::YomiCard::readings() const { return readings_; }
 
 void dict::DefaultCard::setName(const std::string& name) { name_ = name; }
 
@@ -28,6 +28,8 @@ dict::Tag::Tag() {}
 dict::DefaultCard::DefaultCard(Dictionary* dict) : dict_(dict) {}
 
 dict::Card::~Card() {}
+
+std::string dict::Card::reading() { return boost::join(readings(), " "); }
 
 dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 
@@ -52,7 +54,7 @@ std::string dict::YomiCard::etc() const {
   return res;
 }
 
-void dict::YomiCard::setReading(const std::string& reading) {
+void dict::YomiCard::setReading(const std::vector<std::string>& reading) {
   readings_ = reading;
 }
 
@@ -60,11 +62,13 @@ dict::DeinflectCard::DeinflectCard(dict::Dictionary* dict)
     : DefaultCard(dict),
       deinflect_dict_(dynamic_cast<DeinflectDictionary*>(dict)) {}
 
-void dict::DeinflectCard::setReading(const std::string& meaning) {
-  reading_ = meaning;
+void dict::DeinflectCard::setReading(const std::string& reading) {
+  reading_ = reading;
 }
 
-std::string dict::DeinflectCard::reading() const { return reading_; }
+std::vector<std::string> dict::DeinflectCard::readings() const {
+  return std::vector<std::string>{reading_};
+}
 
 std::string dict::DeinflectCard::meaning() const { return ""; }
 

@@ -39,4 +39,8 @@ target_link_libraries(ywindow
     Qt5::Widgets
 )
 
+target_include_directories(ywindow
+    PRIVATE
+    ${Boost_INCLUDE_DIRS}
+)
 

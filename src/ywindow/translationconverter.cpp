@@ -1,6 +1,7 @@
 #include "translationconverter.h"
 
 #include <QDebug>
+#include <boost/algorithm/string.hpp>
 #include <set>
 #include <sstream>
 

@@ -25,9 +25,11 @@ class Card {
  public:
   virtual ~Card();
 
+  std::string reading();
+
   // please, separate separate readings by ";"
   virtual std::string name() const = 0;
-  virtual std::string reading() const = 0;
+  virtual std::vector<std::string> readings() const = 0;
   virtual std::string meaning() const = 0;
   virtual std::string dictionaryInfo() const = 0;
   virtual std::string etc() const = 0;
@@ -58,18 +60,18 @@ class YomiCard : public DefaultCard {
   void setTags(std::vector<std::string>&& tags);
   void addMeaning(const std::string& meaning);
 
-  std::string reading() const override;
+  std::vector<std::string> readings() const override;
   std::string meaning() const override;
   std::string dictionaryInfo() const override;
   std::string etc() const override;
 
-  void setReading(const std::string& reading);
+  void setReading(const std::vector<std::string>& readings);
 
  protected:
   YomiDictionary* yomi_dict_;
   std::vector<std::string> meanings_;
   std::vector<std::string> tags_;
-  std::string readings_;
+  std::vector<std::string> readings_;
 };
 
 class DeinflectDictionary;
@@ -78,9 +80,9 @@ class DeinflectCard : public DefaultCard {
  public:
   DeinflectCard(Dictionary* dict);
 
-  void setReading(const std::string& meaning);
+  void setReading(const std::string& reading);
 
-  std::string reading() const override;
+  std::vector<std::string> readings() const override;
   std::string meaning() const override;
   std::string dictionaryInfo() const override;
   std::string etc() const override;
