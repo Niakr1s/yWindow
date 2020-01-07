@@ -18,7 +18,10 @@ TEST(translationresult, test1) {
   auto translated = yomi->translate("見る笑う", true);
   ASSERT_EQ(translated.chunks().size(), 2);
 
-  auto merged = translated.merged(deinflected);
+  for (auto &t : deinflected.translated_texts()) {
+    auto merged = t.mergeWith(translated);
+    int i = 0;
+  }
 }
 
 #endif  // DICT_TRANSLATIONRESULT_TESTS_H

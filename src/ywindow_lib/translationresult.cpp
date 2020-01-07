@@ -41,6 +41,19 @@ dict::TranslationChunkPtrs &dict::TranslationResult::chunks() {
   return chunks_;
 }
 
+std::pair<dict::TranslationChunkPtr, size_t> dict::TranslationResult::chunk(
+    size_t orig_text_pos) const {
+  size_t counter = 0;
+  for (auto &chunk : chunks_) {
+    for (size_t i = 0, i_max = chunk->text().size(); i != i_max; ++i) {
+      if (counter++ == orig_text_pos) {
+        return {chunk, i};
+      }
+    }
+  }
+  return {nullptr, 0};
+}
+
 void dict::TranslationResult::normalize() {
   sort();
   TranslationChunkPtrs new_chunks;
@@ -76,22 +89,37 @@ void dict::TranslationResult::sort() {
             });
 }
 
-dict::TranslationResult dict::TranslationResult::merged(
+dict::TranslationResult dict::TranslationResult::mergeWith(
     const dict::TranslationResult &rhs) {
   TranslationResult res{orig_text_};
-  for (auto &chunk : rhs.chunks_) {
+  for (auto ch : rhs.chunks_) {
+    auto beg_ch = chunk(ch->orig_begin());
+    auto end_ch = chunk(ch->orig_end());
+    auto orig_begin = beg_ch.first->orig_begin() /*+ beg_ch.second*/;
+    auto orig_end = end_ch.first->orig_end() /* + end_ch.second*/;
+    auto subst = orig_text_.substr(orig_begin, orig_end - orig_begin + 1);
+    auto new_chunk =
+        TranslationChunkPtr(new TranslationChunk(subst, orig_begin, orig_end));
+    res.chunks().push_back(new_chunk);
   }
+  res.normalize();
+  return res;
+}
+
+dict::TranslationResult dict::TranslatedText::mergeWith(
+    const dict::TranslationResult &rhs) {
+  TranslationResult res{""};
   return res;
 }
 
 std::string dict::TranslationResult::orig_text() const { return orig_text_; }
 
-std::vector<dict::TranslationResult::TranslatedText>
-dict::TranslationResult::translated_texts() const {
+std::vector<dict::TranslatedText> dict::TranslationResult::translated_texts()
+    const {
   return translated_texts_inner(TranslationResult(*this));
 }
 
-std::vector<dict::TranslationResult::TranslatedText>
+std::vector<dict::TranslatedText>
 dict::TranslationResult::translated_texts_inner(TranslationResult input) {
   std::vector<TranslatedText> res;
 
@@ -131,7 +159,7 @@ dict::TranslationResult::translated_texts_inner(TranslationResult input) {
   return res;
 }
 
-std::string dict::TranslationResult::TranslatedText::string() const {
+std::string dict::TranslatedText::string() const {
   std::string res;
   for (auto &chunk : text) {
     res.append(chunk.translated_text);

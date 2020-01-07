@@ -34,31 +34,35 @@ class TranslationChunk {
 using TranslationChunkPtr = std::shared_ptr<TranslationChunk>;
 using TranslationChunkPtrs = std::vector<TranslationChunkPtr>;
 
+struct TranslatedTextChunk {
+  std::string translated_text;
+  TranslationChunkPtr chunk;
+  Card* card;
+};
+
+class TranslationResult;
+
+struct TranslatedText {
+  std::vector<TranslatedTextChunk> text;
+  std::string string() const;
+  TranslationResult mergeWith(const TranslationResult& rhs);
+};
+
 class TranslationResult {
  public:
   TranslationResult(const std::string& orig_text);
-
-  struct TranslatedTextChunk {
-    std::string translated_text;
-    TranslationChunkPtr chunk;
-    Card* card;
-  };
-
-  struct TranslatedText {
-    std::vector<TranslatedTextChunk> text;
-    std::string string() const;
-  };
 
   std::string orig_text() const;
   std::vector<TranslatedText> translated_texts() const;
 
   TranslationChunkPtrs& chunks();
+  std::pair<TranslationChunkPtr, size_t> chunk(size_t orig_text_pos) const;
 
   // creating chunks for not translated parts of orig_text
   void normalize();
   void sort();
 
-  TranslationResult merged(const TranslationResult& rhs);
+  TranslationResult mergeWith(const TranslationResult& rhs);
 
  private:
   std::string orig_text_;
