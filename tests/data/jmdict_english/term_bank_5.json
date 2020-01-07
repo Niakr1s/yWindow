@@ -34,5 +34,124 @@
         ],
         1243860,
         ""
+    ],
+    [
+        "見る",
+        "みる",
+        "v1 vt",
+        "v1",
+        747,
+        [
+            "to look over",
+            "to look on",
+            "to assess",
+            "to examine",
+            "to judge"
+        ],
+        1259290,
+        "P ichi news"
+    ],
+    [
+        "見る",
+        "みる",
+        "v1 vt uk",
+        "v1",
+        746,
+        [
+            "to look after",
+            "to keep an eye on",
+            "to take care of"
+        ],
+        1259290,
+        "P ichi news"
+    ],
+    [
+        "見る",
+        "みる",
+        "v1 vt",
+        "v1",
+        745,
+        [
+            "to view (e.g. flowers, movie)"
+        ],
+        1259290,
+        "P ichi news"
+    ],
+    [
+        "見る",
+        "みる",
+        "aux-v v1 uk",
+        "v1",
+        744,
+        [
+            "to try",
+            "to try out",
+            "to test"
+        ],
+        1259290,
+        "P ichi news"
+    ],
+    [
+        "見る",
+        "みる",
+        "aux-v v1 uk",
+        "v1",
+        743,
+        [
+            "to see that...",
+            "to find that..."
+        ],
+        1259290,
+        "P ichi news"
+    ],
+    [
+        "笑う",
+        "わらう",
+        "v5u vi",
+        "v5",
+        720,
+        [
+            "to laugh"
+        ],
+        1351360,
+        "P ichi news"
+    ],
+    [
+        "笑う",
+        "わらう",
+        "v5u vi",
+        "v5",
+        719,
+        [
+            "to smile"
+        ],
+        1351360,
+        "P ichi news"
+    ],
+    [
+        "笑う",
+        "わらう",
+        "v5u vi",
+        "v5",
+        718,
+        [
+            "to sneer",
+            "to ridicule"
+        ],
+        1351360,
+        "P ichi news"
+    ],
+    [
+        "笑う",
+        "わらう",
+        "v5u vi",
+        "v5",
+        717,
+        [
+            "to be dumbfounded",
+            "to be flabbergasted"
+        ],
+        1351360,
+        "P ichi news"
     ]
 ]
