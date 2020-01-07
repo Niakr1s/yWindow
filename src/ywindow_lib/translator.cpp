@@ -81,12 +81,6 @@ dict::TranslationChunk dict::DictionaryTranslator::translateFullSubStr(
   return chunk;
 }
 
-dict::TranslatorDecorator::TranslatorDecorator(dict::Translator *translator)
-    : next_translator_(translator) {}
-
-dict::DeinflectTranslator::DeinflectTranslator(dict::Translator *translator)
-    : TranslatorDecorator(translator) {}
-
 size_t dict::Translator::MAX_CHUNK_SIZE = 30;
 
 dict::DictionaryTranslator::DictionaryTranslator() {}
@@ -111,4 +105,21 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslate(
     }
   }
   return res;
+}
+
+dict::DeinflectTranslator::DeinflectTranslator(
+    const fs::path &file, dict::Translator *next_translator)
+    : DictionaryTranslator(), next_translator_(next_translator) {
+  future_ = Loader::loadFromFS<DeinflectDictionary>(file);
+}
+
+void dict::DeinflectTranslator::prepareDictionaries() {
+  if (dicts_.empty()) {
+    dicts_.push_back(std::unique_ptr<Dictionary>(future_.get()));
+  }
+}
+
+dict::TranslationResult dict::DeinflectTranslator::doTranslate(
+    const std::string &str, bool all) {
+  return DictionaryTranslator::doTranslate(str, all);
 }

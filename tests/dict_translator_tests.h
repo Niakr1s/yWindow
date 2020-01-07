@@ -50,4 +50,10 @@ TEST(yomi_translator, translation_result_all_true) {
   ASSERT_EQ(res.chunks()[5].text(), "etc");
 }
 
+TEST(deinflector, test1) {
+  auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
+  auto res = de->translate("見れば笑って", true);
+  ASSERT_EQ(res.chunks().size(), 4);
+}
+
 #endif  // DICT_TRANSLATOR_TESTS_H

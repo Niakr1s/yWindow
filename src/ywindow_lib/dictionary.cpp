@@ -13,7 +13,9 @@ dict::DefaultDictionary::DefaultDictionary() : Dictionary() {}
 dict::YomiDictionary::YomiDictionary()
     : DefaultDictionary(), tags_(std::make_shared<TagMap>()) {}
 
-void dict::DefaultDictionary::doUpdateInfo(const std::string &info) { info_ = info; }
+void dict::DefaultDictionary::doUpdateInfo(const std::string &info) {
+  info_ = info;
+}
 
 void dict::YomiDictionary::addTag(const Tag &tag) {
   std::unique_lock<std::mutex> lock(mutex_);
@@ -42,3 +44,5 @@ dict::CardPtrMultiMap dict::DefaultDictionary::doQuery(
 }
 
 const dict::TagMap &dict::YomiDictionary::tags() const { return *tags_; }
+
+dict::DeinflectDictionary::DeinflectDictionary() : DefaultDictionary() {}

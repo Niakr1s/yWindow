@@ -69,7 +69,7 @@ class YomiDictionary : public DefaultDictionary {
 
 class DeinflectDictionary : public DefaultDictionary {
  public:
-  DeinflectDictionary() : DefaultDictionary() {}
+  DeinflectDictionary();
 };
 
 }  // namespace dict

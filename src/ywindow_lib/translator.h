@@ -39,7 +39,7 @@ class DictionaryTranslator : public Translator {
   // called before actual translation, use it for initializing dicts_ variable
   virtual void prepareDictionaries() = 0;
 
-  TranslationResult doTranslate(const std::string& str, bool all) final;
+  TranslationResult doTranslate(const std::string& str, bool all) override;
 
   TranslationChunk translateAnyOfSubStr(const std::string& str, size_t begin,
                                         size_t count);
@@ -58,17 +58,17 @@ class YomiTranslator : public DictionaryTranslator {
   std::vector<std::future<Dictionary*>> dicts_futures_;
 };
 
-class TranslatorDecorator : public Translator {
+class DeinflectTranslator : public DictionaryTranslator {
  public:
-  TranslatorDecorator(Translator* translator);
+  DeinflectTranslator(const fs::path& file, Translator* next_translator);
 
  protected:
-  Translator* next_translator_;
-};
+  void prepareDictionaries() override;
+  TranslationResult doTranslate(const std::string& str, bool all) override;
 
-class DeinflectTranslator : public TranslatorDecorator {
- public:
-  DeinflectTranslator(Translator* translator);
+ private:
+  Translator* next_translator_;
+  std::future<Dictionary*> future_;
 };
 
 }  // namespace dict
