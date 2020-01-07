@@ -50,10 +50,22 @@ TEST(yomi_translator, translation_result_all_true) {
   ASSERT_EQ(res.chunks()[5].text(), "etc");
 }
 
+TEST(yomi_translator, translation_result_all_true2) {
+  auto yomi = new YomiTranslator("data");
+  auto res = yomi->translate("見る笑う", true);
+  ASSERT_EQ(res.chunks().size(), 2);
+  ASSERT_TRUE(res.chunks()[0].translated());
+  ASSERT_TRUE(res.chunks()[1].translated());
+}
+
 TEST(deinflector, test1) {
   auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
   auto res = de->translate("見れば笑って", true);
   ASSERT_EQ(res.chunks().size(), 4);
+  ASSERT_EQ(res.chunks()[0].text(), "見");
+  ASSERT_EQ(res.chunks()[1].text(), "れば");
+  ASSERT_EQ(res.chunks()[2].text(), "笑");
+  ASSERT_EQ(res.chunks()[3].text(), "って");
 }
 
 #endif  // DICT_TRANSLATOR_TESTS_H

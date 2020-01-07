@@ -74,4 +74,65 @@ void dict::TranslationResult::sort() {
             });
 }
 
+dict::TranslationResult dict::TranslationResult::merged(
+    const dict::TranslationResult &rhs) {
+  TranslationResult res{orig_text_};
+  for (auto &chunk : rhs.chunks_) {
+  }
+  return res;
+}
+
 std::string dict::TranslationResult::orig_text() const { return orig_text_; }
+
+std::vector<dict::TranslationResult::TranslatedText>
+dict::TranslationResult::translated_texts() const {
+  return translated_texts_inner(TranslationResult(*this));
+}
+
+std::vector<dict::TranslationResult::TranslatedText>
+dict::TranslationResult::translated_texts_inner(TranslationResult input) {
+  std::vector<TranslatedText> res;
+
+  auto append_to_res = [&res, input](TranslatedTextChunk last_part) {
+    auto inner_input = TranslationResult(input);
+    inner_input.chunks().pop_back();
+    if (inner_input.chunks().empty()) {
+      res.push_back(TranslatedText{{last_part}});
+    } else {
+      for (auto &s : translated_texts_inner(inner_input)) {
+        auto to_push = s;
+        to_push.text.push_back(last_part);
+        res.push_back(to_push);
+      }
+    }
+  };
+
+  auto chunk = input.chunks().back();
+  if (!chunk.translated()) {
+    TranslatedTextChunk last_part_chunk;
+    auto last_part = chunk.text();
+    last_part_chunk.translated_text = last_part;
+    last_part_chunk.chunk = &chunk;  // TODO  WARNING, NEED SHARED_PTR
+    append_to_res(last_part_chunk);
+  } else {
+    for (auto [s, card] : chunk.translations()) {
+      for (auto &last_part : card->readings()) {
+        TranslatedTextChunk last_part_chunk;
+        last_part_chunk.translated_text = last_part;
+        last_part_chunk.chunk = &chunk;  // TODO  WARNING, NEED SHARED_PTR
+        last_part_chunk.card = card;
+        append_to_res(last_part_chunk);
+      }
+    }
+  }
+
+  return res;
+}
+
+std::string dict::TranslationResult::TranslatedText::string() const {
+  std::string res;
+  for (auto &chunk : text) {
+    res.append(chunk.translated_text);
+  }
+  return res;
+}

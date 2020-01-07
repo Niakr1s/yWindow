@@ -35,18 +35,34 @@ class TranslationResult {
  public:
   TranslationResult(const std::string& orig_text);
 
+  struct TranslatedTextChunk {
+    std::string translated_text;
+    TranslationChunk* chunk;
+    Card* card;
+  };
+
+  struct TranslatedText {
+    std::vector<TranslatedTextChunk> text;
+    std::string string() const;
+  };
+
   std::string orig_text() const;
+  std::vector<TranslatedText> translated_texts() const;
 
   TranslationChunks& chunks();
 
   // creating chunks for not translated parts of orig_text
   void normalize();
-
   void sort();
+
+  TranslationResult merged(const TranslationResult& rhs);
 
  private:
   std::string orig_text_;
   TranslationChunks chunks_;
+
+  static std::vector<TranslatedText> translated_texts_inner(
+      TranslationResult input);
 };
 
 }  // namespace dict
