@@ -16,27 +16,27 @@ class Dictionary {
   Dictionary();
   virtual ~Dictionary();
 
-  CardPtrMultiMap query(const string& text) const;
+  CardPtrMultiMap query(const std::string& text) const;
 
   virtual void addCard(Card* card) {
     std::unique_lock<std::mutex> lock(mutex_);
     return doAddCard(card);
   }
 
-  void updateInfo(const string& info) {
+  void updateInfo(const std::string& info) {
     std::unique_lock<std::mutex> lock(mutex_);
     return doUpdateInfo(info);
   }
 
-  virtual const string& info() const = 0;
+  virtual const std::string& info() const = 0;
   virtual size_t size() const = 0;
 
   std::mutex& mutex();
 
  protected:
-  virtual CardPtrMultiMap doQuery(const string& text) const = 0;
+  virtual CardPtrMultiMap doQuery(const std::string& text) const = 0;
   virtual void doAddCard(Card* card) = 0;
-  virtual void doUpdateInfo(const string& info) = 0;
+  virtual void doUpdateInfo(const std::string& info) = 0;
   std::mutex mutex_;
 };
 
@@ -44,16 +44,16 @@ class DefaultDictionary : public Dictionary {
  public:
   DefaultDictionary();
 
-  const string& info() const override;
+  const std::string& info() const override;
   size_t size() const override;
 
  protected:
-  string info_;
+  std::string info_;
   CardUniquePtrMap cards_;
 
-  CardPtrMultiMap doQuery(const string& text) const override;
+  CardPtrMultiMap doQuery(const std::string& text) const override;
   virtual void doAddCard(Card* card) override;
-  void doUpdateInfo(const string& info) override;
+  void doUpdateInfo(const std::string& info) override;
 };
 
 class YomiDictionary : public DefaultDictionary {

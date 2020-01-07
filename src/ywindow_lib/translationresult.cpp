@@ -8,11 +8,11 @@ bool dict::TranslationChunk::translated() const {
 
 dict::TranslationChunk::TranslationChunk() : TranslationChunk("", 0, 0) {}
 
-dict::TranslationChunk::TranslationChunk(const string &text, size_t orig_begin,
-                                         size_t orig_end)
+dict::TranslationChunk::TranslationChunk(const std::string &text,
+                                         size_t orig_begin, size_t orig_end)
     : text_(text), orig_begin_(orig_begin), orig_end_(orig_end) {}
 
-dict::string dict::TranslationChunk::text() const { return text_; }
+std::string dict::TranslationChunk::text() const { return text_; }
 
 size_t dict::TranslationChunk::orig_begin() const { return orig_begin_; }
 
@@ -34,7 +34,7 @@ const dict::CardPtrMultiMap &dict::TranslationChunk::subTranslations() const {
   return sub_translations_;
 }
 
-dict::TranslationResult::TranslationResult(const dict::string &orig_text)
+dict::TranslationResult::TranslationResult(const std::string &orig_text)
     : orig_text_(orig_text) {}
 
 dict::TranslationChunks &dict::TranslationResult::chunks() { return chunks_; }
@@ -74,4 +74,4 @@ void dict::TranslationResult::sort() {
             });
 }
 
-dict::string dict::TranslationResult::orig_text() const { return orig_text_; }
+std::string dict::TranslationResult::orig_text() const { return orig_text_; }

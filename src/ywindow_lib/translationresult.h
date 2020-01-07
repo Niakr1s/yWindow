@@ -8,9 +8,9 @@ namespace dict {
 class TranslationChunk {
  public:
   TranslationChunk();
-  TranslationChunk(const string& text, size_t orig_begin, size_t orig_end);
+  TranslationChunk(const std::string& text, size_t orig_begin, size_t orig_end);
 
-  string text() const;
+  std::string text() const;
 
   size_t orig_begin() const;
   size_t orig_end() const;
@@ -24,7 +24,7 @@ class TranslationChunk {
   const CardPtrMultiMap& subTranslations() const;
 
  private:
-  string text_;
+  std::string text_;
   size_t orig_begin_, orig_end_;
   CardPtrMultiMap translations_, sub_translations_;
 };
@@ -33,9 +33,9 @@ using TranslationChunks = std::vector<TranslationChunk>;
 
 class TranslationResult {
  public:
-  TranslationResult(const string& orig_text);
+  TranslationResult(const std::string& orig_text);
 
-  string orig_text() const;
+  std::string orig_text() const;
 
   TranslationChunks& chunks();
 
@@ -45,7 +45,7 @@ class TranslationResult {
   void sort();
 
  private:
-  string orig_text_;
+  std::string orig_text_;
   TranslationChunks chunks_;
 };
 

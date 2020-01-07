@@ -30,7 +30,7 @@ std::string YTranslationConverter::doToHtml(
 
 YTranslationConverter::DictCardPtrMap YTranslationConverter::toDictCardPtrMap(
     const dict::CardPtrMultiMap& input) {
-  std::set<dict::string> keys;
+  std::set<std::string> keys;
   for (auto& it : input) {
     keys.insert(it.first);
   }

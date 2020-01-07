@@ -60,7 +60,7 @@ dict::TranslationChunk dict::DictionaryTranslator::translateAnyOfSubStr(
 
 dict::TranslationChunk dict::DictionaryTranslator::translateFullSubStr(
     const std::string &str, size_t begin, size_t count) {
-  string str_chunk = str.substr(begin, count);
+  std::string str_chunk = str.substr(begin, count);
   TranslationChunk chunk{str_chunk, begin, begin + count - 1};
   for (auto &dict : dicts_) {
     auto query = dict->query(str_chunk);

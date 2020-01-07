@@ -61,7 +61,7 @@ dict::YomiKanjiParser::YomiKanjiParser(std::istream *iss) : YomiParser(iss) {}
 
 void dict::YomiIndexParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
-  string info = root.get("title", "").asString();
+  std::string info = root.get("title", "").asString();
   dict->updateInfo(info);
 }
 
@@ -89,7 +89,7 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 
     card->setReading(root[i][1].asString());
 
-    std::vector<string> tags;
+    std::vector<std::string> tags;
     boost::split(tags, root[i][2].asString(), boost::is_any_of(" "));
     card->setTags(std::move(tags));
 
@@ -110,7 +110,7 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
     card->setKunReading(root[i][1].asString());
     card->setOnReading(root[i][2].asString());
 
-    std::vector<string> tags;
+    std::vector<std::string> tags;
     boost::split(tags, root[i][3].asString(), boost::is_any_of(" "));
     card->setTags(std::move(tags));
 
