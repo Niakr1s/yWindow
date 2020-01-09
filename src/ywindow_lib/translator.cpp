@@ -37,6 +37,11 @@ dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs)
   }
 }
 
+dict::TranslationResult dict::YomiTranslator::doTranslate(
+    const std::string &str) {
+  return doTranslateAll<TranslatedChunkFinal>(str);
+}
+
 void dict::DictionaryTranslator::prepareDictionaries() {
   while (!dicts_futures_.empty()) {
     try {
@@ -68,11 +73,7 @@ dict::CardPtrMultiMap dict::DictionaryTranslator::queryAllDicts(
   return res;
 }
 
-dict::TranslationResult dict::DictionaryTranslator::doTranslate(
-    const std::string &str) {
-  return doTranslateAll(str);
-}
-
+template <class TranslatedChunk_T>
 dict::TranslationResult dict::DictionaryTranslator::doTranslateAll(
     const std::string &str) {
   TranslationChunkPtrs translated_chunks;
@@ -82,7 +83,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslateAll(
             it_end = transl_res.chunks().end();
        it < it_end; ++it) {
     TranslationResult inner{it, it_end};
-    auto chunk = doTranslateFirstOf(inner.orig_text());
+    auto chunk = doTranslateFirstOf<TranslatedChunk_T>(inner.orig_text());
     if (chunk.first->translated()) {
       translated_chunks.push_back(chunk.first);
       it += chunk.second - 1;
@@ -93,6 +94,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslateAll(
   return TranslationResult{translated_chunks.begin(), translated_chunks.end()};
 }
 
+template <class TranslatedChunk_T>
 std::pair<dict::TranslationChunkPtr, int>
 dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
   TranslationResult transl_result{str};
@@ -112,15 +114,16 @@ dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
         sub_translations.insert(inner_sub_translations.cbegin(),
                                 inner_sub_translations.cend());
       }
-      return {std::make_shared<TranslatedChunk>(inner_orig_text,
-                                                std::move(translations),
-                                                std::move(sub_translations)),
+      return {std::make_shared<TranslatedChunk_T>(inner_orig_text,
+                                                  std::move(translations),
+                                                  std::move(sub_translations)),
               it - it_beg};
     }
   }
   return {std::make_shared<UntranslatedChunk>(str), 0};
 }
 
+template <class TranslatedChunk_T>
 dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
     const std::string &str) {
   TranslationResult transl_result{str};
@@ -139,8 +142,8 @@ dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
     sub_translations.insert(inner_sub_translations.cbegin(),
                             inner_sub_translations.cend());
   }
-  return std::make_shared<TranslatedChunk>(str, std::move(translations),
-                                           std::move(sub_translations));
+  return std::make_shared<TranslatedChunk_T>(str, std::move(translations),
+                                             std::move(sub_translations));
 }
 
 dict::DeinflectTranslator::DeinflectTranslator(
@@ -151,5 +154,5 @@ dict::DeinflectTranslator::DeinflectTranslator(
 
 dict::TranslationResult dict::DeinflectTranslator::doTranslate(
     const std::string &str) {
-  return DictionaryTranslator::doTranslate(str);
+  return doTranslateAll<TranslatedChunk>(str);
 }

@@ -42,15 +42,18 @@ class DictionaryTranslator : public Translator {
   CardPtrMultiMap queryAllDicts(const std::string& str);
 
   void prepareDictionaries() final;
-  TranslationResult doTranslate(const std::string& str) override;
 
+  // template main function, use it with TranslatedChunk or TranslatedChunkFinal
+  template <class TranslatedChunk>
   TranslationResult doTranslateAll(const std::string& str);
 
   // second arg of pair is num of first full utf8 symbols translated
   // equal to num of first translated chunks() in TranslationResult{str}
+  template <class TranslatedChunk>
   std::pair<TranslationChunkPtr, int> doTranslateFirstOf(
       const std::string& str);
 
+  template <class TranslatedChunk>
   TranslationChunkPtr doTranslateFullStr(const std::string& str);
 };
 
@@ -58,6 +61,9 @@ class YomiTranslator : public DictionaryTranslator {
  public:
   YomiTranslator(const fs::path& root_dir);
   YomiTranslator(std::initializer_list<fs::path> dicts_dirs);
+
+ protected:
+  TranslationResult doTranslate(const std::string& str) override;
 };
 
 class DeinflectTranslator : public DictionaryTranslator {

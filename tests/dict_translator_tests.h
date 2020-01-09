@@ -20,6 +20,7 @@ TEST(yomi_translator, test1) {
   ASSERT_TRUE(res.chunks()[0]->translated());
   ASSERT_EQ(res.chunks()[0]->subTranslations().size(), 1);
   ASSERT_TRUE(res.chunks()[0]->translated());
+  ASSERT_TRUE(res.chunks()[0]->final());
 }
 
 TEST(yomi_translator, translation_result) {
@@ -50,6 +51,14 @@ TEST(deinflector, test1) {
   ASSERT_EQ(res.chunks()[1]->originText(), "れば");
   ASSERT_EQ(res.chunks()[2]->originText(), "笑");
   ASSERT_EQ(res.chunks()[3]->originText(), "って");
+  ASSERT_FALSE(res.chunks()[0]->translated());
+  ASSERT_TRUE(res.chunks()[1]->translated());
+  ASSERT_FALSE(res.chunks()[2]->translated());
+  ASSERT_TRUE(res.chunks()[3]->translated());
+  ASSERT_FALSE(res.chunks()[0]->final());
+  ASSERT_FALSE(res.chunks()[1]->final());
+  ASSERT_FALSE(res.chunks()[2]->final());
+  ASSERT_FALSE(res.chunks()[3]->final());
 }
 
 #endif  // DICT_TRANSLATOR_TESTS_H
