@@ -80,15 +80,16 @@ class TranslationText;
 class TranslationTextChunk {
  public:
   TranslationTextChunk(TranslationChunkPtr chunk, const std::string& reading)
-      : chunk_(chunk), reading_(reading) {}
+      : translation_chunk_(chunk), reading_(reading) {}
 
-  TranslationChunkPtr chunk() const;
   std::string reading() const { return reading_; }
 
   TranslationText operator+(const TranslationText& rhs);
 
+  TranslationChunkPtr translationChunk() const;
+
  private:
-  TranslationChunkPtr chunk_;
+  TranslationChunkPtr translation_chunk_;
   std::string reading_;
 };
 
@@ -100,7 +101,6 @@ class TranslationText {
       : readings_(readings) {}
 
   std::string string() const;
-  TranslationResult mergeWith(const TranslationResult& rhs);
 
   const std::vector<TranslationTextChunk>& readings() const;
 
@@ -108,7 +108,6 @@ class TranslationText {
 
  private:
   std::vector<TranslationTextChunk> readings_;
-  std::string orig_text_;
 };
 
 class TranslationResult {

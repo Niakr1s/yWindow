@@ -12,18 +12,16 @@ TEST(translationresult, test1) {
   auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
   auto deinflected = de->translate("見れば笑って");
   ASSERT_EQ(deinflected.chunks().size(), 4);
-  //  auto deinflected_translated_text = deinflected.translated_texts();
-  //  ASSERT_EQ(deinflected_translated_text.size(), 3);
-  //  auto yomi = new YomiTranslator("data");
-  //  auto translated = yomi->translate("見る笑う", true);
-  //  ASSERT_EQ(translated.chunks().size(), 2);
+  auto deinflected_translated_text = deinflected.toTexts();
+  ASSERT_EQ(deinflected_translated_text.size(), 3);
+  auto yomi = new YomiTranslator("data");
 
-  //  for (auto &t : deinflected_translated_text) {
-  //    TranslationResult m = t.mergeWith(translated);
-  //    ASSERT_EQ(m.chunks().size(), 2);
-  //    ASSERT_EQ(m.chunks()[0]->text(), "見れば");
-  //    ASSERT_EQ(m.chunks()[1]->text(), "笑って");
-  //  }
+  for (auto &t : deinflected_translated_text) {
+    auto to_translate = t.string();
+    auto translated = yomi->translate(to_translate);
+    TranslationResult m = t + translated;
+    ASSERT_EQ(m.orig_text(), "見れば笑って");
+  }
 }
 
 TEST(translationresult, constructor1) {
