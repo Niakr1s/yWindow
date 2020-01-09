@@ -18,11 +18,11 @@ class Translator {
  public:
   virtual ~Translator();
 
-  TranslationResult translate(const std::wstring& wstr, bool all);
-  TranslationResult translate(const std::string& str, bool all);
+  TranslationResult translate(const std::wstring& wstr);
+  TranslationResult translate(const std::string& str);
 
  protected:
-  virtual TranslationResult doTranslate(const std::string& str, bool all) = 0;
+  virtual TranslationResult doTranslate(const std::string& str) = 0;
   virtual void prepareDictionaries() = 0;
 
   static size_t MAX_CHUNK_SIZE;
@@ -42,7 +42,7 @@ class DictionaryTranslator : public Translator {
   CardPtrMultiMap queryAllDicts(const std::string& str);
 
   void prepareDictionaries() final;
-  TranslationResult doTranslate(const std::string& str, bool all) override;
+  TranslationResult doTranslate(const std::string& str) override;
 
   TranslationResult doTranslateAll(const std::string& str);
 
@@ -52,12 +52,6 @@ class DictionaryTranslator : public Translator {
       const std::string& str);
 
   TranslationChunkPtr doTranslateFullStr(const std::string& str);
-
- private:
-  TranslationChunk* translateAnyOfSubStr(const std::string& str, size_t begin,
-                                         size_t count);
-  TranslationChunk* translateFullSubStr(const std::string& str, size_t begin,
-                                        size_t count);
 };
 
 class YomiTranslator : public DictionaryTranslator {
@@ -71,7 +65,7 @@ class DeinflectTranslator : public DictionaryTranslator {
   DeinflectTranslator(const fs::path& file, Translator* next_translator);
 
  protected:
-  TranslationResult doTranslate(const std::string& str, bool all) override;
+  TranslationResult doTranslate(const std::string& str) override;
 
  private:
   Translator* next_translator_;

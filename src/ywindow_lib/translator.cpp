@@ -8,16 +8,14 @@
 
 dict::Translator::~Translator() {}
 
-dict::TranslationResult dict::Translator::translate(const std::wstring &wstr,
-                                                    bool all) {
+dict::TranslationResult dict::Translator::translate(const std::wstring &wstr) {
   std::string str = WideStringToString(wstr);
-  return translate(str, all);
+  return translate(str);
 }
 
-dict::TranslationResult dict::Translator::translate(const std::string &str,
-                                                    bool all) {
+dict::TranslationResult dict::Translator::translate(const std::string &str) {
   prepareDictionaries();
-  auto res = doTranslate(str, all);
+  auto res = doTranslate(str);
   //  res.normalize();
   return res;
 }
@@ -50,39 +48,6 @@ void dict::DictionaryTranslator::prepareDictionaries() {
   }
 }
 
-dict::TranslationChunk *dict::DictionaryTranslator::translateAnyOfSubStr(
-    const std::string &str, size_t begin, size_t count) {
-  for (size_t sz = std::min(count, MAX_CHUNK_SIZE); sz != 0; --sz) {
-    auto chunk = translateFullSubStr(str, begin, sz);
-    if (chunk->translated()) return chunk;
-  }
-  // TODO
-  return new UntranslatedChunk({str.substr(begin, count)});
-}
-
-dict::TranslationChunk *dict::DictionaryTranslator::translateFullSubStr(
-    const std::string &str, size_t begin, size_t count) {
-  std::string str_chunk = str.substr(begin, count);
-  auto chunk = new UntranslatedChunk({str_chunk, begin});  // TODO
-  //  for (auto &dict : dicts_) {
-  //    auto query = dict->query(str_chunk);
-  //    for (auto &card : query) {
-  //      chunk->translations().insert(card);
-  //    }
-  //  }
-  //  if (!chunk->translated()) return chunk;
-  //  while (--count != 0) {
-  //    str_chunk = str.substr(begin, count);
-  //    for (auto &dict : dicts_) {
-  //      auto query = dict->query(str_chunk);
-  //      for (auto &card : query) {
-  //        chunk->subTranslations().insert(card);
-  //      }
-  //    }
-  //  }
-  return chunk;
-}
-
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
 dict::DictionaryTranslator::DictionaryTranslator() {}
@@ -104,7 +69,7 @@ dict::CardPtrMultiMap dict::DictionaryTranslator::queryAllDicts(
 }
 
 dict::TranslationResult dict::DictionaryTranslator::doTranslate(
-    const std::string &str, bool all) {
+    const std::string &str) {
   return doTranslateAll(str);
 }
 
@@ -185,6 +150,6 @@ dict::DeinflectTranslator::DeinflectTranslator(
 }
 
 dict::TranslationResult dict::DeinflectTranslator::doTranslate(
-    const std::string &str, bool all) {
-  return DictionaryTranslator::doTranslate(str, all);
+    const std::string &str) {
+  return DictionaryTranslator::doTranslate(str);
 }

@@ -10,7 +10,7 @@ using namespace dict;
 
 TEST(translationresult, test1) {
   auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
-  auto deinflected = de->translate("見れば笑って", true);
+  auto deinflected = de->translate("見れば笑って");
   ASSERT_EQ(deinflected.chunks().size(), 4);
   //  auto deinflected_translated_text = deinflected.translated_texts();
   //  ASSERT_EQ(deinflected_translated_text.size(), 3);
