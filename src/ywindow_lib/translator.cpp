@@ -18,7 +18,7 @@ dict::TranslationResult dict::Translator::translate(const std::string &str,
                                                     bool all) {
   prepareDictionaries();
   auto res = doTranslate(str, all);
-  res.normalize();
+  //  res.normalize();
   return res;
 }
 
@@ -56,30 +56,30 @@ dict::TranslationChunk *dict::DictionaryTranslator::translateAnyOfSubStr(
     auto chunk = translateFullSubStr(str, begin, sz);
     if (chunk->translated()) return chunk;
   }
-  return new TranslationChunk(
-      {str.substr(begin, count), begin, begin + count - 1});
+  // TODO
+  return new UntranslatedChunk({str.substr(begin, count)});
 }
 
 dict::TranslationChunk *dict::DictionaryTranslator::translateFullSubStr(
     const std::string &str, size_t begin, size_t count) {
   std::string str_chunk = str.substr(begin, count);
-  auto chunk = new TranslationChunk({str_chunk, begin, begin + count - 1});
-  for (auto &dict : dicts_) {
-    auto query = dict->query(str_chunk);
-    for (auto &card : query) {
-      chunk->translations().insert(card);
-    }
-  }
-  if (!chunk->translated()) return chunk;
-  while (--count != 0) {
-    str_chunk = str.substr(begin, count);
-    for (auto &dict : dicts_) {
-      auto query = dict->query(str_chunk);
-      for (auto &card : query) {
-        chunk->subTranslations().insert(card);
-      }
-    }
-  }
+  auto chunk = new UntranslatedChunk({str_chunk, begin});  // TODO
+  //  for (auto &dict : dicts_) {
+  //    auto query = dict->query(str_chunk);
+  //    for (auto &card : query) {
+  //      chunk->translations().insert(card);
+  //    }
+  //  }
+  //  if (!chunk->translated()) return chunk;
+  //  while (--count != 0) {
+  //    str_chunk = str.substr(begin, count);
+  //    for (auto &dict : dicts_) {
+  //      auto query = dict->query(str_chunk);
+  //      for (auto &card : query) {
+  //        chunk->subTranslations().insert(card);
+  //      }
+  //    }
+  //  }
   return chunk;
 }
 
@@ -102,7 +102,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslate(
       auto chunk = translateAnyOfSubStr(str, i, i_max - i);
       if (chunk->translated()) {
         res.chunks().push_back(TranslationChunkPtr(chunk));
-        i = chunk->orig_end();
+        //        i = chunk->orig_end();
       }
     }
   }

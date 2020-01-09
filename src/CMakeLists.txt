@@ -1,2 +1,2 @@
 ﻿add_subdirectory(ywindow_lib)
-add_subdirectory(ywindow)
+#add_subdirectory(ywindow)

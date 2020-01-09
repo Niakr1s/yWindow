@@ -22,6 +22,7 @@ add_library(ywindow_lib STATIC ${ywindow_lib_src})
 target_include_directories(ywindow_lib
     PRIVATE
     ${CMAKE_SOURCE_DIR}/3rdparty/jsoncpp/include
+    ${CMAKE_SOURCE_DIR}/3rdparty/utf8cpp/source
     ${Boost_INCLUDE_DIRS}
     PUBLIC
     .
