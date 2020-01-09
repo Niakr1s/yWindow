@@ -148,14 +148,18 @@ std::vector<dict::TranslationResult> dict::TranslationResult::splitByFinal()
   TranslationChunkPtrs buffer;
   for (auto &ch : chunks_) {
     if (ch->final()) {
-      res.push_back(TranslationResult{buffer.begin(), buffer.end()});
-      buffer.clear();
+      if (!buffer.empty()) {
+        res.push_back(TranslationResult{buffer.begin(), buffer.end()});
+        buffer.clear();
+      }
       res.push_back(TranslationResult{{ch}});
     } else {
       buffer.push_back(ch);
     }
   }
-  res.push_back(TranslationResult{buffer.begin(), buffer.end()});
+  if (!buffer.empty()) {
+    res.push_back(TranslationResult{buffer.begin(), buffer.end()});
+  }
   return res;
 }
 
@@ -226,17 +230,19 @@ dict::TranslationResult dict::TranslationText::operator+(
   TranslationChunkPtrs res_chunks;
   auto it = readings_.begin(), it_end = readings_.end();
   for (auto rhs_chunk : rhs.chunks()) {
-    auto rhs_chunk_orig_text = rhs_chunk->originText();
+    auto rhs_chunk_copied = rhs_chunk->copy();
+    auto rhs_chunk_orig_text = rhs_chunk_copied->originText();
     std::string reading, origin_text;
     while (it != it_end && reading != rhs_chunk_orig_text) {
+      //      this_orig_text.append(it->translationChunk()->originText());
       reading.append(it->reading());
       origin_text.append(it->translationChunk()->originText());
       ++it;
     }
-    rhs_chunk->setOriginText(origin_text);
-    res_chunks.push_back(rhs_chunk);
+    rhs_chunk_copied->setOriginText(origin_text);
+    res_chunks.push_back(rhs_chunk_copied);
   }
-  return TranslationResult(rhs.chunks().begin(), rhs.chunks().end());
+  return TranslationResult(res_chunks.begin(), res_chunks.end());
 }
 
 dict::TranslationText dict::TranslationTextChunk::operator+(

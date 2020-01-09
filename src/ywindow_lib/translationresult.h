@@ -29,6 +29,8 @@ class TranslationChunk {
   virtual void insertSubTranslation(const std::pair<std::string, Card*>&);
   const CardPtrMultiMap& subTranslations() const;
 
+  virtual std::shared_ptr<TranslationChunk> copy() const = 0;
+
  protected:
   std::string origin_text_;
   CardPtrMultiMap translations_, sub_translations_;
@@ -40,6 +42,10 @@ class UntranslatedChunk : public TranslationChunk {
       : TranslationChunk(origin_text) {}
 
   bool final() const override { return false; }
+
+  virtual std::shared_ptr<TranslationChunk> copy() const override {
+    return std::make_shared<UntranslatedChunk>(*this);
+  }
 };
 
 class TranslatedChunk : public TranslationChunk {
@@ -50,6 +56,10 @@ class TranslatedChunk : public TranslationChunk {
                   CardPtrMultiMap&& sub_translations);
 
   bool final() const override;
+
+  virtual std::shared_ptr<TranslationChunk> copy() const override {
+    return std::make_shared<TranslatedChunk>(*this);
+  }
 };
 
 class TranslatedChunkFinal : public TranslatedChunk {
