@@ -180,9 +180,19 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
       if (ch.final()) {
         buffer.push_back(ch);
       } else {
-        buffer.push_back(
-            TranslationResult::bestTranslation(ch.mergeWithNextTranslation(
-                (*translator_it)->translate(ch.orig_text()))));
+        auto texts = ch.toTexts();
+        std::vector<TranslationResult> merged;
+        for (auto &text : texts) {
+          auto ch_translated = (*translator_it)->translate(text.string());
+
+          std::vector<TranslationResult> merged_inner =
+              ch.mergeWithNextTranslation(ch_translated);
+          merged.insert(merged.end(), merged_inner.begin(), merged_inner.end());
+        }
+        //        auto ch_translated =
+        //        (*translator_it)->translate(ch.orig_text()); auto merged =
+        //        ch.mergeWithNextTranslation(ch_translated);
+        buffer.push_back(TranslationResult::bestTranslation(merged));
       }
     }
     res = TranslationResult::join(buffer);

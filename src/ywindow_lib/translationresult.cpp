@@ -95,10 +95,11 @@ size_t dict::TranslationResult::translatedSize() const {
 std::vector<dict::TranslationResult>
 dict::TranslationResult::mergeWithNextTranslation(
     const dict::TranslationResult &next_transl_res) {
-  auto texts = toTexts();
+  std::vector<TranslationText> texts = toTexts();
   std::vector<TranslationResult> res;
   for (auto &text : texts) {
-    res.push_back(text + next_transl_res);
+    TranslationResult merged = text + next_transl_res;
+    res.push_back(merged);
   }
   return res;
 }
@@ -149,8 +150,10 @@ std::vector<dict::TranslationResult> dict::TranslationResult::splitByFinal()
     if (ch->final()) {
       res.push_back(TranslationResult{buffer.begin(), buffer.end()});
       buffer.clear();
+      res.push_back(TranslationResult{{ch}});
+    } else {
+      buffer.push_back(ch);
     }
-    buffer.push_back(ch);
   }
   res.push_back(TranslationResult{buffer.begin(), buffer.end()});
   return res;
@@ -218,6 +221,8 @@ const std::vector<dict::TranslationTextChunk> &dict::TranslationText::readings()
 
 dict::TranslationResult dict::TranslationText::operator+(
     const dict::TranslationResult &rhs) {
+  auto this_str = string();
+  auto rhs_orig_str = rhs.orig_text();
   TranslationChunkPtrs res_chunks;
   auto it = readings_.begin(), it_end = readings_.end();
   for (auto rhs_chunk : rhs.chunks()) {
