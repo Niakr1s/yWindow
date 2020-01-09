@@ -15,9 +15,6 @@ class TranslationChunk {
   TranslationChunk(const std::string& origin_text,
                    CardPtrMultiMap&& translations,
                    CardPtrMultiMap&& sub_translations);
-  TranslationChunk(const std::string& origin_text,
-                   const CardPtrMultiMap& translations,
-                   const CardPtrMultiMap& sub_translations);
   virtual ~TranslationChunk();
 
   std::string originText() const;
@@ -50,9 +47,6 @@ class TranslatedChunk : public TranslationChunk {
   TranslatedChunk(const std::string& origin_text,
                   CardPtrMultiMap&& translations,
                   CardPtrMultiMap&& sub_translations);
-  TranslatedChunk(const std::string& origin_text,
-                  const CardPtrMultiMap& translations,
-                  const CardPtrMultiMap& sub_translations);
 
   bool final() const override;
 };
@@ -62,9 +56,6 @@ class TranslatedChunkFinal : public TranslatedChunk {
   TranslatedChunkFinal(const std::string& origin_text,
                        CardPtrMultiMap&& translations,
                        CardPtrMultiMap&& sub_translations);
-  TranslatedChunkFinal(const std::string& origin_text,
-                       const CardPtrMultiMap& translations,
-                       const CardPtrMultiMap& sub_translations);
 
   bool final() const override;
 };

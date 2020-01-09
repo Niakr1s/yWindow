@@ -21,13 +21,6 @@ dict::TranslationChunk::TranslationChunk(
       translations_(translations),
       sub_translations_(sub_translations) {}
 
-dict::TranslationChunk::TranslationChunk(
-    const std::string &origin_text, const dict::CardPtrMultiMap &translations,
-    const dict::CardPtrMultiMap &sub_translations)
-    : origin_text_(origin_text),
-      translations_(translations),
-      sub_translations_(sub_translations) {}
-
 dict::TranslationChunk::~TranslationChunk() {}
 
 std::string dict::TranslationChunk::originText() const { return origin_text_; }
@@ -177,11 +170,6 @@ dict::TranslatedChunk::TranslatedChunk(const std::string &origin_text,
     : TranslationChunk(origin_text, std::move(translations),
                        std::move(sub_translations)) {}
 
-dict::TranslatedChunk::TranslatedChunk(
-    const std::string &origin_text, const dict::CardPtrMultiMap &translations,
-    const dict::CardPtrMultiMap &sub_translations)
-    : TranslationChunk(origin_text, translations, sub_translations) {}
-
 bool dict::TranslatedChunk::final() const { return false; }
 
 dict::TranslatedChunkFinal::TranslatedChunkFinal(
@@ -189,10 +177,5 @@ dict::TranslatedChunkFinal::TranslatedChunkFinal(
     dict::CardPtrMultiMap &&sub_translations)
     : TranslatedChunk(origin_text, std::move(translations),
                       std::move(sub_translations)) {}
-
-dict::TranslatedChunkFinal::TranslatedChunkFinal(
-    const std::string &origin_text, const dict::CardPtrMultiMap &translations,
-    const dict::CardPtrMultiMap &sub_translations)
-    : TranslatedChunk(origin_text, translations, sub_translations) {}
 
 bool dict::TranslatedChunkFinal::final() const { return true; }
