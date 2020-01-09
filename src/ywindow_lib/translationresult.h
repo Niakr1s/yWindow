@@ -15,9 +15,13 @@ class TranslationChunk {
   TranslationChunk(const std::string& origin_text,
                    CardPtrMultiMap&& translations,
                    CardPtrMultiMap&& sub_translations);
+  TranslationChunk(const std::string& origin_text,
+                   const CardPtrMultiMap& translations,
+                   const CardPtrMultiMap& sub_translations);
   virtual ~TranslationChunk();
 
   std::string originText() const;
+  void setOriginText(const std::string& origin_text);
   std::string translatedText() const;
 
   bool translated() const;
@@ -46,22 +50,24 @@ class TranslatedChunk : public TranslationChunk {
  public:
   TranslatedChunk(const std::string& origin_text,
                   CardPtrMultiMap&& translations,
-                  CardPtrMultiMap&& sub_translations)
-      : TranslationChunk(origin_text, std::move(translations),
-                         std::move(sub_translations)) {}
+                  CardPtrMultiMap&& sub_translations);
+  TranslatedChunk(const std::string& origin_text,
+                  const CardPtrMultiMap& translations,
+                  const CardPtrMultiMap& sub_translations);
 
-  bool final() const override { return false; }
+  bool final() const override;
 };
 
 class TranslatedChunkFinal : public TranslatedChunk {
  public:
   TranslatedChunkFinal(const std::string& origin_text,
                        CardPtrMultiMap&& translations,
-                       CardPtrMultiMap&& sub_translations)
-      : TranslatedChunk(origin_text, std::move(translations),
-                        std::move(sub_translations)) {}
+                       CardPtrMultiMap&& sub_translations);
+  TranslatedChunkFinal(const std::string& origin_text,
+                       const CardPtrMultiMap& translations,
+                       const CardPtrMultiMap& sub_translations);
 
-  bool final() const override { return true; }
+  bool final() const override;
 };
 
 // end TranslationChunk
@@ -69,22 +75,41 @@ class TranslatedChunkFinal : public TranslatedChunk {
 using TranslationChunkPtr = std::shared_ptr<TranslationChunk>;
 using TranslationChunkPtrs = std::vector<TranslationChunkPtr>;
 
-// struct TranslatedTextChunk {
-//  std::string translated_text;
-//  TranslationChunkPtr chunk;
-//  Card* card;
-//};
+class TranslationText;
 
-// class TranslationResult;
+class TranslationTextChunk {
+ public:
+  TranslationTextChunk(TranslationChunkPtr chunk, const std::string& reading)
+      : chunk_(chunk), reading_(reading) {}
 
-// struct TranslatedText {
-//  std::vector<TranslatedTextChunk> text;
-//  std::string orig_text;
-//  std::string string() const;
-//  TranslationResult mergeWith(const TranslationResult& rhs);
-//  std::pair<const TranslatedTextChunk*, size_t> chunk(
-//      size_t orig_text_pos) const;
-//};
+  TranslationChunkPtr chunk() const;
+  std::string reading() const { return reading_; }
+
+  TranslationText operator+(const TranslationText& rhs);
+
+ private:
+  TranslationChunkPtr chunk_;
+  std::string reading_;
+};
+
+class TranslationResult;
+
+class TranslationText {
+ public:
+  TranslationText(std::vector<TranslationTextChunk>&& readings)
+      : readings_(readings) {}
+
+  std::string string() const;
+  TranslationResult mergeWith(const TranslationResult& rhs);
+
+  const std::vector<TranslationTextChunk>& readings() const;
+
+  TranslationResult operator+(const TranslationResult& rhs);
+
+ private:
+  std::vector<TranslationTextChunk> readings_;
+  std::string orig_text_;
+};
 
 class TranslationResult {
  public:
@@ -94,7 +119,7 @@ class TranslationResult {
 
   std::string orig_text() const;
   size_t size() const;
-  //  std::vector<TranslatedText> translated_texts() const;
+  std::vector<TranslationText> toTexts() const;
 
   void insertChunk(TranslationChunkPtr chunk);
   const TranslationChunkPtrs& chunks() const;
@@ -102,8 +127,7 @@ class TranslationResult {
  private:
   TranslationChunkPtrs chunks_;
 
-  //  static std::vector<TranslatedText> translated_texts_inner(
-  //      TranslationResult input);
+  static std::vector<TranslationText> toTextsInner(TranslationResult input);
 };
 
 }  // namespace dict

@@ -21,6 +21,13 @@ dict::TranslationChunk::TranslationChunk(
       translations_(translations),
       sub_translations_(sub_translations) {}
 
+dict::TranslationChunk::TranslationChunk(
+    const std::string &origin_text, const dict::CardPtrMultiMap &translations,
+    const dict::CardPtrMultiMap &sub_translations)
+    : origin_text_(origin_text),
+      translations_(translations),
+      sub_translations_(sub_translations) {}
+
 dict::TranslationChunk::~TranslationChunk() {}
 
 std::string dict::TranslationChunk::originText() const { return origin_text_; }
@@ -34,6 +41,10 @@ void dict::TranslationChunk::insertSubTranslation(
 
 const dict::CardPtrMultiMap &dict::TranslationChunk::subTranslations() const {
   return sub_translations_;
+}
+
+void TranslationChunk::setOrigin_text(const std::string &origin_text) {
+  origin_text_ = origin_text;
 }
 
 dict::TranslationResult::TranslationResult(const std::string &orig_text) {
@@ -117,55 +128,105 @@ void dict::TranslationResult::insertChunk(dict::TranslationChunkPtr chunk) {
 //  return {nullptr, 0};
 //}
 
-// std::vector<dict::TranslatedText> dict::TranslationResult::translated_texts()
-//    const {
-//  return translated_texts_inner(TranslationResult(*this));
-//}
+std::vector<dict::TranslationText> dict::TranslationResult::toTexts() const {
+  return toTextsInner(TranslationResult(*this));
+}
 
-// std::vector<dict::TranslatedText>
-// dict::TranslationResult::translated_texts_inner(TranslationResult input) {
-//  std::vector<TranslatedText> res;
+std::vector<dict::TranslationText> dict::TranslationResult::toTextsInner(
+    TranslationResult transl_res) {
+  std::vector<TranslationText> res;
 
-//  auto append_to_res = [&res, input](TranslatedTextChunk last_part) {
-//    auto inner_input = TranslationResult(input);
-//    inner_input.chunks().pop_back();
-//    if (inner_input.chunks().empty()) {
-//      res.push_back(TranslatedText{{last_part}, inner_input.orig_text()});
-//    } else {
-//      for (auto &s : translated_texts_inner(inner_input)) {
-//        auto to_push = s;
-//        to_push.text.push_back(last_part);
-//        res.push_back(to_push);
-//      }
-//    }
-//  };
+  for (auto it = transl_res.chunks().begin(),
+            it_end = transl_res.chunks().end();
+       it != it_end; ++it) {
+    if ((*it)->translated()) {
+      for (auto &[_, card] : (*it)->translations()) {
+        for (auto &reading : card->readings()) {
+          TranslationTextChunk first(*it, reading);
 
-//  auto chunk = input.chunks().back();
-//  if (!chunk->translated()) {
-//    TranslatedTextChunk last_part_chunk;
-//    auto last_part = chunk->text();
-//    last_part_chunk.translated_text = last_part;
-//    last_part_chunk.chunk = chunk;
-//    append_to_res(last_part_chunk);
-//  } else {
-//    for (auto [s, card] : chunk->translations()) {
-//      for (auto &last_part : card->readings()) {
-//        TranslatedTextChunk last_part_chunk;
-//        last_part_chunk.translated_text = last_part;
-//        last_part_chunk.chunk = chunk;
-//        last_part_chunk.card = card;
-//        append_to_res(last_part_chunk);
-//      }
-//    }
-//  }
+          TranslationResult remained_transl_res{it, it_end};
+          auto remained_texts = toTextsInner(remained_transl_res);
 
-//  return res;
-//}
+          for (auto &remained_readings : remained_texts) {
+            res.push_back(TranslationText{first + remained_readings});
+          }
+        }
+      }
+    } else {
+      TranslationTextChunk first(*it, (*it)->originText());
 
-// std::string dict::TranslatedText::string() const {
-//  std::string res;
-//  for (auto &chunk : text) {
-//    res.append(chunk.translated_text);
-//  }
-//  return res;
-//}
+      TranslationResult remained_transl_res{it, it_end};
+      auto remained_texts = toTextsInner(remained_transl_res);
+
+      for (auto &remained_readings : remained_texts) {
+        res.push_back(TranslationText{first + remained_readings});
+      }
+    }
+  }
+  return res;
+}
+
+std::string dict::TranslationText::string() const {
+  std::string res;
+  for (auto &reading : readings_) {
+    res.append(reading.reading());
+  }
+  return res;
+}
+
+const std::vector<dict::TranslationTextChunk> &dict::TranslationText::readings()
+    const {
+  return readings_;
+}
+
+dict::TranslationResult dict::TranslationText::operator+(
+    const dict::TranslationResult &rhs) {
+  TranslationChunkPtrs res_chunks;
+  auto it = readings_.begin(), it_end = readings_.end();
+  for (auto rhs_chunk : rhs.chunks()) {
+    auto rhs_chunk_orig_text = rhs_chunk->originText();
+    std::string reading, origin_text;
+    while (it != it_end && reading != rhs_chunk_orig_text) {
+      reading.append(it->reading());
+      origin_text.append(it->chunk()->originText());
+      ++it;
+    }
+    rhs_chunk->setOriginText(origin_text);
+    res_chunks.push_back(rhs_chunk);
+  }
+  return TranslationResult(rhs.chunks().begin(), rhs.chunks().end());
+}
+
+dict::TranslationText dict::TranslationTextChunk::operator+(
+    const dict::TranslationText &rhs) {
+  std::vector<TranslationTextChunk> new_readings{{*this}};
+  new_readings.insert(new_readings.end(), rhs.readings().cbegin(),
+                      rhs.readings().cend());
+  return TranslationText(std::move(new_readings));
+}
+
+dict::TranslatedChunk::TranslatedChunk(const std::string &origin_text,
+                                       dict::CardPtrMultiMap &&translations,
+                                       dict::CardPtrMultiMap &&sub_translations)
+    : TranslationChunk(origin_text, std::move(translations),
+                       std::move(sub_translations)) {}
+
+dict::TranslatedChunk::TranslatedChunk(
+    const std::string &origin_text, const dict::CardPtrMultiMap &translations,
+    const dict::CardPtrMultiMap &sub_translations)
+    : TranslationChunk(origin_text, translations, sub_translations) {}
+
+bool dict::TranslatedChunk::final() const { return false; }
+
+dict::TranslatedChunkFinal::TranslatedChunkFinal(
+    const std::string &origin_text, dict::CardPtrMultiMap &&translations,
+    dict::CardPtrMultiMap &&sub_translations)
+    : TranslatedChunk(origin_text, std::move(translations),
+                      std::move(sub_translations)) {}
+
+dict::TranslatedChunkFinal::TranslatedChunkFinal(
+    const std::string &origin_text, const dict::CardPtrMultiMap &translations,
+    const dict::CardPtrMultiMap &sub_translations)
+    : TranslatedChunk(origin_text, translations, sub_translations) {}
+
+bool dict::TranslatedChunkFinal::final() const { return true; }
