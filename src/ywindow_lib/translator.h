@@ -47,6 +47,7 @@ class DictionaryTranslator : public Translator {
   template <class TranslatedChunk>
   TranslationResult doTranslateAll(const std::string& str);
 
+ private:
   // second arg of pair is num of first full utf8 symbols translated
   // equal to num of first translated chunks() in TranslationResult{str}
   template <class TranslatedChunk>
