@@ -66,10 +66,6 @@ dict::TranslationResult::TranslationResult(
     TranslationChunkPtrs::const_iterator end)
     : chunks_(begin, end) {}
 
-// dict::TranslationChunkPtrs &dict::TranslationResult::chunks() {
-//  return chunks_;
-//}
-
 const dict::TranslationChunkPtrs &dict::TranslationResult::chunks() const {
   return chunks_;
 }
@@ -154,7 +150,7 @@ dict::TranslationResult dict::TranslationText::operator+(
     std::string reading, origin_text;
     while (it != it_end && reading != rhs_chunk_orig_text) {
       reading.append(it->reading());
-      origin_text.append(it->chunk()->originText());
+      origin_text.append(it->translationChunk()->originText());
       ++it;
     }
     rhs_chunk->setOriginText(origin_text);

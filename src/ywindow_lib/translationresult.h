@@ -22,7 +22,6 @@ class TranslationChunk {
 
   std::string originText() const;
   void setOriginText(const std::string& origin_text);
-  std::string translatedText() const;
 
   bool translated() const;
   virtual bool final() const = 0;
