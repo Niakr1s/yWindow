@@ -21,6 +21,8 @@ TEST(translationresult, test1) {
     auto translated = yomi->translate(to_translate);
     TranslationResult m = t + translated;
     ASSERT_EQ(m.orig_text(), "見れば笑って");
+    ASSERT_EQ(m.chunks()[0]->originText(), "見れば");
+    ASSERT_EQ(m.chunks()[0]->translations().begin()->first, "見る");
   }
 }
 
