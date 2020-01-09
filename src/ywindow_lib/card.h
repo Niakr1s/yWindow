@@ -42,7 +42,7 @@ class DefaultCard : public Card {
   void setName(const std::string& name);
 
   Dictionary* dict() const;
-
+  std::string dictionaryInfo() const override;
   std::string name() const override;
 
  protected:
@@ -62,13 +62,11 @@ class YomiCard : public DefaultCard {
 
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
-  std::string dictionaryInfo() const override;
   std::string etc() const override;
 
   void setReading(const std::vector<std::string>& readings);
 
  protected:
-  YomiDictionary* yomi_dict_;
   std::vector<std::string> meanings_;
   std::vector<std::string> tags_;
   std::vector<std::string> readings_;
@@ -84,12 +82,24 @@ class DeinflectCard : public DefaultCard {
 
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
-  std::string dictionaryInfo() const override;
   std::string etc() const override;
 
  private:
   std::string reading_;
-  DeinflectDictionary* deinflect_dict_;
+};
+
+class UserCard : public DefaultCard {
+ public:
+  UserCard(Dictionary* dict);
+
+  void setReading(const std::string& reading);
+
+  std::vector<std::string> readings() const override;
+  std::string meaning() const override;
+  std::string etc() const override;
+
+ private:
+  std::string reading_;
 };
 
 using CardUniquePtrMap = std::multimap<std::string, std::unique_ptr<Card>>;

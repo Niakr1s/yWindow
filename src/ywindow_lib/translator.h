@@ -23,7 +23,7 @@ class Translator {
 
  protected:
   virtual TranslationResult doTranslate(const std::string& str) = 0;
-  virtual void prepareDictionaries() = 0;
+  virtual void prepareDictionaries();
 
   static size_t MAX_CHUNK_SIZE;
 };
@@ -76,6 +76,28 @@ class DeinflectTranslator : public DictionaryTranslator {
 
  private:
   Translator* next_translator_;
+};
+
+class UserTranslator : public DictionaryTranslator {
+ public:
+  UserTranslator(const fs::path& file);
+
+ protected:
+  TranslationResult doTranslate(const std::string& str);
+};
+
+class ChainTranslator : public Translator {
+ public:
+  ChainTranslator();
+
+  void addTranslator(Translator* transl);
+  void popTranslator();
+
+ protected:
+  TranslationResult doTranslate(const std::string& str);
+
+ private:
+  std::vector<std::unique_ptr<Translator>> translators_;
 };
 
 }  // namespace dict

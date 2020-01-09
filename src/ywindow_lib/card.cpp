@@ -4,16 +4,11 @@
 
 #include "dictionary.h"
 
-dict::YomiCard::YomiCard(Dictionary* dict)
-    : DefaultCard(dict), yomi_dict_(dynamic_cast<YomiDictionary*>(dict)) {}
+dict::YomiCard::YomiCard(Dictionary* dict) : DefaultCard(dict) {}
 
 void dict::YomiCard::addTag(const std::string& tag) { tags_.push_back(tag); }
 
 void dict::YomiCard::setTags(std::vector<std::string>&& tags) { tags_ = tags; }
-
-std::string dict::YomiCard::dictionaryInfo() const {
-  return yomi_dict_->info();
-}
 
 void dict::YomiCard::addMeaning(const std::string& meaning) {
   meanings_.push_back(meaning);
@@ -33,6 +28,8 @@ std::string dict::Card::reading() { return boost::join(readings(), " "); }
 
 dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 
+std::string dict::DefaultCard::dictionaryInfo() const { return dict_->info(); }
+
 std::string dict::DefaultCard::name() const { return name_; }
 
 std::string dict::YomiCard::meaning() const {
@@ -41,11 +38,13 @@ std::string dict::YomiCard::meaning() const {
 
 std::string dict::YomiCard::etc() const {
   std::string res;
+  auto yomi_dict = dynamic_cast<YomiDictionary*>(dict_);
+  if (!yomi_dict) return res;
 
   std::vector<std::string> to_append;
   for (auto& tag : tags_) {
     try {
-      to_append.push_back(tag + ": " + yomi_dict_->tags().at(tag).description);
+      to_append.push_back(tag + ": " + yomi_dict->tags().at(tag).description);
     } catch (...) {
     }
   }
@@ -59,8 +58,7 @@ void dict::YomiCard::setReading(const std::vector<std::string>& reading) {
 }
 
 dict::DeinflectCard::DeinflectCard(dict::Dictionary* dict)
-    : DefaultCard(dict),
-      deinflect_dict_(dynamic_cast<DeinflectDictionary*>(dict)) {}
+    : DefaultCard(dict) {}
 
 void dict::DeinflectCard::setReading(const std::string& reading) {
   reading_ = reading;
@@ -72,8 +70,16 @@ std::vector<std::string> dict::DeinflectCard::readings() const {
 
 std::string dict::DeinflectCard::meaning() const { return ""; }
 
-std::string dict::DeinflectCard::dictionaryInfo() const {
-  return deinflect_dict_->info();
+std::string dict::DeinflectCard::etc() const { return ""; }
+
+dict::UserCard::UserCard(dict::Dictionary* dict) : DefaultCard(dict) {}
+
+void dict::UserCard::setReading(const std::string& reading) {
+  reading_ = reading;
 }
 
-std::string dict::DeinflectCard::etc() const { return ""; }
+std::vector<std::string> dict::UserCard::readings() const { return {reading_}; }
+
+std::string dict::UserCard::meaning() const { return name_; }
+
+std::string dict::UserCard::etc() const { return ""; }

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Windows.h"
+#include "dict_chaintranslator_tests.h"
 #include "dict_loader_tests.h"
 #include "dict_query_tests.h"
 #include "dict_translationresult_tests.h"

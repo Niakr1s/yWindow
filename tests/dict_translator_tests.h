@@ -61,4 +61,13 @@ TEST(deinflector, test1) {
   ASSERT_FALSE(res.chunks()[3]->final());
 }
 
+TEST(usertranslator, test1) {
+  auto de = new UserTranslator("data/user_dictionary.txt");
+  auto res = de->translate("Niakr1s#1");
+  ASSERT_EQ(res.chunks().size(), 3);
+  ASSERT_EQ(res.chunks()[0]->originText(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[1]->originText(), "#");
+  ASSERT_EQ(res.chunks()[2]->originText(), "1");
+}
+
 #endif  // DICT_TRANSLATOR_TESTS_H

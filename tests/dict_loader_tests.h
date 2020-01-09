@@ -45,4 +45,11 @@ TEST(fs_dict_loader, non_existent_dir) {
       FSPathException);
 }
 
+TEST(fs_dict_loader, userDictionary) {
+  auto future = Loader::loadFromFS<UserDictionary>("data/user_dictionary.txt");
+  auto dictionary = dynamic_cast<UserDictionary*>(future.get());
+  ASSERT_EQ(dictionary->info(), "user_dictionary");
+  ASSERT_EQ(dictionary->size(), 2);
+}
+
 #endif  // DICT_LOADER_TESTS_H

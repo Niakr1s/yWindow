@@ -44,6 +44,7 @@ class UntranslatedChunk : public TranslationChunk {
 
 class TranslatedChunk : public TranslationChunk {
  public:
+  TranslatedChunk(const std::string& origin_text);
   TranslatedChunk(const std::string& origin_text,
                   CardPtrMultiMap&& translations,
                   CardPtrMultiMap&& sub_translations);
@@ -53,6 +54,7 @@ class TranslatedChunk : public TranslationChunk {
 
 class TranslatedChunkFinal : public TranslatedChunk {
  public:
+  TranslatedChunkFinal(const std::string& origin_text);
   TranslatedChunkFinal(const std::string& origin_text,
                        CardPtrMultiMap&& translations,
                        CardPtrMultiMap&& sub_translations);
@@ -102,16 +104,34 @@ class TranslationText {
 
 class TranslationResult {
  public:
+  TranslationResult();
   TranslationResult(const std::string& orig_text);
   TranslationResult(TranslationChunkPtrs::const_iterator begin,
                     TranslationChunkPtrs::const_iterator end);
+  TranslationResult(TranslationChunkPtrs&& chunks);
 
   std::string orig_text() const;
   size_t size() const;
   std::vector<TranslationText> toTexts() const;
+  std::vector<TranslationResult> splitByFinal() const;
+  bool final() const;
 
   void insertChunk(TranslationChunkPtr chunk);
   const TranslationChunkPtrs& chunks() const;
+
+  TranslationResult operator+(const TranslationResult& rhs);
+  void operator+=(const TranslationResult& rhs);
+
+  size_t untranslatedSize() const;
+  size_t translatedSize() const;
+
+  std::vector<TranslationResult> mergeWithNextTranslation(
+      const TranslationResult& next_transl_res);
+
+  static TranslationResult bestTranslation(
+      std::vector<TranslationResult> results);
+  static TranslationResult join(
+      const std::vector<TranslationResult>& transl_results);
 
  private:
   TranslationChunkPtrs chunks_;

@@ -93,6 +93,18 @@ class YomiKanjiParser : public YomiParser {
   void doParseInto(Dictionary* dict) override;
 };
 
+class UserParser : public Parser {
+  friend Parser;
+
+ protected:
+  UserParser(const fs::path& path);
+
+  void doParseInto(Dictionary* dict) override;
+
+ private:
+  fs::path path_;
+};
+
 class DeinflectDictionary;
 
 class DeinflectParser : public JsonParser {

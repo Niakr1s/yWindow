@@ -31,6 +31,8 @@ dict::Parser *dict::Parser::getParser(Dictionary *dict, const fs::path &path) {
              deinflect) {
     auto ifs = new std::ifstream(path);
     return new DeinflectParser(ifs, path.filename().string());
+  } else if (auto user = dynamic_cast<UserDictionary *>(dict); user) {
+    return new UserParser(path);
   }
   return new DummyParser();
 }
@@ -140,5 +142,28 @@ void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
       card->setReading((*it)[i]["kanaOut"].asString());
       dict->addCard(card);
     }
+  }
+}
+
+dict::UserParser::UserParser(const fs::path &path) : Parser(), path_(path) {}
+
+void dict::UserParser::doParseInto(dict::Dictionary *dict) {
+  std::ifstream is(path_);
+  dict->updateInfo(path_.stem().string());
+  if (!is.is_open()) {
+    return;
+  }
+
+  for (std::string line; std::getline(is, line);) {
+    if (line[0] == '#' || line.empty()) continue;
+    std::vector<std::string> pair;
+    boost::split(pair, line, boost::is_any_of("="));
+    if (pair.size() != 2) continue;
+    auto card = new UserCard(dict);
+    boost::trim(pair[0]);
+    boost::trim(pair[1]);
+    card->setName(pair[0]);
+    card->setReading(pair[1]);
+    dict->addCard(card);
   }
 }

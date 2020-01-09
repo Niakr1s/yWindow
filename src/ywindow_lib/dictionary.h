@@ -67,6 +67,11 @@ class YomiDictionary : public DefaultDictionary {
   std::shared_ptr<TagMap> tags_;
 };
 
+class UserDictionary : public DefaultDictionary {
+ public:
+  UserDictionary();
+};
+
 class DeinflectDictionary : public DefaultDictionary {
  public:
   DeinflectDictionary();

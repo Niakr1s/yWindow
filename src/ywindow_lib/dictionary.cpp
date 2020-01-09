@@ -46,3 +46,5 @@ dict::CardPtrMultiMap dict::DefaultDictionary::doQuery(
 const dict::TagMap &dict::YomiDictionary::tags() const { return *tags_; }
 
 dict::DeinflectDictionary::DeinflectDictionary() : DefaultDictionary() {}
+
+dict::UserDictionary::UserDictionary() : DefaultDictionary() {}

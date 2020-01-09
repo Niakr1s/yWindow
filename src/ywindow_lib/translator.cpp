@@ -20,6 +20,8 @@ dict::TranslationResult dict::Translator::translate(const std::string &str) {
   return res;
 }
 
+void dict::Translator::prepareDictionaries() {}
+
 dict::YomiTranslator::YomiTranslator(const fs::path &root_dir)
     : DictionaryTranslator() {
   for (auto &path : fs::directory_iterator(root_dir)) {
@@ -155,4 +157,45 @@ dict::DeinflectTranslator::DeinflectTranslator(
 dict::TranslationResult dict::DeinflectTranslator::doTranslate(
     const std::string &str) {
   return doTranslateAll<TranslatedChunk>(str);
+}
+
+dict::ChainTranslator::ChainTranslator() {}
+
+void dict::ChainTranslator::addTranslator(Translator *transl) {
+  translators_.push_back(std::unique_ptr<Translator>(transl));
+}
+
+void dict::ChainTranslator::popTranslator() { translators_.pop_back(); }
+
+dict::TranslationResult dict::ChainTranslator::doTranslate(
+    const std::string &str) {
+  if (translators_.empty()) return TranslationResult(str);
+  auto translator_it = translators_.begin(),
+       translator_it_end = translators_.end();
+  TranslationResult res = (*translator_it)->translate(str);
+  while (++translator_it != translator_it_end) {
+    std::vector<TranslationResult> splitted = res.splitByFinal();
+    std::vector<TranslationResult> buffer;
+    for (auto &ch : splitted) {
+      if (ch.final()) {
+        buffer.push_back(ch);
+      } else {
+        buffer.push_back(
+            TranslationResult::bestTranslation(ch.mergeWithNextTranslation(
+                (*translator_it)->translate(ch.orig_text()))));
+      }
+    }
+    res = TranslationResult::join(buffer);
+  }
+  return res;
+}
+
+dict::UserTranslator::UserTranslator(const fs::path &file)
+    : DictionaryTranslator() {
+  dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(file));
+}
+
+dict::TranslationResult dict::UserTranslator::doTranslate(
+    const std::string &str) {
+  return doTranslateAll<TranslatedChunkFinal>(str);
 }
