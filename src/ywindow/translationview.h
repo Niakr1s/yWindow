@@ -19,15 +19,14 @@ class TranslationView : public QTextBrowser {
 
  public slots:
   void move(QPoint pos);
-  void displayTranslation(const dict::TranslationChunk& translation,
-                          QPoint point);
+  void displayTranslation(dict::TranslationChunkPtr translation, QPoint point);
   void cancelTranslation();
 
  protected:
   TextModel* model_;
   bool active_ = false;
 
-  virtual void doDisplayTranslation(const dict::TranslationChunk& translation,
+  virtual void doDisplayTranslation(dict::TranslationChunkPtr translation,
                                     QPoint pos) = 0;
   virtual void doCancelTranslation() = 0;
 };
@@ -44,14 +43,14 @@ class DefaultTranslationView : public TranslationView {
   void tryHideOnTimer();
 
  protected:
-  void doDisplayTranslation(const dict::TranslationChunk& translation,
+  void doDisplayTranslation(dict::TranslationChunkPtr translation,
                             QPoint point) override;
   void doCancelTranslation() override;
 
   void leaveEvent(QEvent* event) override;
 
  private:
-  dict::TranslationChunk translation_;
+  dict::TranslationChunkPtr translation_;
   std::unique_ptr<TranslationConverter> converter_;
 
   QRect fittedToDisplay(const QRect& rect);

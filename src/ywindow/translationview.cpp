@@ -26,8 +26,8 @@ void TranslationView::setModel(TextModel* model) {
 
 void TranslationView::move(QPoint pos) { return QWidget::move(pos); }
 
-void TranslationView::displayTranslation(
-    const dict::TranslationChunk& translation, QPoint point) {
+void TranslationView::displayTranslation(dict::TranslationChunkPtr translation,
+                                         QPoint point) {
   active_ = true;
   return doDisplayTranslation(translation, point);
 }
@@ -63,15 +63,15 @@ void DefaultTranslationView::tryHideOnTimer() {
 }
 
 void DefaultTranslationView::doDisplayTranslation(
-    const dict::TranslationChunk& translation, QPoint point) {
+    dict::TranslationChunkPtr translation, QPoint point) {
   translation_ = translation;
   qDebug() << "TranslationDisplay: got pos " << point << "height " << height();
 
-  auto tr = translation_.translations();
+  auto tr = translation_->translations();
   qDebug() << "got " << tr.size() << " translations";
 
   clear();
-  setHtml(QString::fromStdString(converter_->toHtml(translation)));
+  setHtml(QString::fromStdString(converter_->toHtml(*translation)));
   moveCursor(QTextCursor::Start);
 
   adjustHeight(document()->size().height());

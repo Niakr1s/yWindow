@@ -22,7 +22,7 @@ class TextModel : public QObject {
 
  signals:
   void textChanged();
-  void gotTranslation(dict::TranslationChunk, QPoint point);
+  void gotTranslation(dict::TranslationChunkPtr, QPoint point);
   void gotTranslationLength(int);
   void cancelTranslation();
 
