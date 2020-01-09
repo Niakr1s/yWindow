@@ -12,6 +12,9 @@ namespace dict {
 class TranslationChunk {
  public:
   TranslationChunk(const std::string& origin_text);
+  TranslationChunk(const std::string& origin_text,
+                   CardPtrMultiMap&& translations,
+                   CardPtrMultiMap&& sub_translations);
   virtual ~TranslationChunk();
 
   std::string originText() const;
@@ -41,20 +44,22 @@ class UntranslatedChunk : public TranslationChunk {
 
 class TranslatedChunk : public TranslationChunk {
  public:
-  TranslatedChunk(const std::string& origin_text)
-      : TranslationChunk(origin_text) {}
-
-  void insertTranslation(const std::pair<std::string, Card*>& transl) override;
-  void insertSubTranslation(
-      const std::pair<std::string, Card*>& transl) override;
+  TranslatedChunk(const std::string& origin_text,
+                  CardPtrMultiMap&& translations,
+                  CardPtrMultiMap&& sub_translations)
+      : TranslationChunk(origin_text, std::move(translations),
+                         std::move(sub_translations)) {}
 
   bool final() const override { return false; }
 };
 
 class TranslatedChunkFinal : public TranslatedChunk {
  public:
-  TranslatedChunkFinal(const std::string& origin_text)
-      : TranslatedChunk(origin_text) {}
+  TranslatedChunkFinal(const std::string& origin_text,
+                       CardPtrMultiMap&& translations,
+                       CardPtrMultiMap&& sub_translations)
+      : TranslatedChunk(origin_text, std::move(translations),
+                        std::move(sub_translations)) {}
 
   bool final() const override { return true; }
 };
@@ -84,15 +89,17 @@ using TranslationChunkPtrs = std::vector<TranslationChunkPtr>;
 class TranslationResult {
  public:
   TranslationResult(const std::string& orig_text);
+  TranslationResult(TranslationChunkPtrs::const_iterator begin,
+                    TranslationChunkPtrs::const_iterator end);
 
   std::string orig_text() const;
+  size_t size() const;
   //  std::vector<TranslatedText> translated_texts() const;
 
-  TranslationChunkPtrs& chunks();
+  void insertChunk(TranslationChunkPtr chunk);
   const TranslationChunkPtrs& chunks() const;
 
  private:
-  std::string orig_text_;
   TranslationChunkPtrs chunks_;
 
   //  static std::vector<TranslatedText> translated_texts_inner(

@@ -22,32 +22,16 @@ TEST(yomi_translator, test1) {
   ASSERT_TRUE(res.chunks()[0]->translated());
 }
 
-TEST(yomi_translator, translation_result_all_false) {
+TEST(yomi_translator, translation_result) {
   auto yomi = new YomiTranslator("data");
-  auto res = yomi->translate("９日etc９日etc９日etc", false);
-  ASSERT_EQ(res.chunks().size(), 2);
+  auto res = yomi->translate("９日etc", false);
+  ASSERT_EQ(res.chunks().size(), 4);
   ASSERT_TRUE(res.chunks()[0]->translated());
   ASSERT_FALSE(res.chunks()[1]->translated());
-  //  ASSERT_EQ(res.chunks()[0]->text(), "９日");
-  //  ASSERT_EQ(res.chunks()[1]->text(), "etc９日etc９日etc");
-}
-
-TEST(yomi_translator, translation_result_all_true) {
-  auto yomi = new YomiTranslator("data");
-  auto res = yomi->translate("９日etc９日etc９日etc", true);
-  ASSERT_EQ(res.chunks().size(), 6);
-  ASSERT_TRUE(res.chunks()[0]->translated());
-  ASSERT_FALSE(res.chunks()[1]->translated());
-  ASSERT_TRUE(res.chunks()[2]->translated());
-  ASSERT_FALSE(res.chunks()[3]->translated());
-  ASSERT_TRUE(res.chunks()[4]->translated());
-  ASSERT_FALSE(res.chunks()[5]->translated());
-  //  ASSERT_EQ(res.chunks()[0]->text(), "９日");
-  //  ASSERT_EQ(res.chunks()[1]->text(), "etc");
-  //  ASSERT_EQ(res.chunks()[2]->text(), "９日");
-  //  ASSERT_EQ(res.chunks()[3]->text(), "etc");
-  //  ASSERT_EQ(res.chunks()[4]->text(), "９日");
-  //  ASSERT_EQ(res.chunks()[5]->text(), "etc");
+  ASSERT_EQ(res.chunks()[0]->originText(), "９日");
+  ASSERT_EQ(res.chunks()[1]->originText(), "e");
+  ASSERT_EQ(res.chunks()[2]->originText(), "t");
+  ASSERT_EQ(res.chunks()[3]->originText(), "c");
 }
 
 TEST(yomi_translator, translation_result_all_true2) {
@@ -62,10 +46,10 @@ TEST(deinflector, test1) {
   auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
   auto res = de->translate("見れば笑って", true);
   ASSERT_EQ(res.chunks().size(), 4);
-  //  ASSERT_EQ(res.chunks()[0]->text(), "見");
-  //  ASSERT_EQ(res.chunks()[1]->text(), "れば");
-  //  ASSERT_EQ(res.chunks()[2]->text(), "笑");
-  //  ASSERT_EQ(res.chunks()[3]->text(), "って");
+  ASSERT_EQ(res.chunks()[0]->originText(), "見");
+  ASSERT_EQ(res.chunks()[1]->originText(), "れば");
+  ASSERT_EQ(res.chunks()[2]->originText(), "笑");
+  ASSERT_EQ(res.chunks()[3]->originText(), "って");
 }
 
 #endif  // DICT_TRANSLATOR_TESTS_H

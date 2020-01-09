@@ -14,6 +14,13 @@ void dict::TranslationChunk::insertTranslation(
 dict::TranslationChunk::TranslationChunk(const std::string &origin_text)
     : origin_text_(origin_text) {}
 
+dict::TranslationChunk::TranslationChunk(
+    const std::string &origin_text, dict::CardPtrMultiMap &&translations,
+    dict::CardPtrMultiMap &&sub_translations)
+    : origin_text_(origin_text),
+      translations_(translations),
+      sub_translations_(sub_translations) {}
+
 dict::TranslationChunk::~TranslationChunk() {}
 
 std::string dict::TranslationChunk::originText() const { return origin_text_; }
@@ -29,41 +36,46 @@ const dict::CardPtrMultiMap &dict::TranslationChunk::subTranslations() const {
   return sub_translations_;
 }
 
-void dict::TranslatedChunk::insertTranslation(
-    const std::pair<std::string, dict::Card *> &transl) {
-  translations_.insert(transl);
-}
-
-void dict::TranslatedChunk::insertSubTranslation(
-    const std::pair<std::string, dict::Card *> &transl) {
-  sub_translations_.insert(transl);
-}
-
-dict::TranslationResult::TranslationResult(const std::string &orig_text)
-    : orig_text_(orig_text) {
-  if (auto it = utf8::find_invalid(orig_text_.begin(), orig_text_.end());
-      it != orig_text_.end()) {
+dict::TranslationResult::TranslationResult(const std::string &orig_text) {
+  if (auto it = utf8::find_invalid(orig_text.begin(), orig_text.end());
+      it != orig_text.end()) {
     throw std::runtime_error("TranslationResult: not valid utf8 string");
   }
-
-  for (auto it = orig_text_.begin(), it_prev = orig_text_.begin(),
-            it_end = orig_text_.end();
-       it != it_end;) {
+  for (auto it = orig_text.begin(), it_prev = orig_text.begin(),
+            it_end = orig_text.end();
+       it != it_end; it_prev = it) {
     utf8::next(it, it_end);
     chunks_.push_back(
         std::make_shared<UntranslatedChunk>(std::string(it_prev, it)));
   }
 }
 
-dict::TranslationChunkPtrs &dict::TranslationResult::chunks() {
-  return chunks_;
-}
+dict::TranslationResult::TranslationResult(
+    TranslationChunkPtrs::const_iterator begin,
+    TranslationChunkPtrs::const_iterator end)
+    : chunks_(begin, end) {}
+
+// dict::TranslationChunkPtrs &dict::TranslationResult::chunks() {
+//  return chunks_;
+//}
 
 const dict::TranslationChunkPtrs &dict::TranslationResult::chunks() const {
   return chunks_;
 }
 
-std::string dict::TranslationResult::orig_text() const { return orig_text_; }
+std::string dict::TranslationResult::orig_text() const {
+  std::string res;
+  for (auto &ch : chunks_) {
+    res.append(ch->originText());
+  }
+  return res;
+}
+
+size_t dict::TranslationResult::size() const { return chunks_.size(); }
+
+void dict::TranslationResult::insertChunk(dict::TranslationChunkPtr chunk) {
+  chunks_.push_back(chunk);
+}
 
 // dict::TranslationResult dict::TranslatedText::mergeWith(
 //    const dict::TranslationResult &rhs) {

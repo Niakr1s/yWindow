@@ -39,8 +39,19 @@ class DictionaryTranslator : public Translator {
   std::vector<std::unique_ptr<Dictionary>> dicts_;
   std::vector<std::future<Dictionary*>> dicts_futures_;
 
+  CardPtrMultiMap queryAllDicts(const std::string& str);
+
   void prepareDictionaries() final;
   TranslationResult doTranslate(const std::string& str, bool all) override;
+
+  TranslationResult doTranslateAll(const std::string& str);
+
+  // second arg of pair is num of first full utf8 symbols translated
+  // equal to num of first translated chunks() in TranslationResult{str}
+  std::pair<TranslationChunkPtr, int> doTranslateFirstOf(
+      const std::string& str);
+
+  TranslationChunkPtr doTranslateFullStr(const std::string& str);
 
  private:
   TranslationChunk* translateAnyOfSubStr(const std::string& str, size_t begin,
