@@ -108,7 +108,7 @@ dict::TranslationResult dict::TranslationResult::bestTranslation(
   if (results.empty())
     throw std::invalid_argument("bestTranslation: input is empty");
   std::sort(results.begin(), results.end(), [](auto &lhs, auto &rhs) {
-    return lhs.untranslatedSize(), rhs.untranslatedSize();
+    return lhs.untranslatedSize() < rhs.untranslatedSize();
   });
   return results.front();
 }
