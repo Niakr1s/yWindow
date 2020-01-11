@@ -24,7 +24,6 @@ std::string YTranslationConverter::doToHtml(
   std::ostringstream ss;
   t.render(ss);
   std::string res = ss.str();
-  qDebug() << QString::fromStdString(res);
 
   return res;
 }
