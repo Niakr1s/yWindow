@@ -68,6 +68,17 @@ const dict::TranslationChunkPtrs &dict::TranslationResult::chunks() const {
   return chunks_;
 }
 
+dict::TranslationChunkPtr dict::TranslationResult::chunk(int utf8_pos) {
+  std::string buf;
+  for (auto &ch : chunks_) {
+    buf.append(ch->originText());
+    if (utf8::distance(buf.begin(), buf.end()) > utf8_pos) {
+      return ch;
+    }
+  }
+  return nullptr;
+}
+
 dict::TranslationResult dict::TranslationResult::operator+(
     const dict::TranslationResult &rhs) {
   auto merged_chunks = chunks_;

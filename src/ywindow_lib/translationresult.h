@@ -129,6 +129,8 @@ class TranslationResult {
   void insertChunk(TranslationChunkPtr chunk);
   const TranslationChunkPtrs& chunks() const;
 
+  TranslationChunkPtr chunk(int utf8_pos);
+
   TranslationResult operator+(const TranslationResult& rhs);
   void operator+=(const TranslationResult& rhs);
 

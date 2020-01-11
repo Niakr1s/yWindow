@@ -35,13 +35,13 @@ DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
 
 void DefaultTextView::doDisplayText() {
   auto list = model_->toHtml();
-  current_text_ = list;
+  current_text_ = model_->toPlainText();
   qDebug() << "Display: got text to display: " << list;
 
   auto back = list.back();
   list.pop_back();
 
-  setPlainText(list.join("\n"));
+  setHtml(list.join("<br>"));
   moveCursor(QTextCursor::End);
   if (!list.empty()) {
     insertPlainText("\n");
@@ -107,7 +107,7 @@ std::pair<int, int> DefaultTextView::innerColToModelPos(int pos) {
   for (int i = 0, i_max = current_text_.size(); i != i_max; ++i) {
     for (int j = 0, j_max = current_text_[i].size(); j != j_max; ++j) {
       if (counter == pos) {
-        return {line, col};
+        goto theEnd;
       }
       ++counter;
       ++col;
@@ -119,6 +119,7 @@ std::pair<int, int> DefaultTextView::innerColToModelPos(int pos) {
     ++line;
     col = 0;
   }
+theEnd:
   if (line >= current_text_.size() || col >= current_text_[line].size()) {
     return {-1, -1};
   }

@@ -10,6 +10,8 @@ TextModel::~TextModel() {}
 
 QStringList TextModel::toHtml() { return doToHtml(); }
 
+QStringList TextModel::toPlainText() { return doToPlainText(); }
+
 void TextModel::translate(std::pair<int, int> pos, QPoint point) {
   if (pos == last_pos_) return;
   last_pos_ = pos;
@@ -39,6 +41,8 @@ YomiStyleTextModel::YomiStyleTextModel(dict::Translator *translator,
 
 QStringList YomiStyleTextModel::doToHtml() { return text_; }
 
+QStringList YomiStyleTextModel::doToPlainText() { return text_; }
+
 dict::TranslationChunkPtr YomiStyleTextModel::doTranslate(
     std::pair<int, int> pos) {
   QString to_translate = text_[pos.first].mid(pos.second);
@@ -50,6 +54,35 @@ dict::TranslationChunkPtr YomiStyleTextModel::doTranslate(
 
 void YomiStyleTextModel::doAddText(const QString &text) {
   text_.push_back(text);
+  while (text_.size() > max_size_) {
+    text_.pop_front();
+  }
+}
+
+FullTranslateTextModel::FullTranslateTextModel(dict::Translator *translator,
+                                               QObject *parent)
+    : TextModel(parent),
+      translator_(std::unique_ptr<dict::Translator>(translator)) {}
+
+QStringList FullTranslateTextModel::doToHtml() {
+  return doToPlainText();  // TODO
+}
+
+QStringList FullTranslateTextModel::doToPlainText() {
+  QStringList res;
+  for (auto &text : text_) {
+    res.push_back(QString::fromStdString(text.orig_text()));
+  }
+  return res;
+}
+
+dict::TranslationChunkPtr FullTranslateTextModel::doTranslate(
+    std::pair<int, int> pos) {
+  return text_[pos.first].chunk(pos.second);
+}
+
+void FullTranslateTextModel::doAddText(const QString &text) {
+  text_.push_back(translator_->translate(text.toStdString()));
   while (text_.size() > max_size_) {
     text_.pop_front();
   }
