@@ -26,6 +26,8 @@ dict::Card::~Card() {}
 
 std::string dict::Card::reading() { return boost::join(readings(), " "); }
 
+std::string dict::Card::originName() const { return name(); }
+
 dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 
 std::string dict::DefaultCard::dictionaryInfo() const { return dict_->info(); }
@@ -83,3 +85,22 @@ std::vector<std::string> dict::UserCard::readings() const { return {reading_}; }
 std::string dict::UserCard::meaning() const { return name_; }
 
 std::string dict::UserCard::etc() const { return ""; }
+
+dict::ProxyCard::ProxyCard(dict::Card* card, const std::string& name)
+    : card_(card), name_(name) {}
+
+std::string dict::ProxyCard::originName() const { return card_->name(); }
+
+std::string dict::ProxyCard::name() const { return name_; }
+
+std::vector<std::string> dict::ProxyCard::readings() const {
+  return card_->readings();
+}
+
+std::string dict::ProxyCard::meaning() const { return card_->meaning(); }
+
+std::string dict::ProxyCard::dictionaryInfo() const {
+  return card_->dictionaryInfo();
+}
+
+std::string dict::ProxyCard::etc() const { return card_->etc(); }

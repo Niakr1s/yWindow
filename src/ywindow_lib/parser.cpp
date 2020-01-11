@@ -113,8 +113,7 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 
     for (auto &reading : card->readings()) {
       if (reading != card->name()) {
-        YomiCard *reading_card = new YomiCard(*card);
-        reading_card->setName(reading);
+        ProxyCard *reading_card = new ProxyCard(card, reading);
         dict->addCard(reading_card);
       }
     }
@@ -151,8 +150,7 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
 
     for (auto &reading : card->readings()) {
       if (reading != card->name()) {
-        YomiCard *reading_card = new YomiCard(*card);
-        reading_card->setName(reading);
+        ProxyCard *reading_card = new ProxyCard(card, reading);
         dict->addCard(reading_card);
       }
     }

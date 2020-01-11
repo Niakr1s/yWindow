@@ -28,6 +28,7 @@ class Card {
   std::string reading();
 
   // please, separate separate readings by ";"
+  virtual std::string originName() const;
   virtual std::string name() const = 0;
   virtual std::vector<std::string> readings() const = 0;
   virtual std::string meaning() const = 0;
@@ -100,6 +101,22 @@ class UserCard : public DefaultCard {
 
  private:
   std::string reading_;
+};
+
+class ProxyCard : public Card {
+ public:
+  ProxyCard(Card* card, const std::string& name);
+
+  std::string originName() const override;
+  std::string name() const override;
+  std::vector<std::string> readings() const override;
+  std::string meaning() const override;
+  std::string dictionaryInfo() const override;
+  std::string etc() const override;
+
+ private:
+  Card* card_;
+  std::string name_;
 };
 
 using CardUniquePtrMap = std::multimap<std::string, std::unique_ptr<Card>>;
