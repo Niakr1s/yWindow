@@ -21,6 +21,8 @@
     translationconverter.cpp
     NLTemplate.h
     NLTemplate.cpp
+    texttohtml.h
+    texttohtml.cpp
 )
 
 file(COPY templates DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

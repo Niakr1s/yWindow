@@ -2,6 +2,7 @@
 
 #include <QDebug>
 
+#include "texttohtml.h"
 #include "translator.h"
 
 TextModel::TextModel(QObject *parent) : QObject(parent) {}
@@ -65,7 +66,23 @@ FullTranslateTextModel::FullTranslateTextModel(dict::Translator *translator,
       translator_(std::unique_ptr<dict::Translator>(translator)) {}
 
 QStringList FullTranslateTextModel::doToHtml() {
-  return doToPlainText();  // TODO
+  QStringList res;
+  TextToHtml converter({"green", "blue"});
+
+  for (auto &transl_res : text_) {
+    for (auto &ch : transl_res.chunks()) {
+      if (!ch->translated()) {
+        converter.addChunkNoColor(ch->originText());
+      } else {
+        converter.nextColor();
+        converter.addChunk(ch->originText());
+      }
+    }
+    res.push_back(converter.result());
+    converter.clear();
+  }
+
+  return res;
 }
 
 QStringList FullTranslateTextModel::doToPlainText() {
