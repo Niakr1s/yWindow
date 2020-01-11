@@ -22,10 +22,7 @@ class TranslationChunk {
   bool translated() const;
   virtual bool final() const = 0;
 
-  virtual void insertTranslation(Card*);
   const CardPtrs& translations() const;
-
-  virtual void insertSubTranslation(Card*);
   const CardPtrs& subTranslations() const;
 
   virtual std::shared_ptr<TranslationChunk> copy() const = 0;

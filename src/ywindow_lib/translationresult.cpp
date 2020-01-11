@@ -8,8 +8,6 @@ bool dict::TranslationChunk::translated() const {
   return !translations_.empty();
 }
 
-void dict::TranslationChunk::insertTranslation(Card *) {}
-
 dict::TranslationChunk::TranslationChunk(const std::string &origin_text)
     : origin_text_(origin_text) {}
 
@@ -27,8 +25,6 @@ std::string dict::TranslationChunk::originText() const { return origin_text_; }
 const dict::CardPtrs &dict::TranslationChunk::translations() const {
   return translations_;
 }
-
-void dict::TranslationChunk::insertSubTranslation(dict::Card *) {}
 
 const dict::CardPtrs &dict::TranslationChunk::subTranslations() const {
   return sub_translations_;
