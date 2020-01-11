@@ -87,11 +87,11 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     YomiCard *card = new YomiCard(dict);
-    card->setName(root[i][0].asString());
+    card->setWord(root[i][0].asString());
 
     auto json_readings = root[i][1].asString();
     if (json_readings.empty()) {
-      card->setReading({card->name()});
+      card->setReading({card->word()});
     } else {
       std::vector<std::string> readings;
       boost::split(readings, root[i][1].asString(), boost::is_any_of(" "));
@@ -112,7 +112,7 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
     dict->addCard(card);
 
     for (auto &reading : card->readings()) {
-      if (reading != card->name()) {
+      if (reading != card->word()) {
         ProxyCard *reading_card = new ProxyCard(card, reading);
         dict->addCard(reading_card);
       }
@@ -124,12 +124,12 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     YomiCard *card = new YomiCard(dict);
-    card->setName(root[i][0].asString());
+    card->setWord(root[i][0].asString());
 
     auto json_readings = root[i][1].asString() + " " + root[i][2].asString();
     boost::trim(json_readings);
     if (json_readings.empty()) {
-      card->setReading({card->name()});
+      card->setReading({card->word()});
     } else {
       std::vector<std::string> readings;
       boost::split(readings, json_readings, boost::is_any_of(" "));
@@ -149,7 +149,7 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
     dict->addCard(card);
 
     for (auto &reading : card->readings()) {
-      if (reading != card->name()) {
+      if (reading != card->word()) {
         ProxyCard *reading_card = new ProxyCard(card, reading);
         dict->addCard(reading_card);
       }
@@ -167,7 +167,7 @@ void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
   for (auto it = root.begin(), it_max = root.end(); it != it_max; ++it) {
     for (int i = 0, i_max = it->size(); i != i_max; ++i) {
       DeinflectCard *card = new DeinflectCard(dict);
-      card->setName((*it)[i]["kanaIn"].asString());
+      card->setWord((*it)[i]["kanaIn"].asString());
       card->setReading((*it)[i]["kanaOut"].asString());
       dict->addCard(card);
     }
@@ -191,7 +191,7 @@ void dict::UserParser::doParseInto(dict::Dictionary *dict) {
     auto card = new UserCard(dict);
     boost::trim(pair[0]);
     boost::trim(pair[1]);
-    card->setName(pair[0]);
+    card->setWord(pair[0]);
     card->setReading(pair[1]);
     dict->addCard(card);
   }

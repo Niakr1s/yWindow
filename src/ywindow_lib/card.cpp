@@ -16,7 +16,7 @@ void dict::YomiCard::addMeaning(const std::string& meaning) {
 
 std::vector<std::string> dict::YomiCard::readings() const { return readings_; }
 
-void dict::DefaultCard::setName(const std::string& name) { name_ = name; }
+void dict::DefaultCard::setWord(const std::string& name) { word_ = name; }
 
 dict::Tag::Tag() {}
 
@@ -26,13 +26,13 @@ dict::Card::~Card() {}
 
 std::string dict::Card::reading() { return boost::join(readings(), " "); }
 
-std::string dict::Card::originName() const { return name(); }
+std::string dict::Card::originWord() const { return word(); }
 
 dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
 
 std::string dict::DefaultCard::dictionaryInfo() const { return dict_->info(); }
 
-std::string dict::DefaultCard::name() const { return name_; }
+std::string dict::DefaultCard::word() const { return word_; }
 
 std::string dict::YomiCard::meaning() const {
   return boost::join(meanings_, "; ");
@@ -82,16 +82,16 @@ void dict::UserCard::setReading(const std::string& reading) {
 
 std::vector<std::string> dict::UserCard::readings() const { return {reading_}; }
 
-std::string dict::UserCard::meaning() const { return name_; }
+std::string dict::UserCard::meaning() const { return word_; }
 
 std::string dict::UserCard::etc() const { return ""; }
 
 dict::ProxyCard::ProxyCard(dict::Card* card, const std::string& name)
-    : card_(card), name_(name) {}
+    : card_(card), word_(name) {}
 
-std::string dict::ProxyCard::originName() const { return card_->name(); }
+std::string dict::ProxyCard::originWord() const { return card_->word(); }
 
-std::string dict::ProxyCard::name() const { return name_; }
+std::string dict::ProxyCard::word() const { return word_; }
 
 std::vector<std::string> dict::ProxyCard::readings() const {
   return card_->readings();

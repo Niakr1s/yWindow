@@ -28,8 +28,8 @@ class Card {
   std::string reading();
 
   // please, separate separate readings by ";"
-  virtual std::string originName() const;
-  virtual std::string name() const = 0;
+  virtual std::string originWord() const;
+  virtual std::string word() const = 0;
   virtual std::vector<std::string> readings() const = 0;
   virtual std::string meaning() const = 0;
   virtual std::string dictionaryInfo() const = 0;
@@ -40,15 +40,15 @@ class DefaultCard : public Card {
  public:
   DefaultCard(Dictionary* dict);
 
-  void setName(const std::string& name);
+  void setWord(const std::string& word);
 
   Dictionary* dict() const;
   std::string dictionaryInfo() const override;
-  std::string name() const override;
+  std::string word() const override;
 
  protected:
   Dictionary* dict_;
-  std::string name_;
+  std::string word_;
 };
 
 class YomiDictionary;
@@ -105,10 +105,10 @@ class UserCard : public DefaultCard {
 
 class ProxyCard : public Card {
  public:
-  ProxyCard(Card* card, const std::string& name);
+  ProxyCard(Card* card, const std::string& word);
 
-  std::string originName() const override;
-  std::string name() const override;
+  std::string originWord() const override;
+  std::string word() const override;
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
   std::string dictionaryInfo() const override;
@@ -116,7 +116,7 @@ class ProxyCard : public Card {
 
  private:
   Card* card_;
-  std::string name_;
+  std::string word_;
 };
 
 using CardUniquePtrMap = std::multimap<std::string, std::unique_ptr<Card>>;

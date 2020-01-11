@@ -19,29 +19,29 @@ TEST(chaintranslator, test1) {
 
   res = chain.translate("見れば笑ってNiakr1s");
   ASSERT_EQ(res.size(), 3);
-  ASSERT_EQ(res.chunks()[0]->translations().front()->name(), "見る");
+  ASSERT_EQ(res.chunks()[0]->translations().front()->word(), "見る");
   ASSERT_EQ(res.chunks()[0]->originText(), "見れば");
-  ASSERT_EQ(res.chunks()[2]->translations().front()->name(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[2]->translations().front()->word(), "Niakr1s");
   ASSERT_EQ(res.chunks()[2]->translations().front()->readings().front(), "Nia");
-  ASSERT_EQ(res.chunks()[1]->translations().front()->name(), "笑う");
+  ASSERT_EQ(res.chunks()[1]->translations().front()->word(), "笑う");
   ASSERT_EQ(res.chunks()[1]->originText(), "笑って");
 
   res = chain.translate("見ればNiakr1s笑って");
   ASSERT_EQ(res.size(), 3);
-  ASSERT_EQ(res.chunks()[0]->translations().front()->name(), "見る");
+  ASSERT_EQ(res.chunks()[0]->translations().front()->word(), "見る");
   ASSERT_EQ(res.chunks()[0]->originText(), "見れば");
-  ASSERT_EQ(res.chunks()[1]->translations().front()->name(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[1]->translations().front()->word(), "Niakr1s");
   ASSERT_EQ(res.chunks()[1]->translations().front()->readings().front(), "Nia");
-  ASSERT_EQ(res.chunks()[2]->translations().front()->name(), "笑う");
+  ASSERT_EQ(res.chunks()[2]->translations().front()->word(), "笑う");
   ASSERT_EQ(res.chunks()[2]->originText(), "笑って");
 
   res = chain.translate("Niakr1s見れば笑って");
   ASSERT_EQ(res.size(), 3);
-  ASSERT_EQ(res.chunks()[1]->translations().front()->name(), "見る");
+  ASSERT_EQ(res.chunks()[1]->translations().front()->word(), "見る");
   ASSERT_EQ(res.chunks()[1]->originText(), "見れば");
-  ASSERT_EQ(res.chunks()[0]->translations().front()->name(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[0]->translations().front()->word(), "Niakr1s");
   ASSERT_EQ(res.chunks()[0]->translations().front()->readings().front(), "Nia");
-  ASSERT_EQ(res.chunks()[2]->translations().front()->name(), "笑う");
+  ASSERT_EQ(res.chunks()[2]->translations().front()->word(), "笑う");
   ASSERT_EQ(res.chunks()[2]->originText(), "笑って");
 
   res = chain.translate("見Niakr1sれば笑Niakr1sって");

@@ -32,7 +32,7 @@ YTranslationConverter::DictCardPtrMap YTranslationConverter::toDictCardPtrMap(
     const dict::CardPtrs& input) {
   DictCardPtrMap res;
   for (auto& it : input) {
-    res[it->originName()][it->dictionaryInfo()].push_back(it);
+    res[it->originWord()][it->dictionaryInfo()].push_back(it);
   }
   return res;
 }

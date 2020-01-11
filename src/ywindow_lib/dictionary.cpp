@@ -24,7 +24,7 @@ void dict::YomiDictionary::addTag(const Tag &tag) {
 
 void dict::DefaultDictionary::doAddCard(Card *card) {
   auto card_to_insert = std::unique_ptr<Card>(card);
-  cards_.insert({card_to_insert->name(), std::move(card_to_insert)});
+  cards_.insert({card_to_insert->word(), std::move(card_to_insert)});
 }
 
 const std::string &dict::DefaultDictionary::info() const { return info_; }
