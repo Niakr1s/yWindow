@@ -6,40 +6,22 @@
 <div class="word">{{ name }}</div>
 {% block dict %}
 <div class="dict">{{ dict }}</div>
-<table>
-    {% block row %}
-    <tr>
-        <td class="meaning" width="{{ width }}%" colspan="{{ colspan }}">
-            {{ meaning }}
-        </td>
-        {% block reading %}
-        <td class="reading" width="20%" align="right">
-            {{ reading }}
-        </td>
-        {% endblock %}
-    </tr>
-    {% endblock %}
-</table><br>
+{% block row %}
+<div class="reading">{{ reading }}</div>
+<div class="meaning">{{ meaning }}</div>
 {% endblock %}
+{% endblock %}
+<br>
 {% endblock %}
 
 {% block sub_cards %}
 <div class="word">{{ name }}</div>
 {% block dict %}
 <div class="dict">{{ dict }}</div>
-<table>
-    {% block row %}
-    <tr>
-        <td class="meaning" width="{{ width }}%" colspan="{{ colspan }}">
-            {{ meaning }}
-        </td>
-        {% block reading %}
-        <td class="reading" width="20%" align="right">
-            {{ reading }}
-        </td>
-        {% endblock %}
-    </tr>
-    {% endblock %}
-</table><br>
+{% block row %}
+<div class="reading">{{ reading }}</div>
+<div class="meaning">{{ meaning }}</div>
 {% endblock %}
+{% endblock %}
+<br>
 {% endblock %}

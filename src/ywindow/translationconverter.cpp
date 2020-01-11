@@ -60,19 +60,8 @@ void YTranslationConverter::appendDictCardPtrMap(
         auto meaning = (dicts_it->second)[cards_it]->meaning();
         auto reading = (dicts_it->second)[cards_it]->reading();
 
-        row_block[cards_it].set(
-            "colspan", reading.empty() ? std::to_string(2) : std::to_string(1));
-        row_block[cards_it].set("width", reading.empty() ? std::to_string(100)
-                                                         : std::to_string(80));
-
         row_block[cards_it].set("meaning", meaning);
-
-        Block& reading_block = row_block[cards_it].block("reading");
-        if (!reading.empty()) {
-          reading_block.set("reading", reading);
-        } else {
-          reading_block.disable();
-        }
+        row_block[cards_it].set("reading", reading);
       }
     }
   }
