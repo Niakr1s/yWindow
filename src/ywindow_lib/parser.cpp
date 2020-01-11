@@ -89,19 +89,35 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
     YomiCard *card = new YomiCard(dict);
     card->setName(root[i][0].asString());
 
-    std::vector<std::string> readings;
-    boost::split(readings, root[i][1].asString(), boost::is_any_of(" "));
-    card->setReading(readings);
+    auto json_readings = root[i][1].asString();
+    if (json_readings.empty()) {
+      card->setReading({card->name()});
+    } else {
+      std::vector<std::string> readings;
+      boost::split(readings, root[i][1].asString(), boost::is_any_of(" "));
+      card->setReading(readings);
+    }
 
-    std::vector<std::string> tags;
-    boost::split(tags, root[i][2].asString(), boost::is_any_of(" "));
-    card->setTags(std::move(tags));
+    auto json_tags = root[i][2].asString();
+    if (!json_tags.empty()) {
+      std::vector<std::string> tags;
+      boost::split(tags, root[i][2].asString(), boost::is_any_of(" "));
+      card->setTags(std::move(tags));
+    }
 
     for (int j = 0, j_max = root[i][5].size(); j != j_max; ++j) {
       card->addMeaning(root[i][5][j].asString());
     }
 
     dict->addCard(card);
+
+    for (auto &reading : card->readings()) {
+      if (reading != card->name()) {
+        YomiCard *reading_card = new YomiCard(*card);
+        reading_card->setName(reading);
+        dict->addCard(reading_card);
+      }
+    }
   }
 }
 
@@ -111,20 +127,35 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
     YomiCard *card = new YomiCard(dict);
     card->setName(root[i][0].asString());
 
-    std::vector<std::string> readings;
-    boost::split(readings, root[i][1].asString() + " " + root[i][2].asString(),
-                 boost::is_any_of(" "));
+    auto json_readings = root[i][1].asString() + " " + root[i][2].asString();
+    boost::trim(json_readings);
+    if (json_readings.empty()) {
+      card->setReading({card->name()});
+    } else {
+      std::vector<std::string> readings;
+      boost::split(readings, json_readings, boost::is_any_of(" "));
+      card->setReading(readings);
+    }
 
-    card->setReading(readings);
-
-    std::vector<std::string> tags;
-    boost::split(tags, root[i][3].asString(), boost::is_any_of(" "));
-    card->setTags(std::move(tags));
+    auto json_tags = root[i][3].asString();
+    if (!json_tags.empty()) {
+      std::vector<std::string> tags;
+      boost::split(tags, root[i][3].asString(), boost::is_any_of(" "));
+      card->setTags(std::move(tags));
+    }
 
     for (int j = 0, j_max = root[i][4].size(); j != j_max; ++j) {
       card->addMeaning(root[i][4][j].asString());
     }
     dict->addCard(card);
+
+    for (auto &reading : card->readings()) {
+      if (reading != card->name()) {
+        YomiCard *reading_card = new YomiCard(*card);
+        reading_card->setName(reading);
+        dict->addCard(reading_card);
+      }
+    }
   }
 }
 
