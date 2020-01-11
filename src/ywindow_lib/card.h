@@ -94,13 +94,14 @@ class UserCard : public DefaultCard {
   UserCard(Dictionary* dict);
 
   void setReading(const std::string& reading);
+  void setMeaning(const std::string& meaning);
 
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
   std::string etc() const override;
 
  private:
-  std::string reading_;
+  std::string reading_, meaning_;
 };
 
 class ProxyCard : public Card {

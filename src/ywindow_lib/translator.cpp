@@ -218,5 +218,5 @@ dict::UserTranslator::UserTranslator(const fs::path &file)
 
 dict::TranslationResult dict::UserTranslator::doTranslate(
     const std::string &str) {
-  return doTranslateAll<TranslatedChunkFinal>(str);
+  return doTranslateAll<TranslatedUserChunk>(str);
 }

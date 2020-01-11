@@ -1,7 +1,7 @@
 #include "texttohtml.h"
 
-TextToHtml::TextToHtml(QStringList colors)
-    : colors_(colors), current_color_(0) {
+TextToHtml::TextToHtml(QStringList colors, QString highlight_color)
+    : colors_(colors), current_color_(0), highlight_color_(highlight_color) {
   if (colors.empty()) {
     throw std::invalid_argument("TextToHtml: empty colors");
   }
@@ -21,12 +21,20 @@ void TextToHtml::addChunkNoColor(const std::string& str) {
   return addChunkNoColor(QString::fromStdString(str));
 }
 
+void TextToHtml::addChunkHighlighted(const std::string& str) {
+  return addChunkHighlighted(QString::fromStdString(str));
+}
+
 void TextToHtml::addChunk(const QString& str) {
   return addChunkWithColor(str, colors_[current_color_]);
 }
 
 void TextToHtml::addChunkNoColor(const QString& str) {
   result_.append(QString(R"***(<span>%1</span>)***").arg(str));
+}
+
+void TextToHtml::addChunkHighlighted(const QString& str) {
+  return addChunkWithColor(str, highlight_color_);
 }
 
 QString TextToHtml::result() const { return result_; }

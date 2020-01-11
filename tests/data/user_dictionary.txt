@@ -1,3 +1,3 @@
-# word = reading
-Niakr1s = Nia
-Mandalorian = Mando
+# word = reading (, meaning #optional)
+Niakr1s = Nia, Username
+Mandalorian = Mando, Disney's character

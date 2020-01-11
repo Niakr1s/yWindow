@@ -7,6 +7,7 @@
 
 #include "card.h"
 #include "dictionary.h"
+#include "stringconvert.h"
 
 void dict::Parser::parseInto(Dictionary *dict) { return doParseInto(dict); }
 
@@ -184,15 +185,31 @@ void dict::UserParser::doParseInto(dict::Dictionary *dict) {
   }
 
   for (std::string line; std::getline(is, line);) {
-    if (line[0] == '#' || line.empty()) continue;
+    if (line.empty() || line[0] == '#') continue;
+
     std::vector<std::string> pair;
     boost::split(pair, line, boost::is_any_of("="));
+    trimStr(pair);
+
     if (pair.size() != 2) continue;
+
     auto card = new UserCard(dict);
-    boost::trim(pair[0]);
-    boost::trim(pair[1]);
     card->setWord(pair[0]);
-    card->setReading(pair[1]);
+
+    std::vector<std::string> reading_and_meaning;
+    boost::split(reading_and_meaning, pair[1], boost::is_any_of(","));
+    trimStr(reading_and_meaning);
+
+    if (reading_and_meaning.empty()) continue;
+
+    card->setReading(reading_and_meaning[0]);
+
+    if (reading_and_meaning.size() == 2) {
+      card->setMeaning(reading_and_meaning[1]);
+    } else {
+      card->setMeaning(card->word());
+    }
+
     dict->addCard(card);
   }
 }

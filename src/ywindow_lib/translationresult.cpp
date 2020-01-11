@@ -8,6 +8,8 @@ bool dict::TranslationChunk::translated() const {
   return !translations_.empty();
 }
 
+bool dict::TranslationChunk::user() const { return false; }
+
 dict::TranslationChunk::TranslationChunk(const std::string &origin_text)
     : origin_text_(origin_text) {}
 
@@ -283,3 +285,5 @@ dict::TranslatedChunkFinal::TranslatedChunkFinal(const std::string &origin_text,
                       std::move(sub_translations)) {}
 
 bool dict::TranslatedChunkFinal::final() const { return true; }
+
+bool dict::TranslatedUserChunk::user() const { return true; }

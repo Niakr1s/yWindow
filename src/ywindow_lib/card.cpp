@@ -80,9 +80,13 @@ void dict::UserCard::setReading(const std::string& reading) {
   reading_ = reading;
 }
 
+void dict::UserCard::setMeaning(const std::string& meaning) {
+  meaning_ = meaning;
+}
+
 std::vector<std::string> dict::UserCard::readings() const { return {reading_}; }
 
-std::string dict::UserCard::meaning() const { return word_; }
+std::string dict::UserCard::meaning() const { return meaning_; }
 
 std::string dict::UserCard::etc() const { return ""; }
 

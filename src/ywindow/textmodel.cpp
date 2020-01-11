@@ -67,15 +67,19 @@ FullTranslateTextModel::FullTranslateTextModel(dict::Translator *translator,
 
 QStringList FullTranslateTextModel::doToHtml() {
   QStringList res;
-  TextToHtml converter({"green", "blue"});
+  TextToHtml converter({"green", "blue"}, "red");
 
   for (auto &transl_res : text_) {
     for (auto &ch : transl_res.chunks()) {
       if (!ch->translated()) {
         converter.addChunkNoColor(ch->originText());
       } else {
-        converter.nextColor();
-        converter.addChunk(ch->originText());
+        if (ch->user()) {
+          converter.addChunkHighlighted(ch->originText());
+        } else {
+          converter.nextColor();
+          converter.addChunk(ch->originText());
+        }
       }
     }
     res.push_back(converter.result());

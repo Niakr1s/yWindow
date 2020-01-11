@@ -21,6 +21,7 @@ class TranslationChunk {
 
   bool translated() const;
   virtual bool final() const = 0;
+  virtual bool user() const;
 
   const CardPtrs& translations() const;
   const CardPtrs& subTranslations() const;
@@ -64,6 +65,13 @@ class TranslatedChunkFinal : public TranslatedChunk {
                        CardPtrs&& sub_translations);
 
   bool final() const override;
+};
+
+class TranslatedUserChunk : public TranslatedChunkFinal {
+ public:
+  using TranslatedChunkFinal::TranslatedChunkFinal;
+
+  bool user() const;
 };
 
 // end TranslationChunk
