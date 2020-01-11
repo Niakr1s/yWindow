@@ -8,7 +8,7 @@ TextModel::TextModel(QObject *parent) : QObject(parent) {}
 
 TextModel::~TextModel() {}
 
-QStringList TextModel::getText() { return doGetText(); }
+QStringList TextModel::toHtml() { return doToHtml(); }
 
 void TextModel::translate(std::pair<int, int> pos, QPoint point) {
   if (pos == last_pos_) return;
@@ -37,7 +37,7 @@ YomiStyleTextModel::YomiStyleTextModel(dict::Translator *translator,
     : TextModel(parent),
       translator_(std::unique_ptr<dict::Translator>(translator)) {}
 
-QStringList YomiStyleTextModel::doGetText() { return text_; }
+QStringList YomiStyleTextModel::doToHtml() { return text_; }
 
 dict::TranslationChunkPtr YomiStyleTextModel::doTranslate(
     std::pair<int, int> pos) {

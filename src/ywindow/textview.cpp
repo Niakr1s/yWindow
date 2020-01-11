@@ -34,7 +34,7 @@ DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
 }
 
 void DefaultTextView::doDisplayText() {
-  auto list = model_->getText();
+  auto list = model_->toHtml();
   current_text_ = list;
   qDebug() << "Display: got text to display: " << list;
 

@@ -18,7 +18,7 @@ class TextModel : public QObject {
   TextModel(QObject* parent = nullptr);
   virtual ~TextModel();
 
-  QStringList getText();
+  QStringList toHtml();
 
  signals:
   void textChanged();
@@ -34,7 +34,7 @@ class TextModel : public QObject {
   std::pair<int, int> last_pos_ = {-1, -1};
   int current_pos_ = -1;
 
-  virtual QStringList doGetText() = 0;
+  virtual QStringList doToHtml() = 0;
   virtual dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) = 0;
   virtual void doAddText(const QString& text) = 0;
 };
@@ -44,7 +44,7 @@ class YomiStyleTextModel : public TextModel {
   YomiStyleTextModel(dict::Translator* translator, QObject* parent = nullptr);
 
  protected:
-  QStringList doGetText() override;
+  QStringList doToHtml() override;
   dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) override;
   void doAddText(const QString& text) override;
 
