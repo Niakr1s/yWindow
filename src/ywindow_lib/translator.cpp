@@ -161,6 +161,13 @@ dict::TranslationResult dict::DeinflectTranslator::doTranslate(
 
 dict::ChainTranslator::ChainTranslator() {}
 
+dict::ChainTranslator::ChainTranslator(
+    std::initializer_list<dict::Translator *> translators) {
+  for (auto &tr : translators) {
+    translators_.push_back(std::unique_ptr<Translator>(tr));
+  }
+}
+
 void dict::ChainTranslator::addTranslator(Translator *transl) {
   translators_.push_back(std::unique_ptr<Translator>(transl));
 }

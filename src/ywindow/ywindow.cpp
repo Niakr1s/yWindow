@@ -51,8 +51,12 @@ void YWindow::saveSettings() { settings_.setValue("geometry", geometry()); }
 void YWindow::initTextMVC() {
   //  text_model_ = new YomiStyleTextModel(new
   //  dict::YomiTranslator("yomi_dicts"));
-  text_model_ =
-      new FullTranslateTextModel(new dict::YomiTranslator("yomi_dicts"));
+  //  text_model_ =
+  //      new FullTranslateTextModel(new dict::YomiTranslator("dicts/yomi"));
+  text_model_ = new FullTranslateTextModel(new dict::ChainTranslator(
+      {new dict::UserTranslator("dicts/user.txt"),
+       //       new dict::DeinflectTranslator("dicts/deinflect.json", nullptr),
+       new dict::YomiTranslator("dicts/yomi")}));
 
   text_controller_ = new TextController();
   text_controller_->setModel(text_model_);

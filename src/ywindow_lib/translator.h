@@ -89,6 +89,7 @@ class UserTranslator : public DictionaryTranslator {
 class ChainTranslator : public Translator {
  public:
   ChainTranslator();
+  ChainTranslator(std::initializer_list<Translator*> translators);
 
   void addTranslator(Translator* transl);
   void popTranslator();
