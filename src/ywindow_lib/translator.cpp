@@ -204,7 +204,9 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
         buffer.push_back(TranslationResult::bestTranslation(merged));
       }
     }
-    res = TranslationResult::join(buffer);
+    if (!buffer.empty()) {
+      res = TranslationResult::join(buffer);
+    }
   }
   return res;
 }
