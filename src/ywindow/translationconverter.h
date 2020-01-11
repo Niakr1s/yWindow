@@ -34,7 +34,7 @@ class YTranslationConverter : public TranslationConverter {
   std::string doToHtml(const dict::TranslationChunk& translation) override;
 
  private:
-  static DictCardPtrMap toDictCardPtrMap(const dict::CardPtrMultiMap& input);
+  static DictCardPtrMap toDictCardPtrMap(const dict::CardPtrs& input);
   static void appendDictCardPtrMap(Block& word_block,
                                    const DictCardPtrMap& cards);
 };

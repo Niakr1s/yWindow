@@ -22,7 +22,7 @@ TEST(translationresult, test1) {
     TranslationResult m = t + translated;
     ASSERT_EQ(m.orig_text(), "見れば笑って");
     ASSERT_EQ(m.chunks()[0]->originText(), "見れば");
-    ASSERT_EQ(m.chunks()[0]->translations().begin()->first, "見る");
+    ASSERT_EQ(m.chunks()[0]->translations().front()->name(), "見る");
   }
 }
 

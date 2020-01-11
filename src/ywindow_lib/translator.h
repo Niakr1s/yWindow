@@ -39,7 +39,7 @@ class DictionaryTranslator : public Translator {
   std::vector<std::unique_ptr<Dictionary>> dicts_;
   std::vector<std::future<Dictionary*>> dicts_futures_;
 
-  CardPtrMultiMap queryAllDicts(const std::string& str);
+  CardPtrs queryAllDicts(const std::string& str);
 
   void prepareDictionaries() final;
 

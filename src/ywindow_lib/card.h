@@ -121,6 +121,7 @@ class ProxyCard : public Card {
 
 using CardUniquePtrMap = std::multimap<std::string, std::unique_ptr<Card>>;
 using CardPtrMultiMap = std::multimap<std::string, Card*>;
+using CardPtrs = std::vector<Card*>;
 
 }  // namespace dict
 

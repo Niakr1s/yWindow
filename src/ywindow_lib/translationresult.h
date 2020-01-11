@@ -12,9 +12,8 @@ namespace dict {
 class TranslationChunk {
  public:
   TranslationChunk(const std::string& origin_text);
-  TranslationChunk(const std::string& origin_text,
-                   CardPtrMultiMap&& translations,
-                   CardPtrMultiMap&& sub_translations);
+  TranslationChunk(const std::string& origin_text, CardPtrs&& translations,
+                   CardPtrs&& sub_translations);
   virtual ~TranslationChunk();
 
   std::string originText() const;
@@ -23,17 +22,17 @@ class TranslationChunk {
   bool translated() const;
   virtual bool final() const = 0;
 
-  virtual void insertTranslation(const std::pair<std::string, Card*>&);
-  const CardPtrMultiMap& translations() const;
+  virtual void insertTranslation(Card*);
+  const CardPtrs& translations() const;
 
-  virtual void insertSubTranslation(const std::pair<std::string, Card*>&);
-  const CardPtrMultiMap& subTranslations() const;
+  virtual void insertSubTranslation(Card*);
+  const CardPtrs& subTranslations() const;
 
   virtual std::shared_ptr<TranslationChunk> copy() const = 0;
 
  protected:
   std::string origin_text_;
-  CardPtrMultiMap translations_, sub_translations_;
+  CardPtrs translations_, sub_translations_;
 };
 
 class UntranslatedChunk : public TranslationChunk {
@@ -51,9 +50,8 @@ class UntranslatedChunk : public TranslationChunk {
 class TranslatedChunk : public TranslationChunk {
  public:
   TranslatedChunk(const std::string& origin_text);
-  TranslatedChunk(const std::string& origin_text,
-                  CardPtrMultiMap&& translations,
-                  CardPtrMultiMap&& sub_translations);
+  TranslatedChunk(const std::string& origin_text, CardPtrs&& translations,
+                  CardPtrs&& sub_translations);
 
   bool final() const override;
 
@@ -65,9 +63,8 @@ class TranslatedChunk : public TranslationChunk {
 class TranslatedChunkFinal : public TranslatedChunk {
  public:
   TranslatedChunkFinal(const std::string& origin_text);
-  TranslatedChunkFinal(const std::string& origin_text,
-                       CardPtrMultiMap&& translations,
-                       CardPtrMultiMap&& sub_translations);
+  TranslatedChunkFinal(const std::string& origin_text, CardPtrs&& translations,
+                       CardPtrs&& sub_translations);
 
   bool final() const override;
 };

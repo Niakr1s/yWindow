@@ -29,20 +29,11 @@ std::string YTranslationConverter::doToHtml(
 }
 
 YTranslationConverter::DictCardPtrMap YTranslationConverter::toDictCardPtrMap(
-    const dict::CardPtrMultiMap& input) {
-  std::set<std::string> keys;
-  for (auto& it : input) {
-    keys.insert(it.first);
-  }
-
+    const dict::CardPtrs& input) {
   DictCardPtrMap res;
-  for (auto& k : keys) {
-    auto range = input.equal_range(k);
-    for (auto it = range.first; it != range.second; ++it) {
-      res[k][it->second->dictionaryInfo()].push_back(it->second);
-    }
+  for (auto& it : input) {
+    res[it->originName()][it->dictionaryInfo()].push_back(it);
   }
-
   return res;
 }
 

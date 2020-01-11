@@ -63,13 +63,13 @@ void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
   dicts_.push_back(std::unique_ptr<Dictionary>(dict));
 }
 
-dict::CardPtrMultiMap dict::DictionaryTranslator::queryAllDicts(
+dict::CardPtrs dict::DictionaryTranslator::queryAllDicts(
     const std::string &str) {
-  CardPtrMultiMap res;
+  CardPtrs res;
   for (auto &dict : dicts_) {
     auto query = dict->query(str);
     for (auto &card : query) {
-      res.insert(card);
+      res.push_back(card);
     }
   }
   return res;
@@ -106,14 +106,15 @@ dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
             it_beg = transl_result.chunks().begin();
        it != it_beg; --it) {
     auto inner_orig_text = TranslationResult{it_beg, it}.orig_text();
-    CardPtrMultiMap translations = queryAllDicts(inner_orig_text);
+    CardPtrs translations = queryAllDicts(inner_orig_text);
 
     if (!translations.empty()) {
-      CardPtrMultiMap sub_translations;
+      CardPtrs sub_translations;
       for (auto inner_it = it - 1; inner_it != it_beg; --inner_it) {
-        CardPtrMultiMap inner_sub_translations =
+        CardPtrs inner_sub_translations =
             queryAllDicts(TranslationResult{it_beg, inner_it}.orig_text());
-        sub_translations.insert(inner_sub_translations.cbegin(),
+        sub_translations.insert(sub_translations.end(),
+                                inner_sub_translations.cbegin(),
                                 inner_sub_translations.cend());
       }
       return {std::make_shared<TranslatedChunk_T>(inner_orig_text,
@@ -132,16 +133,17 @@ dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
   if (transl_result.size() == 0)
     return std::make_shared<UntranslatedChunk>(str);
 
-  CardPtrMultiMap translations = queryAllDicts(str);
+  CardPtrs translations = queryAllDicts(str);
   if (translations.empty()) return std::make_shared<UntranslatedChunk>(str);
 
-  CardPtrMultiMap sub_translations;
+  CardPtrs sub_translations;
   for (auto it = transl_result.chunks().end() - 1,
             it_begin = transl_result.chunks().begin();
        it != it_begin; --it) {
-    CardPtrMultiMap inner_sub_translations =
+    CardPtrs inner_sub_translations =
         queryAllDicts(TranslationResult{it_begin, it}.orig_text());
-    sub_translations.insert(inner_sub_translations.cbegin(),
+    sub_translations.insert(sub_translations.end(),
+                            inner_sub_translations.cbegin(),
                             inner_sub_translations.cend());
   }
   return std::make_shared<TranslatedChunk_T>(str, std::move(translations),
