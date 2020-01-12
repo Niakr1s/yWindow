@@ -9,7 +9,7 @@
 using namespace dict;
 
 TEST(translationresult, test1) {
-  auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
+  auto de = new DeinflectTranslator("data/deinflect.json");
   auto deinflected = de->translate("見れば笑って");
   ASSERT_EQ(deinflected.chunks().size(), 4);
   auto deinflected_translated_text = deinflected.toTexts();

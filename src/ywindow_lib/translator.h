@@ -75,13 +75,10 @@ class YomiTranslator : public DictionaryTranslator {
 
 class DeinflectTranslator : public DictionaryTranslator {
  public:
-  DeinflectTranslator(const fs::path& file, Translator* next_translator);
+  DeinflectTranslator(const fs::path& file);
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
-
- private:
-  Translator* next_translator_;
 };
 
 class UserTranslator : public DictionaryTranslator {

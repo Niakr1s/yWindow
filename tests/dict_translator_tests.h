@@ -45,7 +45,7 @@ TEST(yomi_translator, translation_result_all_true2) {
 
 TEST(yomi_translator, with_deinflector) {
   auto yomi = new YomiTranslator(
-      "data", new DeinflectTranslator("data/deinflect.json", nullptr));
+      "data", new DeinflectTranslator("data/deinflect.json"));
   auto res = yomi->translate("見れば笑って");
   ASSERT_EQ(res.chunks().size(), 2);
   ASSERT_TRUE(res.chunks()[0]->translated());
@@ -57,7 +57,7 @@ TEST(yomi_translator, with_deinflector) {
 }
 
 TEST(deinflector, test1) {
-  auto de = new DeinflectTranslator("data/deinflect.json", nullptr);
+  auto de = new DeinflectTranslator("data/deinflect.json");
   auto res = de->translate("見れば笑って");
   ASSERT_EQ(res.chunks().size(), 4);
   ASSERT_EQ(res.chunks()[0]->originText(), "見");

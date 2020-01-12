@@ -13,7 +13,7 @@ using namespace dict;
 TEST(chaintranslator, test1) {
   ChainTranslator chain;
   chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
-  chain.addTranslator(new DeinflectTranslator("data/deinflect.json", nullptr));
+  chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
   chain.addTranslator(new YomiTranslator("data"));
   TranslationResult res;
 

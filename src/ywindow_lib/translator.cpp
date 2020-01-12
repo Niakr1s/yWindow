@@ -194,9 +194,8 @@ dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
   return std::make_shared<UntranslatedChunk>(str);
 }
 
-dict::DeinflectTranslator::DeinflectTranslator(
-    const fs::path &file, dict::Translator *next_translator)
-    : DictionaryTranslator(), next_translator_(next_translator) {
+dict::DeinflectTranslator::DeinflectTranslator(const fs::path &file)
+    : DictionaryTranslator() {
   dicts_futures_.push_back(Loader::loadFromFS<DeinflectDictionary>(file));
 }
 
