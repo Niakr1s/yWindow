@@ -5,6 +5,7 @@
 #include "dictionary.h"
 #include "loader.h"
 #include "stringconvert.h"
+#include "translationresult.h"
 
 dict::Translator::~Translator() {}
 
@@ -22,8 +23,9 @@ dict::TranslationResult dict::Translator::translate(const std::string &str) {
 
 void dict::Translator::prepareDictionaries() {}
 
-dict::YomiTranslator::YomiTranslator(const fs::path &root_dir)
-    : DictionaryTranslator() {
+dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
+                                     Translator *deinflector)
+    : DictionaryTranslator(deinflector) {
   for (auto &path : fs::directory_iterator(root_dir)) {
     if (!path.is_directory()) {
       continue;
@@ -32,8 +34,9 @@ dict::YomiTranslator::YomiTranslator(const fs::path &root_dir)
   }
 }
 
-dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs)
-    : DictionaryTranslator() {
+dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs,
+                                     Translator *deinflector)
+    : DictionaryTranslator(deinflector) {
   for (auto &dir : dicts_dirs) {
     dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
   }
@@ -57,14 +60,15 @@ void dict::DictionaryTranslator::prepareDictionaries() {
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
-dict::DictionaryTranslator::DictionaryTranslator() {}
+dict::DictionaryTranslator::DictionaryTranslator(Translator *deinflector)
+    : deinflector_(std::unique_ptr<Translator>(deinflector)) {}
 
 void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
   dicts_.push_back(std::unique_ptr<Dictionary>(dict));
 }
 
-void dict::DictionaryTranslator::setDeinflector(dict::Dictionary *deinflector) {
-  deinflector_ = std::unique_ptr<Dictionary>(deinflector);
+void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
+  deinflector_ = std::unique_ptr<Translator>(deinflector);
 }
 
 dict::CardPtrs dict::DictionaryTranslator::queryAllDicts(
@@ -82,9 +86,11 @@ dict::CardPtrs dict::DictionaryTranslator::queryAllDicts(
 template <class TranslatedChunk_T>
 dict::TranslationResult dict::DictionaryTranslator::doTranslateAll(
     const std::string &str) {
+  TranslationResult transl_res{str};
+  if (str.empty()) return transl_res;
+
   TranslationChunkPtrs translated_chunks;
 
-  TranslationResult transl_res{str};
   for (auto it = transl_res.chunks().begin(),
             it_end = transl_res.chunks().end();
        it < it_end; ++it) {
@@ -116,6 +122,13 @@ dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
     if (full_translated->translated()) {
       return {full_translated, res_second};
     }
+    if (deinflector_) {
+      full_translated =
+          doDeinflectAndTranslateFullStr<TranslatedChunk_T>(inner_orig_text);
+      if (full_translated->translated()) {
+        return {full_translated, res_second};
+      }
+    }
   }
   return {std::make_shared<UntranslatedChunk>(str), 0};
 }
@@ -142,6 +155,43 @@ dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
   }
   return std::make_shared<TranslatedChunk_T>(str, std::move(translations),
                                              std::move(sub_translations));
+}
+
+template <class TranslatedChunk_T>
+dict::TranslationChunkPtr
+dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
+    const std::string &str) {
+  TranslationResult transl_result{str};
+  TranslationChunkPtrs chunks_with_deinflection{transl_result.chunks().front()};
+
+  for (auto it = transl_result.chunks().begin() + 1,
+            it_end = transl_result.chunks().end();
+       it != it_end; ++it) {
+    std::string inner_str = TranslationResult{it, it_end}.orig_text();
+    TranslationResult deinflected = deinflector_->translate(inner_str);
+
+    if (deinflected.untranslatedSize() != 0 ||
+        deinflected.chunks().size() != 1) {
+      chunks_with_deinflection.push_back(*it);
+      continue;
+    }
+    TranslationChunkPtr deinflected_chunk = deinflected.chunks().front();
+    chunks_with_deinflection.push_back(deinflected_chunk);
+
+    std::vector<TranslationText> texts =
+        TranslationResult(chunks_with_deinflection.begin(),
+                          chunks_with_deinflection.end())
+            .toTexts();
+    for (auto &text : texts) {
+      TranslationChunkPtr ch =
+          doTranslateFullStr<TranslatedChunk_T>(text.string());
+      if (ch->translated()) {
+        ch->setOriginText(str);
+        return ch;
+      }
+    }
+  }
+  return std::make_shared<UntranslatedChunk>(str);
 }
 
 dict::DeinflectTranslator::DeinflectTranslator(
