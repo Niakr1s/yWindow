@@ -33,11 +33,13 @@ class DictionaryTranslator : public Translator {
   DictionaryTranslator();
 
   void addDict(Dictionary* dict);
+  void setDeinflector(Dictionary* deinflector);
 
  protected:
   // in children provide dicts via dicts_futures_ or dicts_
   std::vector<std::unique_ptr<Dictionary>> dicts_;
   std::vector<std::future<Dictionary*>> dicts_futures_;
+  std::unique_ptr<Dictionary> deinflector_;
 
   CardPtrs queryAllDicts(const std::string& str);
 

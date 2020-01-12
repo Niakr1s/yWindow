@@ -63,6 +63,10 @@ void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
   dicts_.push_back(std::unique_ptr<Dictionary>(dict));
 }
 
+void dict::DictionaryTranslator::setDeinflector(dict::Dictionary *deinflector) {
+  deinflector_ = std::unique_ptr<Dictionary>(deinflector);
+}
+
 dict::CardPtrs dict::DictionaryTranslator::queryAllDicts(
     const std::string &str) {
   CardPtrs res;
@@ -106,21 +110,11 @@ dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
             it_beg = transl_result.chunks().begin();
        it != it_beg; --it) {
     auto inner_orig_text = TranslationResult{it_beg, it}.orig_text();
-    CardPtrs translations = queryAllDicts(inner_orig_text);
-
-    if (!translations.empty()) {
-      CardPtrs sub_translations;
-      for (auto inner_it = it - 1; inner_it != it_beg; --inner_it) {
-        CardPtrs inner_sub_translations =
-            queryAllDicts(TranslationResult{it_beg, inner_it}.orig_text());
-        sub_translations.insert(sub_translations.end(),
-                                inner_sub_translations.cbegin(),
-                                inner_sub_translations.cend());
-      }
-      return {std::make_shared<TranslatedChunk_T>(inner_orig_text,
-                                                  std::move(translations),
-                                                  std::move(sub_translations)),
-              it - it_beg};
+    int res_second = it - it_beg;
+    TranslationChunkPtr full_translated =
+        doTranslateFullStr<TranslatedChunk_T>(inner_orig_text);
+    if (full_translated->translated()) {
+      return {full_translated, res_second};
     }
   }
   return {std::make_shared<UntranslatedChunk>(str), 0};
