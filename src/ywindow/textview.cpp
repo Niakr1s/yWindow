@@ -20,6 +20,7 @@ void TextView::setController(TextController *controller) {
 
 void TextView::setModel(TextModel *model) {
   model_ = model;
+  should_highlight_ = model_->isOnlyHovered();
   connect(model_, &TextModel::textChanged, this, &TextView::displayText);
   connect(model_, &TextModel::gotTranslationLength, this,
           &TextView::highlightTranslated);
@@ -90,7 +91,9 @@ int DefaultTextView::fontHeight() {
 }
 
 void DefaultTextView::highlightTranslated(int length) {
-  highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
+  if (should_highlight_) {
+    highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
+  }
 }
 
 int DefaultTextView::rowsAvailable() {

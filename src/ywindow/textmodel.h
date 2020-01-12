@@ -22,6 +22,8 @@ class TextModel : public QObject {
   QStringList toHtml();
   QStringList toPlainText();
 
+  virtual bool isOnlyHovered() const = 0;
+
  signals:
   void textChanged();
   void gotTranslation(dict::TranslationChunkPtr, QPoint point);
@@ -46,6 +48,8 @@ class YomiStyleTextModel : public TextModel {
  public:
   YomiStyleTextModel(dict::Translator* translator, QObject* parent = nullptr);
 
+  bool isOnlyHovered() const override;
+
  protected:
   QStringList doToHtml() override;
   QStringList doToPlainText() override;
@@ -62,6 +66,8 @@ class FullTranslateTextModel : public TextModel {
  public:
   FullTranslateTextModel(dict::Translator* translator,
                          QObject* parent = nullptr);
+
+  bool isOnlyHovered() const override;
 
  protected:
   QStringList doToHtml() override;

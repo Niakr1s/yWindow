@@ -40,6 +40,8 @@ YomiStyleTextModel::YomiStyleTextModel(dict::Translator *translator,
     : TextModel(parent),
       translator_(std::unique_ptr<dict::Translator>(translator)) {}
 
+bool YomiStyleTextModel::isOnlyHovered() const { return true; }
+
 QStringList YomiStyleTextModel::doToHtml() { return text_; }
 
 QStringList YomiStyleTextModel::doToPlainText() { return text_; }
@@ -64,6 +66,8 @@ FullTranslateTextModel::FullTranslateTextModel(dict::Translator *translator,
                                                QObject *parent)
     : TextModel(parent),
       translator_(std::unique_ptr<dict::Translator>(translator)) {}
+
+bool FullTranslateTextModel::isOnlyHovered() const { return false; }
 
 QStringList FullTranslateTextModel::doToHtml() {
   QStringList res;

@@ -33,6 +33,7 @@ class TextView : public QTextBrowser {
  protected:
   TextController* controller_;
   TextModel* model_;
+  bool should_highlight_ = false;
 
   virtual void doDisplayText() = 0;
 };
