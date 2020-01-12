@@ -73,6 +73,7 @@ class YomiTranslator : public DictionaryTranslator {
   TranslationResult doTranslate(const std::string& str) override;
 };
 
+// Use only as inner of DictionaryTranslator
 class DeinflectTranslator : public DictionaryTranslator {
  public:
   DeinflectTranslator(const fs::path& file);
@@ -89,6 +90,7 @@ class UserTranslator : public DictionaryTranslator {
   TranslationResult doTranslate(const std::string& str);
 };
 
+// Don't use DeinflectTranslator here, use it as inner of DictionaryTranslator
 class ChainTranslator : public Translator {
  public:
   ChainTranslator();
