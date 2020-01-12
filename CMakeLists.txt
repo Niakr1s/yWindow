@@ -30,10 +30,7 @@ project ("yWindow")
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 
-find_package(Boost
-    REQUIRED COMPONENTS
-    log
-)
+find_package(Boost)
 
 add_subdirectory(3rdparty/jsoncpp)
 
