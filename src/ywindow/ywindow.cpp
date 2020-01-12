@@ -69,8 +69,8 @@ void YWindow::initTextMVC() {
   translation_view_->setModel(text_model_);
 
   YStyler ystyler;
-  ystyler.appendStyle(text_view_, 40);
-  ystyler.appendStyle(translation_view_, 12);
+  ystyler.appendStyleTextView(text_view_, 40);
+  ystyler.appendStyleTranslationView(translation_view_, 12);
 }
 
 void YWindow::resizeEvent(QResizeEvent *event) {

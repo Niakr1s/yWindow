@@ -11,7 +11,6 @@
 
 TranslationView::TranslationView(QWidget* parent) : QTextBrowser(parent) {
   hide();
-  setMaximumHeight(400);
 }
 
 TranslationView::~TranslationView() {}

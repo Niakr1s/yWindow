@@ -8,7 +8,12 @@ class YStyler {
  public:
   YStyler();
 
-  void appendStyle(QTextBrowser* text_edit, int pixel_size);
+  void appendStyleTranslationView(QTextBrowser* text_edit, int pixel_size);
+  void appendStyleTextView(QTextBrowser* text_edit, int pixel_size);
+
+ private:
+  void appendStyleCommonView(QTextBrowser* text_edit);
+  void setPixelSize(QTextBrowser* text_edit, int pixel_size);
 };
 
 #endif  // YSTYLER_H
