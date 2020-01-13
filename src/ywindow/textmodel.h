@@ -27,11 +27,11 @@ class TextModel : public QObject {
  signals:
   void textChanged();
   void gotTranslation(dict::TranslationChunkPtr, QPoint point);
-  void gotTranslationLength(int);
+  void gotTranslationLength(int length);
   void cancelTranslation();
 
  public slots:
-  void translate(std::pair<int, int> pos, QPoint point);
+  void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
   void addText(QString text);
 
  protected:
@@ -41,12 +41,14 @@ class TextModel : public QObject {
   virtual QStringList doToHtml() = 0;
   virtual QStringList doToPlainText() = 0;
   virtual dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) = 0;
+  virtual dict::TranslationChunkPtr doTranslateFromPos(
+      std::pair<int, int> pos) = 0;
   virtual void doAddText(const QString& text) = 0;
 };
 
-class YomiStyleTextModel : public TextModel {
+class DefaultModel : public TextModel {
  public:
-  YomiStyleTextModel(dict::Translator* translator, QObject* parent = nullptr);
+  DefaultModel(dict::Translator* translator, QObject* parent = nullptr);
 
   bool isOnlyHovered() const override;
 
@@ -54,25 +56,8 @@ class YomiStyleTextModel : public TextModel {
   QStringList doToHtml() override;
   QStringList doToPlainText() override;
   dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) override;
-  void doAddText(const QString& text) override;
-
- private:
-  const int max_size_ = 10;
-  QStringList text_;
-  std::unique_ptr<dict::Translator> translator_;
-};
-
-class FullTranslateTextModel : public TextModel {
- public:
-  FullTranslateTextModel(dict::Translator* translator,
-                         QObject* parent = nullptr);
-
-  bool isOnlyHovered() const override;
-
- protected:
-  QStringList doToHtml() override;
-  QStringList doToPlainText() override;
-  dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) override;
+  dict::TranslationChunkPtr doTranslateFromPos(
+      std::pair<int, int> pos) override;
   void doAddText(const QString& text) override;
 
  private:

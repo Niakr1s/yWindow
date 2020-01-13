@@ -13,7 +13,8 @@ QStringList TextModel::toHtml() { return doToHtml(); }
 
 QStringList TextModel::toPlainText() { return doToPlainText(); }
 
-void TextModel::translate(std::pair<int, int> pos, QPoint point) {
+void TextModel::translate(std::pair<int, int> pos, QPoint point,
+                          bool with_shift) {
   if (pos == last_pos_) return;
   last_pos_ = pos;
   qDebug() << "TextModel::translate got new " << pos;
@@ -21,10 +22,14 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point) {
     emit cancelTranslation();
     return;
   }
-  auto res = doTranslate(last_pos_);
+  auto res =
+      with_shift ? doTranslateFromPos(last_pos_) : doTranslate(last_pos_);
   if (res->translated()) {
     emit gotTranslation(res, point);
-    emit gotTranslationLength(QString::fromStdString(res->originText()).size());
+    if (with_shift) {
+      emit gotTranslationLength(
+          QString::fromStdString(res->originText()).size());
+    }
   }
 }
 
@@ -35,41 +40,13 @@ void TextModel::addText(QString text) {
   emit textChanged();
 }
 
-YomiStyleTextModel::YomiStyleTextModel(dict::Translator *translator,
-                                       QObject *parent)
+DefaultModel::DefaultModel(dict::Translator *translator, QObject *parent)
     : TextModel(parent),
       translator_(std::unique_ptr<dict::Translator>(translator)) {}
 
-bool YomiStyleTextModel::isOnlyHovered() const { return true; }
+bool DefaultModel::isOnlyHovered() const { return false; }
 
-QStringList YomiStyleTextModel::doToHtml() { return text_; }
-
-QStringList YomiStyleTextModel::doToPlainText() { return text_; }
-
-dict::TranslationChunkPtr YomiStyleTextModel::doTranslate(
-    std::pair<int, int> pos) {
-  QString to_translate = text_[pos.first].mid(pos.second);
-  auto res = translator_->translate(to_translate.toStdString());
-  qDebug() << "YomiStyleTextModel::doTranslate: transl.size"
-           << res.chunks().front()->translations().size();
-  return res.chunks().front();
-}
-
-void YomiStyleTextModel::doAddText(const QString &text) {
-  text_.push_back(text);
-  while (text_.size() > max_size_) {
-    text_.pop_front();
-  }
-}
-
-FullTranslateTextModel::FullTranslateTextModel(dict::Translator *translator,
-                                               QObject *parent)
-    : TextModel(parent),
-      translator_(std::unique_ptr<dict::Translator>(translator)) {}
-
-bool FullTranslateTextModel::isOnlyHovered() const { return false; }
-
-QStringList FullTranslateTextModel::doToHtml() {
+QStringList DefaultModel::doToHtml() {
   QStringList res;
   TextToHtml converter({"green", "blue"}, "red");
 
@@ -93,7 +70,7 @@ QStringList FullTranslateTextModel::doToHtml() {
   return res;
 }
 
-QStringList FullTranslateTextModel::doToPlainText() {
+QStringList DefaultModel::doToPlainText() {
   QStringList res;
   for (auto &text : text_) {
     res.push_back(QString::fromStdString(text.orig_text()));
@@ -101,12 +78,20 @@ QStringList FullTranslateTextModel::doToPlainText() {
   return res;
 }
 
-dict::TranslationChunkPtr FullTranslateTextModel::doTranslate(
-    std::pair<int, int> pos) {
+dict::TranslationChunkPtr DefaultModel::doTranslate(std::pair<int, int> pos) {
   return text_[pos.first].chunk(pos.second);
 }
 
-void FullTranslateTextModel::doAddText(const QString &text) {
+dict::TranslationChunkPtr DefaultModel::doTranslateFromPos(
+    std::pair<int, int> pos) {
+  QString to_translate =
+      QString::fromStdString(text_[pos.first].orig_text()).mid(pos.second);
+  dict::TranslationResult translated =
+      translator_->translate(to_translate.toStdString());
+  return translated.chunks().front();
+}
+
+void DefaultModel::doAddText(const QString &text) {
   text_.push_back(translator_->translate(text.toStdString()));
   while (text_.size() > max_size_) {
     text_.pop_front();

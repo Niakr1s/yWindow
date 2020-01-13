@@ -22,7 +22,8 @@ class TextController : public QObject {
 
  signals:
   void newText(QString);
-  void charHovered(std::pair<int, int> model_pos, QPoint point);
+  void charHovered(std::pair<int, int> model_pos, QPoint point,
+                   bool with_shift);
 
  protected:
   TextModel* model_;

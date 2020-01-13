@@ -2,6 +2,7 @@
 
 #include <QAbstractTextDocumentLayout>
 #include <QDebug>
+#include <QGuiApplication>
 #include <QMouseEvent>
 #include <QTextBlock>
 
@@ -20,7 +21,6 @@ void TextView::setController(TextController *controller) {
 
 void TextView::setModel(TextModel *model) {
   model_ = model;
-  should_highlight_ = model_->isOnlyHovered();
   connect(model_, &TextModel::textChanged, this, &TextView::displayText);
   connect(model_, &TextModel::gotTranslationLength, this,
           &TextView::highlightTranslated);
@@ -74,7 +74,9 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
   auto current_line_and_col = innerColToModelPos(last_hovered_.inner_col);
   if (current_line_and_col != last_hovered_.model_pos) {
     qDebug() << "mouse hovered: " << current_line_and_col;
-    emitCharHovered(current_line_and_col, global_pos);
+    bool with_shift =
+        QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier;
+    emitCharHovered(current_line_and_col, global_pos, with_shift);
     last_hovered_.model_pos = current_line_and_col;
   }
   return QTextBrowser::mouseMoveEvent(event);
@@ -91,9 +93,7 @@ int DefaultTextView::fontHeight() {
 }
 
 void DefaultTextView::highlightTranslated(int length) {
-  if (should_highlight_) {
-    highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
-  }
+  highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
 }
 
 int DefaultTextView::rowsAvailable() {
@@ -130,7 +130,7 @@ theEnd:
 }
 
 void DefaultTextView::emitCharHovered(std::pair<int, int> model_pos,
-                                      QPoint point) {
+                                      QPoint point, bool with_shift) {
   last_hovered_.model_pos = model_pos;
-  emit charHovered(last_hovered_.model_pos, point);
+  emit charHovered(last_hovered_.model_pos, point, with_shift);
 }

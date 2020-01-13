@@ -24,7 +24,8 @@ class TextView : public QTextBrowser {
   virtual int fontHeight() = 0;
 
  signals:
-  void charHovered(std::pair<int, int> model_pos, QPoint point);
+  void charHovered(std::pair<int, int> model_pos, QPoint point,
+                   bool with_shift);
 
  public slots:
   void displayText();
@@ -33,7 +34,6 @@ class TextView : public QTextBrowser {
  protected:
   TextController* controller_;
   TextModel* model_;
-  bool should_highlight_ = false;
 
   virtual void doDisplayText() = 0;
 };
@@ -76,7 +76,8 @@ class DefaultTextView : public TextView {
   int rowsAvailable();
   std::pair<int, int> innerColToModelPos(int pos);
 
-  void emitCharHovered(std::pair<int, int> model_pos, QPoint point);
+  void emitCharHovered(std::pair<int, int> model_pos, QPoint point,
+                       bool with_shift = false);
 };
 
 #endif  // TEXTVIEW_H
