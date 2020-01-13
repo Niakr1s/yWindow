@@ -1,8 +1,10 @@
 #include "settings.h"
 
 #include <QDebug>
+#include <QFont>
 #include <QSettings>
 
+#include "settingswindow.h"
 #include "ywindow.h"
 
 Settings::Settings() { settings_.beginGroup(TITLE); }
@@ -32,18 +34,17 @@ void Settings::saveYWindow(YWindow* w) {
 void Settings::loadTextView(QTextBrowser* w) {
   loadTextTranslationViewCommon(w);
 
-  setPixelSize(w, settings_.value(QSETTINGS_TEXT_FONT_HEIGHT, 40).toInt());
+  loadFont(w, QSETTINGS_TEXT_FONT, 12);
 }
 
 void Settings::saveTextView(QTextBrowser* w) {
-  settings_.setValue(QSETTINGS_TEXT_FONT_HEIGHT, w->font().pixelSize());
+  settings_.setValue(QSETTINGS_TEXT_FONT, w->font());
 }
 
 void Settings::loadTranslationView(QTextBrowser* w) {
   loadTextTranslationViewCommon(w);
 
-  setPixelSize(w,
-               settings_.value(QSETTINGS_TRANSLATION_FONT_HEIGHT, 12).toInt());
+  loadFont(w, QSETTINGS_TRANSLATION_FONT, 12);
 
   w->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
   w->setMaximumHeight(400);
@@ -51,7 +52,7 @@ void Settings::loadTranslationView(QTextBrowser* w) {
 }
 
 void Settings::saveTranslationView(QTextBrowser* w) {
-  settings_.setValue(QSETTINGS_TRANSLATION_FONT_HEIGHT, w->font().pixelSize());
+  settings_.setValue(QSETTINGS_TRANSLATION_FONT, w->font());
 }
 
 void Settings::loadTextTranslationViewCommon(QTextBrowser* w) {
@@ -74,8 +75,14 @@ void Settings::loadTextTranslationViewCommon(QTextBrowser* w) {
   w->setPalette(pal);
 }
 
-void Settings::setPixelSize(QTextBrowser* w, int sz) {
-  QFont f = w->font();
-  f.setPixelSize(sz);
-  w->setFont(f);
+void Settings::loadFont(QTextBrowser* w, const QString& entry, int sz) {
+  if (settings_.contains(entry)) {
+    QFont font;
+    font.fromString(settings_.value(entry).toString());
+    w->setFont(font);
+  } else {
+    QFont f = w->font();
+    f.setPixelSize(sz);
+    w->setFont(f);
+  }
 }
