@@ -48,7 +48,7 @@ bool DefaultModel::isOnlyHovered() const { return false; }
 
 QStringList DefaultModel::doToHtml() {
   QStringList res;
-  TextToHtml converter({"green", "blue"}, "red");
+  TextToHtml converter;
 
   for (auto &transl_res : text_) {
     for (auto &ch : transl_res.chunks()) {

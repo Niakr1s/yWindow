@@ -8,7 +8,7 @@
 
 class TextToHtml {
  public:
-  TextToHtml(QStringList colors, QString highlight_color);
+  TextToHtml();
 
   void nextColor();
 
@@ -24,12 +24,11 @@ class TextToHtml {
   void clear();
 
  private:
-  QStringList colors_;
-  int current_color_;
-  QString highlight_color_;
+  QStringList colors_{"text_chunk1", "text_chunk2"};
+  int current_color_ = 0;
   QString result_;
 
-  void addChunkWithColor(const QString& str, const QString& color);
+  void addChunkWithColor(const QString& str, const QString& class_name);
 };
 
 #endif  // TEXTTOHTML_H

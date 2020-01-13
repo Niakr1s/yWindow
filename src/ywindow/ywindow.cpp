@@ -59,16 +59,3 @@ void YWindow::initTextMVC() {
   translation_view_->setModel(text_model_);
   SETTINGS->loadTranslationView(translation_view_);
 }
-
-void YWindow::resizeEvent(QResizeEvent *event) {
-  fitToTextView();
-  event->accept();
-}
-
-void YWindow::fitToTextView() {
-  int font_h = text_view_->fontHeight();
-  auto sz = size();
-  auto diff_h = sz.height() - text_view_->height();
-  sz.setHeight((text_view_->height() / font_h) * font_h + diff_h);
-  resize(sz);
-}

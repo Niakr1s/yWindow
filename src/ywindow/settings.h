@@ -36,7 +36,6 @@ class Settings {
   QSettings settings_{"Textractor.ini", QSettings::IniFormat};
 
   void loadTextTranslationViewCommon(QTextBrowser* w);
-  void loadFont(QTextBrowser* w, const QString& entry, int sz);
 };
 
 #endif  // SETTINGS_H

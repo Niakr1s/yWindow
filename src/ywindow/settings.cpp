@@ -33,8 +33,6 @@ void Settings::saveYWindow(YWindow* w) {
 
 void Settings::loadTextView(QTextBrowser* w) {
   loadTextTranslationViewCommon(w);
-
-  loadFont(w, QSETTINGS_TEXT_FONT, 12);
 }
 
 void Settings::saveTextView(QTextBrowser* w) {
@@ -43,8 +41,6 @@ void Settings::saveTextView(QTextBrowser* w) {
 
 void Settings::loadTranslationView(QTextBrowser* w) {
   loadTextTranslationViewCommon(w);
-
-  loadFont(w, QSETTINGS_TRANSLATION_FONT, 12);
 
   w->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
   w->setMaximumHeight(400);
@@ -73,16 +69,4 @@ void Settings::loadTextTranslationViewCommon(QTextBrowser* w) {
   pal.setColor(QPalette::Base, Qt::black);
   pal.setColor(QPalette::Window, Qt::black);
   w->setPalette(pal);
-}
-
-void Settings::loadFont(QTextBrowser* w, const QString& entry, int sz) {
-  if (settings_.contains(entry)) {
-    QFont font;
-    font.fromString(settings_.value(entry).toString());
-    w->setFont(font);
-  } else {
-    QFont f = w->font();
-    f.setPixelSize(sz);
-    w->setFont(f);
-  }
 }

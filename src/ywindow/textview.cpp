@@ -32,28 +32,22 @@ void TextView::displayText() { return doDisplayText(); }
 
 DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
   highlighter_ = new HoverSyntaxHighlighter(document());
+  setSearchPaths({"templates"});
 }
 
 void DefaultTextView::doDisplayText() {
   auto list = model_->toHtml();
   current_text_ = model_->toPlainText();
 
-  auto back = list.back();
-  list.pop_back();
+  list.back() = QString("<a name=\"%1\"></a>%2").arg(anchor_).arg(list.back());
 
   setHtml(list.join("<br>"));
   moveCursor(QTextCursor::End);
-  if (!list.empty()) {
-    insertPlainText("\n");
-  }
 
-  auto html_back = QString("<a name=\"%1\">%2</a>").arg(anchor_).arg(back);
-  insertHtml(html_back);
-  moveCursor(QTextCursor::End);
-
-  for (int i = 0, i_max = rowsAvailable(); i != i_max; ++i) {
-    insertPlainText("\n");
-  }
+  // https://forum.qt.io/topic/109310/qplaintextedit-bottom-margin-empty-space-below-text
+  QTextFrameFormat format = document()->rootFrame()->frameFormat();
+  format.setBottomMargin(contentsRect().height());
+  document()->rootFrame()->setFrameFormat(format);
 
   scrollToAnchor(anchor_);
 }
@@ -86,22 +80,8 @@ void DefaultTextView::leaveEvent(QEvent *event) {
   QTextBrowser::leaveEvent(event);
 }
 
-int DefaultTextView::fontHeight() {
-  QFontMetrics fm(font());
-  return fm.height();
-}
-
 void DefaultTextView::highlightTranslated(int length) {
   highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
-}
-
-int DefaultTextView::rowsAvailable() {
-  auto sz =
-      document()->documentLayout()->blockBoundingRect(document()->lastBlock());
-  int lines = static_cast<int>(sz.height() + 0.1) / fontHeight();
-  int max_rows = height() / fontHeight();
-  auto res = std::max(0, max_rows - lines);
-  return res;
 }
 
 std::pair<int, int> DefaultTextView::innerColToModelPos(int pos) {

@@ -34,9 +34,6 @@ class YWindow : public QWidget {
   TextController* text_controller_;
 
   void initTextMVC();
-
-  void resizeEvent(QResizeEvent* event) override;
-  void fitToTextView();
 };
 
 #endif  // YWINDOW_H

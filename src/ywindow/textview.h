@@ -21,8 +21,6 @@ class TextView : public QTextBrowser {
   void setController(TextController* controller);
   void setModel(TextModel* model);
 
-  virtual int fontHeight() = 0;
-
  signals:
   void charHovered(std::pair<int, int> model_pos, QPoint point,
                    bool with_shift);
@@ -54,8 +52,6 @@ class DefaultTextView : public TextView {
     using std::exception::exception;
   };
 
-  int fontHeight() override;
-
  public slots:
   void highlightTranslated(int length) override;
 
@@ -73,7 +69,6 @@ class DefaultTextView : public TextView {
   LastHovered last_hovered_;
   HoverSyntaxHighlighter* highlighter_;
 
-  int rowsAvailable();
   std::pair<int, int> innerColToModelPos(int pos);
 
   void emitCharHovered(std::pair<int, int> model_pos, QPoint point,
