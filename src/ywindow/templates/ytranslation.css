@@ -1,5 +1,27 @@
+/* comment */
+
 * {
     font-size: 16px;
+}
+
+.text {
+    font-size: 40px;
+}
+
+.text_chunk1 {
+	color: green;
+}
+
+.text_chunk2 {
+    color: blue;
+}
+
+.text_highlighted_chunk {
+    color: red;
+}
+
+.text_untranslated_chunk {
+    color: lightgray;
 }
 
 .word {
