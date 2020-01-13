@@ -3,7 +3,6 @@
 
 #include <QLabel>
 #include <QObject>
-#include <QSettings>
 #include <QStatusBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -23,7 +22,6 @@ class YWindow : public QWidget {
   void newText(QString text);  // entry point
 
  private:
-  QSettings settings_{"Textractor.ini", QSettings::IniFormat, this};
   Status* status_;
 
   const QString TITLE = "yWindow";
@@ -35,8 +33,6 @@ class YWindow : public QWidget {
   TranslationView* translation_view_;
   TextController* text_controller_;
 
-  void initWindow();
-  void saveSettings();
   void initTextMVC();
 
   void resizeEvent(QResizeEvent* event) override;

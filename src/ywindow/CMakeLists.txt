@@ -23,6 +23,8 @@
     NLTemplate.cpp
     texttohtml.h
     texttohtml.cpp
+    settings.h
+    settings.cpp
 )
 
 file(COPY templates DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

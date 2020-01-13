@@ -9,6 +9,7 @@
 #include <QTextBlock>
 #include <QVBoxLayout>
 
+#include "settings.h"
 #include "textcontroller.h"
 #include "textmodel.h"
 #include "textview.h"
@@ -16,9 +17,7 @@
 #include "ystyler.h"
 
 YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
-  settings_.beginGroup(TITLE);
-
-  initWindow();
+  SETTINGS->loadYWindow(this);
 
   vbox_ = new QVBoxLayout(this);
   vbox_->setMargin(0);
@@ -30,23 +29,9 @@ YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   vbox_->addWidget(status_);
 }
 
-YWindow::~YWindow() { saveSettings(); }
+YWindow::~YWindow() { SETTINGS->saveYWindow(this); }
 
 void YWindow::newText(QString text) { return text_controller_->addText(text); }
-
-void YWindow::initWindow() {
-  setWindowTitle(TITLE);
-
-  if (settings_.contains("geometry")) {
-    setGeometry(settings_.value("geometry").toRect());
-  } else {
-    resize(600, 100);
-  }
-  setWindowOpacity(0.8);
-  setStyleSheet("background: black; color: lightGray;");
-}
-
-void YWindow::saveSettings() { settings_.setValue("geometry", geometry()); }
 
 void YWindow::initTextMVC() {
   //  text_model_ = new YomiStyleTextModel(new
