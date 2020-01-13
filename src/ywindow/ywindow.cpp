@@ -14,7 +14,6 @@
 #include "textmodel.h"
 #include "textview.h"
 #include "translator.h"
-#include "ystyler.h"
 
 YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   SETTINGS->loadYWindow(this);
@@ -29,7 +28,12 @@ YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   vbox_->addWidget(status_);
 }
 
-YWindow::~YWindow() { SETTINGS->saveYWindow(this); }
+YWindow::~YWindow() {
+  SETTINGS->saveYWindow(this);
+  SETTINGS->saveTextView(text_view_);
+  SETTINGS->saveTranslationView(translation_view_);
+  SETTINGS->sync();
+}
 
 void YWindow::newText(QString text) { return text_controller_->addText(text); }
 
@@ -49,13 +53,11 @@ void YWindow::initTextMVC() {
   text_view_ = new DefaultTextView(this);
   text_view_->setModel(text_model_);
   text_view_->setController(text_controller_);
+  SETTINGS->loadTextView(text_view_);
 
   translation_view_ = new DefaultTranslationView();
   translation_view_->setModel(text_model_);
-
-  YStyler ystyler;
-  ystyler.appendStyleTextView(text_view_, 40);
-  ystyler.appendStyleTranslationView(translation_view_, 12);
+  SETTINGS->loadTranslationView(translation_view_);
 }
 
 void YWindow::resizeEvent(QResizeEvent *event) {

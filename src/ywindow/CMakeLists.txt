@@ -13,8 +13,6 @@
     translationview.cpp
     textcontroller.h
     textcontroller.cpp
-    ystyler.h
-    ystyler.cpp
     hoversyntaxhighlighter.h
     hoversyntaxhighlighter.cpp
     translationconverter.h
