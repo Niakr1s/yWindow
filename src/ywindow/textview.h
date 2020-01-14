@@ -78,9 +78,9 @@ class DefaultTextView : public TextView {
 
   void emitCharHovered(std::pair<int, int> model_pos, QPoint point,
                        bool with_shift = false);
+  void initMenu();
 
   QMenu* menu_;
-  QAction* show_translators_settings_view_;
   TranslatorsSettingsView* translators_settings_view_;
 };
 

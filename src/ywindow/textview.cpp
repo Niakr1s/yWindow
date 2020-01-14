@@ -2,6 +2,7 @@
 
 #include <QAbstractTextDocumentLayout>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QGuiApplication>
 #include <QMouseEvent>
 #include <QTextBlock>
@@ -37,12 +38,24 @@ DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
 
   translators_settings_view_ = new TranslatorsSettingsView();
 
+  initMenu();
+}
+
+void DefaultTextView::initMenu() {
   menu_ = new QMenu(this);
-  show_translators_settings_view_ =
+
+  auto show_translators_settings_view_ =
       new QAction(tr("Show dictionaries settings"));
   connect(show_translators_settings_view_, &QAction::triggered,
           translators_settings_view_, &TranslatorsSettingsView::show);
   menu_->addAction(show_translators_settings_view_);
+
+  auto open_css_file_ = new QAction(tr("Edit css"));
+  connect(open_css_file_, &QAction::triggered, this, [] {
+    QDesktopServices::openUrl(
+        QUrl::fromLocalFile("templates/ytranslation.css"));
+  });
+  menu_->addAction(open_css_file_);
 
   setContextMenuPolicy(Qt::CustomContextMenu);
   connect(this, &DefaultTextView::customContextMenuRequested, this,
