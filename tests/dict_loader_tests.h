@@ -48,7 +48,7 @@ TEST(fs_dict_loader, non_existent_dir) {
 TEST(fs_dict_loader, userDictionary) {
   auto future = Loader::loadFromFS<UserDictionary>("data/user_dictionary.txt");
   auto dictionary = dynamic_cast<UserDictionary*>(future.get());
-  ASSERT_EQ(dictionary->info(), "user_dictionary");
+  ASSERT_EQ(dictionary->info(), "user_dictionary.txt");
   ASSERT_EQ(dictionary->size(), 2);
 }
 
