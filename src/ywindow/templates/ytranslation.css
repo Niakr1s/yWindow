@@ -1,4 +1,13 @@
-/* comment */
+/* 
+For available css properties see https://doc.qt.io/qt-5/richtext-html-subset.html#css-properties
+
+Classes:
+Main window: text, text_chunk1, text_chunk2, text_highlighted_chunk, text_untranslated_chunk
+Hover window: word, dict, meaning, reading
+*/
+
+
+/* Overall text */
 
 * {
     font-size: 16px;
@@ -9,7 +18,7 @@
 }
 
 .text_chunk1 {
-	color: green;
+    color: green;
 }
 
 .text_chunk2 {
