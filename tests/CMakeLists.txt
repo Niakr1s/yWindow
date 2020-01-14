@@ -10,6 +10,7 @@ add_executable(tests
     dict_translator_tests.h
     dict_translationresult_tests.h
     dict_chaintranslator_tests.h
+    dict_translatorstates_tests.h
 )
 
 file(COPY data DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

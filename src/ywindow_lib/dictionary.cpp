@@ -27,7 +27,9 @@ void dict::DefaultDictionary::doAddCard(Card *card) {
   cards_.insert({card_to_insert->word(), std::move(card_to_insert)});
 }
 
-const std::string &dict::DefaultDictionary::info() const { return info_; }
+dict::Dictionary::dictionary_info_t dict::DefaultDictionary::info() const {
+  return info_;
+}
 
 size_t dict::DefaultDictionary::size() const { return cards_.size(); }
 

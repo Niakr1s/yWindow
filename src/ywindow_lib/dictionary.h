@@ -16,6 +16,8 @@ class Dictionary {
   Dictionary();
   virtual ~Dictionary();
 
+  using dictionary_info_t = std::string;
+
   CardPtrs query(const std::string& text) const;
 
   virtual void addCard(Card* card) {
@@ -28,7 +30,7 @@ class Dictionary {
     return doUpdateInfo(info);
   }
 
-  virtual const std::string& info() const = 0;
+  virtual dictionary_info_t info() const = 0;
   virtual size_t size() const = 0;
 
   std::mutex& mutex();
@@ -44,7 +46,7 @@ class DefaultDictionary : public Dictionary {
  public:
   DefaultDictionary();
 
-  const std::string& info() const override;
+  dictionary_info_t info() const override;
   size_t size() const override;
 
  protected:

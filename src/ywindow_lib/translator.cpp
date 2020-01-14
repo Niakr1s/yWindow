@@ -3,9 +3,168 @@
 #include <algorithm>
 
 #include "dictionary.h"
+#include "json/json.h"
 #include "loader.h"
 #include "stringconvert.h"
 #include "translationresult.h"
+
+dict::TranslatorsState::TranslatorsState(const std::filesystem::path &json_file)
+    : json_file_(json_file) {
+  if (!fs::exists(json_file_)) {
+    fs::create_directories(json_file_.parent_path());
+    std::ofstream f(json_file_);
+  }
+  last_write_time_ = fs::last_write_time(json_file_);
+  try {
+    loadJson();
+  } catch (...) {
+  }
+}
+
+void dict::TranslatorsState::updateFromFS() {
+  if (fileChanged()) {
+    try {
+      loadJson();
+    } catch (...) {
+    }
+  }
+}
+
+bool dict::TranslatorsState::isInOrdered(const std::string &translator_info,
+                                         const std::string &dictionary_info) {
+  try {
+    auto &state = states_.at(translator_info);
+    return isIn(dictionary_info, state.ordered);
+  } catch (std::out_of_range &) {
+    return false;
+  }
+}
+
+bool dict::TranslatorsState::isInUnordered(const std::string &translator_info,
+                                           const std::string &dictionary_info) {
+  try {
+    auto &state = states_.at(translator_info);
+    return isIn(dictionary_info, state.unordered);
+  } catch (std::out_of_range &) {
+    return false;
+  }
+}
+
+bool dict::TranslatorsState::isInDisabled(const std::string &translator_info,
+                                          const std::string &dictionary_info) {
+  try {
+    auto &state = states_.at(translator_info);
+    return isIn(dictionary_info, state.disabled);
+  } catch (std::out_of_range &) {
+    return false;
+  }
+}
+
+bool dict::TranslatorsState::isIn(const std::string &translator_info,
+                                  const std::string &dictionary_info) {
+  return isInOrdered(translator_info, dictionary_info) ||
+         isInUnordered(translator_info, dictionary_info) ||
+         isInDisabled(translator_info, dictionary_info);
+}
+
+bool dict::TranslatorsState::notIn(const std::string &translator_info,
+                                   const std::string &dictionary_info) {
+  return !isInOrdered(translator_info, dictionary_info) &&
+         !isInUnordered(translator_info, dictionary_info) &&
+         !isInDisabled(translator_info, dictionary_info);
+}
+
+bool dict::TranslatorsState::isIn(const std::string &dictionary_info,
+                                  const std::set<std::string> &vec) {
+  if (std::find(vec.cbegin(), vec.cend(), dictionary_info) != vec.cend()) {
+    return true;
+  }
+  return false;
+}
+
+void dict::TranslatorsState::addUnorderedDictionary(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  states_[translator_info].unordered.insert(dictionary_info);
+}
+
+const std::map<std::string, dict::DictionaryState>
+    &dict::TranslatorsState::states() const {
+  return states_;
+}
+
+void dict::TranslatorsState::loadJson() {
+  Json::Value root;
+  std::ifstream is(json_file_);
+  is >> root;
+  if (root.empty()) return;
+  for (size_t i = 0; i != root.size(); ++i) {
+    DictionaryState state;
+    std::string translator_info = root[i].get("translator_info", "").asString();
+    if (translator_info.empty()) continue;
+
+    Json::Value ordered = root[i][ORDERED];
+    Json::Value unordered = root[i][UNORDERED];
+    Json::Value disabled = root[i][DISABLED];
+
+    if (!ordered.empty()) {
+      for (size_t j = 0; j != ordered.size(); ++j) {
+        state.ordered.insert(ordered[j].asString());
+      }
+    }
+    if (!unordered.empty()) {
+      for (size_t j = 0; j != unordered.size(); ++j) {
+        state.unordered.insert(unordered[j].asString());
+      }
+    }
+    if (!disabled.empty()) {
+      for (size_t j = 0; j != disabled.size(); ++j) {
+        state.disabled.insert(disabled[j].asString());
+      }
+    }
+  }
+}
+
+void dict::TranslatorsState::saveJson() {
+  Json::Value root;
+  for (auto &[translator_info, state] : states_) {
+    Json::Value item;
+    item["translator_info"] = translator_info;
+    Json::Value ordered, unordered, disabled;
+    for (auto &it : state.ordered) {
+      ordered.append(it);
+    }
+    for (auto &it : state.unordered) {
+      unordered.append(it);
+    }
+    for (auto &it : state.disabled) {
+      disabled.append(it);
+    }
+    if (!ordered.empty()) {
+      item[ORDERED] = ordered;
+    }
+    if (!unordered.empty()) {
+      item[UNORDERED] = unordered;
+    }
+    if (!disabled.empty()) {
+      item[DISABLED] = disabled;
+    }
+    root.append(item);
+  }
+  {
+    std::ofstream os(json_file_);
+    os << root;
+  }
+  last_write_time_ = fs::last_write_time(json_file_);
+}
+
+bool dict::TranslatorsState::fileChanged() {
+  fs::file_time_type current_write_time = fs::last_write_time(json_file_);
+  bool changed = current_write_time != last_write_time_;
+  if (changed) {
+    last_write_time_ = current_write_time;
+  }
+  return changed;
+}
 
 dict::Translator::~Translator() {}
 
@@ -74,6 +233,22 @@ void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
 
 void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
   deinflector_ = std::unique_ptr<Translator>(deinflector);
+}
+
+void dict::DictionaryTranslator::setTranslatorsState(
+    std::shared_ptr<dict::TranslatorsState> translators_state) {
+  translators_state_ = translators_state;
+  prepareDictionaries();
+  bool json_need_save = false;
+  for (auto &dict : dicts_) {
+    if (translators_state_->notIn(info(), dict->info())) {
+      translators_state_->addUnorderedDictionary(info(), dict->info());
+      json_need_save = true;
+    }
+  }
+  if (json_need_save) {
+    translators_state_->saveJson();
+  }
 }
 
 dict::CardPtrs dict::DictionaryTranslator::queryAllDicts(
@@ -217,6 +392,13 @@ dict::ChainTranslator::ChainTranslator(
     std::initializer_list<dict::Translator *> translators) {
   for (auto &tr : translators) {
     translators_.push_back(std::unique_ptr<Translator>(tr));
+  }
+}
+
+void dict::ChainTranslator::setTranslatorsState(
+    std::shared_ptr<dict::TranslatorsState> translators_state) {
+  for (auto &tr : translators_) {
+    tr->setTranslatorsState(translators_state);
   }
 }
 

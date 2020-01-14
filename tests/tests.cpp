@@ -6,6 +6,7 @@
 #include "dict_query_tests.h"
 #include "dict_translationresult_tests.h"
 #include "dict_translator_tests.h"
+#include "dict_translatorstates_tests.h"
 
 int main(int argc, char* argv[]) {
   SetConsoleOutputCP(CP_UTF8);
