@@ -31,17 +31,14 @@ TEST(translator_states, test2) {
 
   ASSERT_EQ(root.size(), 3);
   ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
-  ASSERT_EQ(root[0]["unordered"].size(), 1);
-  ASSERT_TRUE(root[0]["ordered"].empty());
+  ASSERT_EQ(root[0]["enabled"].size(), 1);
   ASSERT_TRUE(root[0]["disabled"].empty());
   ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
-  ASSERT_EQ(root[1]["unordered"].size(), 1);
-  ASSERT_TRUE(root[1]["ordered"].empty());
+  ASSERT_EQ(root[1]["enabled"].size(), 1);
   ASSERT_TRUE(root[1]["disabled"].empty());
   ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
   ASSERT_EQ(root[2]["disabled"].size(), 2);
-  ASSERT_TRUE(root[2]["ordered"].empty());
-  ASSERT_TRUE(root[2]["unordered"].empty());
+  ASSERT_TRUE(root[2]["enabled"].empty());
 }
 
 TEST(translator_states, test1) {
@@ -62,16 +59,13 @@ TEST(translator_states, test1) {
 
   ASSERT_EQ(root.size(), 3);
   ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
-  ASSERT_EQ(root[0]["unordered"].size(), 1);
-  ASSERT_TRUE(root[0]["ordered"].empty());
+  ASSERT_EQ(root[0]["enabled"].size(), 1);
   ASSERT_TRUE(root[0]["disabled"].empty());
   ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
-  ASSERT_EQ(root[1]["unordered"].size(), 1);
-  ASSERT_TRUE(root[1]["ordered"].empty());
+  ASSERT_EQ(root[1]["enabled"].size(), 1);
   ASSERT_TRUE(root[1]["disabled"].empty());
   ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
-  ASSERT_EQ(root[2]["unordered"].size(), 2);
-  ASSERT_TRUE(root[2]["ordered"].empty());
+  ASSERT_EQ(root[2]["enabled"].size(), 2);
   ASSERT_TRUE(root[2]["disabled"].empty());
 }
 

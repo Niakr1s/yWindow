@@ -26,28 +26,18 @@ void dict::TranslatorsSettings::updateFromFS() {
   }
 }
 
-bool dict::TranslatorsSettings::isInOrdered(
-    const std::string &translator_info, const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::isEnabled(const std::string &translator_info,
+                                          const std::string &dictionary_info) {
   try {
     auto &state = settings_.at(translator_info);
-    return isIn(dictionary_info, state.ordered);
+    return isIn(dictionary_info, state.enabled);
   } catch (std::out_of_range &) {
     return false;
   }
 }
 
-bool dict::TranslatorsSettings::isInUnordered(
-    const std::string &translator_info, const std::string &dictionary_info) {
-  try {
-    auto &state = settings_.at(translator_info);
-    return isIn(dictionary_info, state.unordered);
-  } catch (std::out_of_range &) {
-    return false;
-  }
-}
-
-bool dict::TranslatorsSettings::isInDisabled(
-    const std::string &translator_info, const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::isDisabled(const std::string &translator_info,
+                                           const std::string &dictionary_info) {
   try {
     auto &state = settings_.at(translator_info);
     return isIn(dictionary_info, state.disabled);
@@ -58,16 +48,14 @@ bool dict::TranslatorsSettings::isInDisabled(
 
 bool dict::TranslatorsSettings::isIn(const std::string &translator_info,
                                      const std::string &dictionary_info) {
-  return isInOrdered(translator_info, dictionary_info) ||
-         isInUnordered(translator_info, dictionary_info) ||
-         isInDisabled(translator_info, dictionary_info);
+  return isEnabled(translator_info, dictionary_info) ||
+         isDisabled(translator_info, dictionary_info);
 }
 
-bool dict::TranslatorsSettings::notIn(const std::string &translator_info,
-                                      const std::string &dictionary_info) {
-  return !isInOrdered(translator_info, dictionary_info) &&
-         !isInUnordered(translator_info, dictionary_info) &&
-         !isInDisabled(translator_info, dictionary_info);
+bool dict::TranslatorsSettings::isNotIn(const std::string &translator_info,
+                                        const std::string &dictionary_info) {
+  return !isEnabled(translator_info, dictionary_info) &&
+         !isDisabled(translator_info, dictionary_info);
 }
 
 bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
@@ -78,9 +66,9 @@ bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
   return false;
 }
 
-void dict::TranslatorsSettings::addUnorderedDictionary(
+void dict::TranslatorsSettings::enableDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
-  settings_[translator_info].unordered.insert(dictionary_info);
+  settings_[translator_info].enabled.insert(dictionary_info);
 }
 
 void dict::TranslatorsSettings::loadJson() {
@@ -93,18 +81,12 @@ void dict::TranslatorsSettings::loadJson() {
     std::string translator_info = root[i].get("translator_info", "").asString();
     if (translator_info.empty()) continue;
 
-    Json::Value &ordered = root[i][ORDERED];
-    Json::Value &unordered = root[i][UNORDERED];
+    Json::Value &enabled = root[i][ENABLED];
     Json::Value &disabled = root[i][DISABLED];
 
-    if (!ordered.empty()) {
-      for (size_t j = 0; j != ordered.size(); ++j) {
-        state.ordered.insert(ordered[j].asString());
-      }
-    }
-    if (!unordered.empty()) {
-      for (size_t j = 0; j != unordered.size(); ++j) {
-        state.unordered.insert(unordered[j].asString());
+    if (!enabled.empty()) {
+      for (size_t j = 0; j != enabled.size(); ++j) {
+        state.enabled.insert(enabled[j].asString());
       }
     }
     if (!disabled.empty()) {
@@ -121,21 +103,16 @@ void dict::TranslatorsSettings::saveJson() {
   for (auto &[translator_info, state] : settings_) {
     Json::Value item;
     item["translator_info"] = translator_info;
-    Json::Value ordered, unordered, disabled;
-    for (auto &it : state.ordered) {
-      ordered.append(it);
-    }
-    for (auto &it : state.unordered) {
-      unordered.append(it);
+    Json::Value enabled, disabled;
+
+    for (auto &it : state.enabled) {
+      enabled.append(it);
     }
     for (auto &it : state.disabled) {
       disabled.append(it);
     }
-    if (!ordered.empty()) {
-      item[ORDERED] = ordered;
-    }
-    if (!unordered.empty()) {
-      item[UNORDERED] = unordered;
+    if (!enabled.empty()) {
+      item[ENABLED] = enabled;
     }
     if (!disabled.empty()) {
       item[DISABLED] = disabled;
@@ -216,8 +193,8 @@ void dict::DictionaryTranslator::prepareDictionaries() {
     translators_settings_->updateFromFS();
     bool json_need_save = false;
     for (auto &dict : dicts_) {
-      if (translators_settings_->notIn(info(), dict->info())) {
-        translators_settings_->addUnorderedDictionary(info(), dict->info());
+      if (translators_settings_->isNotIn(info(), dict->info())) {
+        translators_settings_->enableDictionary(info(), dict->info());
         json_need_save = true;
       }
     }
@@ -251,7 +228,7 @@ dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
   CardPtrs res;
   for (auto &dict : dicts_) {
     if (translators_settings_ &&
-        translators_settings_->isInDisabled(info(), dict->info())) {
+        translators_settings_->isDisabled(info(), dict->info())) {
       continue;
     }
 

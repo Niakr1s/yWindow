@@ -20,7 +20,7 @@ namespace dict {
 class Translator;
 
 struct DictionarySettings {
-  std::set<std::string> ordered, unordered, disabled;
+  std::set<std::string> enabled, disabled;
 };
 
 class TranslatorsSettings {
@@ -29,20 +29,18 @@ class TranslatorsSettings {
 
   void updateFromFS();
 
-  bool isInOrdered(const std::string& translator_info,
-                   const std::string& dictionary_info);
-  bool isInUnordered(const std::string& translator_info,
-                     const std::string& dictionary_info);
-  bool isInDisabled(const std::string& translator_info,
-                    const std::string& dictionary_info);
+  bool isEnabled(const std::string& translator_info,
+                 const std::string& dictionary_info);
+  bool isDisabled(const std::string& translator_info,
+                  const std::string& dictionary_info);
   bool isIn(const std::string& translator_info,
             const std::string& dictionary_info);
-  bool notIn(const std::string& translator_info,
-             const std::string& dictionary_info);
+  bool isNotIn(const std::string& translator_info,
+               const std::string& dictionary_info);
 
   // don't forget to saveJson in the end
-  void addUnorderedDictionary(const std::string& translator_info,
-                              const std::string& dictionary_info);
+  void enableDictionary(const std::string& translator_info,
+                        const std::string& dictionary_info);
   void saveJson();
 
  private:
@@ -50,8 +48,7 @@ class TranslatorsSettings {
   fs::file_time_type last_write_time_;
   std::map<std::string, DictionarySettings> settings_;
 
-  const std::string ORDERED = "ordered";
-  const std::string UNORDERED = "unordered";
+  const std::string ENABLED = "enabled";
   const std::string DISABLED = "disabled";
 
   void loadJson();
