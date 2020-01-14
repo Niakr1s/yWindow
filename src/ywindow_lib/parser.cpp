@@ -179,7 +179,7 @@ dict::UserParser::UserParser(const fs::path &path) : Parser(), path_(path) {}
 
 void dict::UserParser::doParseInto(dict::Dictionary *dict) {
   std::ifstream is(path_);
-  dict->updateInfo(path_.stem().string());
+  dict->updateInfo(path_.filename().string());
   if (!is.is_open()) {
     return;
   }
