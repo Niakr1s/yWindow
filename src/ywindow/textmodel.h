@@ -7,10 +7,7 @@
 
 #include "card.h"
 #include "translationresult.h"
-
-namespace dict {
-class Translator;
-}
+#include "translator.h"
 
 class TextModel : public QObject {
   Q_OBJECT
@@ -44,11 +41,15 @@ class TextModel : public QObject {
   virtual dict::TranslationChunkPtr doTranslateFromPos(
       std::pair<int, int> pos) = 0;
   virtual void doAddText(const QString& text) = 0;
+  virtual void prepareTranslator() = 0;
 };
 
 class DefaultModel : public TextModel {
  public:
   DefaultModel(dict::Translator* translator, QObject* parent = nullptr);
+  DefaultModel(dict::Translator* translator,
+               std::shared_ptr<dict::TranslatorsSettings> translators_settings,
+               QObject* parent = nullptr);
 
   bool isOnlyHovered() const override;
 
@@ -59,11 +60,13 @@ class DefaultModel : public TextModel {
   dict::TranslationChunkPtr doTranslateFromPos(
       std::pair<int, int> pos) override;
   void doAddText(const QString& text) override;
+  void prepareTranslator() override;
 
  private:
   const size_t max_size_ = 10;
   std::deque<dict::TranslationResult> text_;
   std::unique_ptr<dict::Translator> translator_;
+  std::shared_ptr<dict::TranslatorsSettings> translators_settings_;
 };
 
 #endif  // TEXTMODEL_H

@@ -3,7 +3,6 @@
 #include <QDebug>
 
 #include "texttohtml.h"
-#include "translator.h"
 
 TextModel::TextModel(QObject *parent) : QObject(parent) {}
 
@@ -22,6 +21,7 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point,
     emit cancelTranslation();
     return;
   }
+  prepareTranslator();
   auto res =
       with_shift ? doTranslateFromPos(last_pos_) : doTranslate(last_pos_);
   if (res->translated()) {
@@ -34,6 +34,7 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point,
 }
 
 void TextModel::addText(QString text) {
+  prepareTranslator();
   qDebug() << " TextModel: adding text: " << text;
   current_pos_ = -1;
   doAddText(text);
@@ -41,8 +42,15 @@ void TextModel::addText(QString text) {
 }
 
 DefaultModel::DefaultModel(dict::Translator *translator, QObject *parent)
+    : DefaultModel(translator, nullptr, parent) {}
+
+DefaultModel::DefaultModel(
+    dict::Translator *translator,
+    std::shared_ptr<dict::TranslatorsSettings> translators_settings,
+    QObject *parent)
     : TextModel(parent),
-      translator_(std::unique_ptr<dict::Translator>(translator)) {}
+      translator_(std::unique_ptr<dict::Translator>(translator)),
+      translators_settings_(translators_settings) {}
 
 bool DefaultModel::isOnlyHovered() const { return false; }
 
@@ -95,5 +103,12 @@ void DefaultModel::doAddText(const QString &text) {
   text_.push_back(translator_->translate(text.toStdString()));
   while (text_.size() > max_size_) {
     text_.pop_front();
+  }
+}
+
+void DefaultModel::prepareTranslator() {
+  if (translators_settings_) {
+    translator_->setTranslatorsSettings(translators_settings_);
+    translators_settings_ = nullptr;
   }
 }
