@@ -3,6 +3,11 @@
 #
 cmake_minimum_required (VERSION 3.13)
 
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (MSVC)
@@ -11,7 +16,7 @@ elseif (MINGW)
     set(CMAKE_CXX_FLAGS "-mwindows")
 endif ()
 
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS ON CACHE STRING "")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -19,16 +24,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/a")
 
 add_definitions( -DBOOST_ALL_DYN_LINK )
 
-option(Boost_x64 OFF)
-if(Boost_x64)
-    set(Boost_ARCHITECTURE "-x64")
-else()
-    set(Boost_ARCHITECTURE "-x86")
-endif()
-
 project ("yWindow")
-
-add_definitions(-DBOOST_ALL_DYN_LINK)
 
 find_package(Boost)
 
