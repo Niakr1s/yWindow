@@ -107,8 +107,8 @@ void DefaultModel::doAddText(const QString &text) {
 }
 
 void DefaultModel::prepareTranslator() {
-  if (translators_settings_) {
+  if (!translators_settings_applied_) {
     translator_->setTranslatorsSettings(translators_settings_);
-    translators_settings_ = nullptr;
+    translators_settings_applied_ = true;
   }
 }

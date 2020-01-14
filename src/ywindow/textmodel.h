@@ -66,7 +66,9 @@ class DefaultModel : public TextModel {
   const size_t max_size_ = 10;
   std::deque<dict::TranslationResult> text_;
   std::unique_ptr<dict::Translator> translator_;
+
   std::shared_ptr<dict::TranslatorsSettings> translators_settings_;
+  bool translators_settings_applied_ = false;
 };
 
 #endif  // TEXTMODEL_H
