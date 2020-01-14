@@ -68,7 +68,14 @@ bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
 
 void dict::TranslatorsSettings::enableDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
+  settings_[translator_info].disabled.erase(dictionary_info);
   settings_[translator_info].enabled.insert(dictionary_info);
+}
+
+void dict::TranslatorsSettings::disableDictionary(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  settings_[translator_info].enabled.erase(dictionary_info);
+  settings_[translator_info].disabled.insert(dictionary_info);
 }
 
 void dict::TranslatorsSettings::loadJson() {

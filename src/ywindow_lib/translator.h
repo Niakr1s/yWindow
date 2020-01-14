@@ -41,6 +41,8 @@ class TranslatorsSettings {
   // don't forget to saveJson in the end
   void enableDictionary(const std::string& translator_info,
                         const std::string& dictionary_info);
+  void disableDictionary(const std::string& translator_info,
+                         const std::string& dictionary_info);
   void saveJson();
 
  private:
