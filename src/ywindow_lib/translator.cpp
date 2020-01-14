@@ -14,20 +14,15 @@ dict::TranslatorsSettings::TranslatorsSettings(
   if (!fs::exists(json_file_)) {
     fs::create_directories(json_file_.parent_path());
     std::ofstream f(json_file_);
+  } else {
+    loadJson();
   }
   last_write_time_ = fs::last_write_time(json_file_);
-  try {
-    loadJson();
-  } catch (...) {
-  }
 }
 
 void dict::TranslatorsSettings::updateFromFS() {
   if (fileChanged()) {
-    try {
-      loadJson();
-    } catch (...) {
-    }
+    loadJson();
   }
 }
 
@@ -217,6 +212,19 @@ void dict::DictionaryTranslator::prepareDictionaries() {
     }
     dicts_futures_.pop_back();
   }
+  if (translators_settings_) {
+    translators_settings_->updateFromFS();
+    bool json_need_save = false;
+    for (auto &dict : dicts_) {
+      if (translators_settings_->notIn(info(), dict->info())) {
+        translators_settings_->addUnorderedDictionary(info(), dict->info());
+        json_need_save = true;
+      }
+    }
+    if (json_need_save) {
+      translators_settings_->saveJson();
+    }
+  }
 }
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
@@ -236,16 +244,6 @@ void dict::DictionaryTranslator::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
   prepareDictionaries();
-  bool json_need_save = false;
-  for (auto &dict : dicts_) {
-    if (translators_settings_->notIn(info(), dict->info())) {
-      translators_settings_->addUnorderedDictionary(info(), dict->info());
-      json_need_save = true;
-    }
-  }
-  if (json_need_save) {
-    translators_settings_->saveJson();
-  }
 }
 
 dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
