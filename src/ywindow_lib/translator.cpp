@@ -20,11 +20,7 @@ dict::TranslatorsSettings::TranslatorsSettings(
   last_write_time_ = fs::last_write_time(json_file_);
 }
 
-void dict::TranslatorsSettings::updateFromFS() {
-  if (fileChanged()) {
-    loadJson();
-  }
-}
+dict::TranslatorsSettings::~TranslatorsSettings() { saveJson(); }
 
 bool dict::TranslatorsSettings::isEnabled(const std::string &translator_info,
                                           const std::string &dictionary_info) {
@@ -76,6 +72,16 @@ void dict::TranslatorsSettings::disableDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
   settings_[translator_info].enabled.erase(dictionary_info);
   settings_[translator_info].disabled.insert(dictionary_info);
+}
+
+void dict::TranslatorsSettings::moveDictionary(
+    const std::string &translator_info, const std::string &dictionary_info,
+    bool enabled) {
+  if (enabled) {
+    enableDictionary(translator_info, dictionary_info);
+  } else {
+    disableDictionary(translator_info, dictionary_info);
+  }
 }
 
 void dict::TranslatorsSettings::loadJson() {
@@ -131,6 +137,19 @@ void dict::TranslatorsSettings::saveJson() {
     os << root;
   }
   last_write_time_ = fs::last_write_time(json_file_);
+}
+
+int dict::TranslatorsSettings::size() const {
+  int res = 0;
+  for (auto &[_, dict_settings] : settings_) {
+    res += dict_settings.enabled.size() + dict_settings.disabled.size();
+  }
+  return res;
+}
+
+const std::map<std::string, dict::DictionarySettings>
+    &dict::TranslatorsSettings::settings() const {
+  return settings_;
 }
 
 bool dict::TranslatorsSettings::fileChanged() {
@@ -197,16 +216,10 @@ void dict::DictionaryTranslator::prepareDictionaries() {
     dicts_futures_.pop_back();
   }
   if (translators_settings_) {
-    translators_settings_->updateFromFS();
-    bool json_need_save = false;
     for (auto &dict : dicts_) {
       if (translators_settings_->isNotIn(info(), dict->info())) {
         translators_settings_->enableDictionary(info(), dict->info());
-        json_need_save = true;
       }
-    }
-    if (json_need_save) {
-      translators_settings_->saveJson();
     }
   }
 }

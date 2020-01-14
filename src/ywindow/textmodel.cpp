@@ -6,11 +6,16 @@
 
 TextModel::TextModel(QObject *parent) : QObject(parent) {}
 
-TextModel::~TextModel() {}
+TextModel::~TextModel() { qDebug() << "TextModel destructor"; }
 
 QStringList TextModel::toHtml() { return doToHtml(); }
 
 QStringList TextModel::toPlainText() { return doToPlainText(); }
+
+void TextModel::setTranslatorsSettings(
+    std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
+  translators_settings_ = translators_settings;
+}
 
 void TextModel::translate(std::pair<int, int> pos, QPoint point,
                           bool with_shift) {
@@ -41,16 +46,14 @@ void TextModel::addText(QString text) {
   emit textChanged();
 }
 
-DefaultModel::DefaultModel(dict::Translator *translator, QObject *parent)
-    : DefaultModel(translator, nullptr, parent) {}
+std::shared_ptr<dict::TranslatorsSettings> TextModel::translators_settings()
+    const {
+  return translators_settings_;
+}
 
-DefaultModel::DefaultModel(
-    dict::Translator *translator,
-    std::shared_ptr<dict::TranslatorsSettings> translators_settings,
-    QObject *parent)
+DefaultModel::DefaultModel(dict::Translator *translator, QObject *parent)
     : TextModel(parent),
-      translator_(std::unique_ptr<dict::Translator>(translator)),
-      translators_settings_(translators_settings) {}
+      translator_(std::unique_ptr<dict::Translator>(translator)) {}
 
 bool DefaultModel::isOnlyHovered() const { return false; }
 
@@ -111,4 +114,9 @@ void DefaultModel::prepareTranslator() {
     translator_->setTranslatorsSettings(translators_settings_);
     translators_settings_applied_ = true;
   }
+}
+
+std::shared_ptr<dict::TranslatorsSettings> DefaultModel::translators_settings()
+    const {
+  return translators_settings_;
 }

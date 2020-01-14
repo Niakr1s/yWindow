@@ -19,6 +19,9 @@ class TextModel : public QObject {
   QStringList toHtml();
   QStringList toPlainText();
 
+  void setTranslatorsSettings(
+      std::shared_ptr<dict::TranslatorsSettings> translators_settings);
+
   virtual bool isOnlyHovered() const = 0;
 
  signals:
@@ -31,9 +34,13 @@ class TextModel : public QObject {
   void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
   void addText(QString text);
 
+  std::shared_ptr<dict::TranslatorsSettings> translators_settings() const;
+
  protected:
   std::pair<int, int> last_pos_ = {-1, -1};
   int current_pos_ = -1;
+  std::shared_ptr<dict::TranslatorsSettings> translators_settings_;
+  bool translators_settings_applied_ = false;
 
   virtual QStringList doToHtml() = 0;
   virtual QStringList doToPlainText() = 0;
@@ -47,11 +54,10 @@ class TextModel : public QObject {
 class DefaultModel : public TextModel {
  public:
   DefaultModel(dict::Translator* translator, QObject* parent = nullptr);
-  DefaultModel(dict::Translator* translator,
-               std::shared_ptr<dict::TranslatorsSettings> translators_settings,
-               QObject* parent = nullptr);
 
   bool isOnlyHovered() const override;
+
+  std::shared_ptr<dict::TranslatorsSettings> translators_settings() const;
 
  protected:
   QStringList doToHtml() override;
@@ -66,9 +72,6 @@ class DefaultModel : public TextModel {
   const size_t max_size_ = 10;
   std::deque<dict::TranslationResult> text_;
   std::unique_ptr<dict::Translator> translator_;
-
-  std::shared_ptr<dict::TranslatorsSettings> translators_settings_;
-  bool translators_settings_applied_ = false;
 };
 
 #endif  // TEXTMODEL_H

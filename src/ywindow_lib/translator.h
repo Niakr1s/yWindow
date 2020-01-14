@@ -26,8 +26,7 @@ struct DictionarySettings {
 class TranslatorsSettings {
  public:
   TranslatorsSettings(const fs::path& json_file);
-
-  void updateFromFS();
+  ~TranslatorsSettings();
 
   bool isEnabled(const std::string& translator_info,
                  const std::string& dictionary_info);
@@ -43,7 +42,13 @@ class TranslatorsSettings {
                         const std::string& dictionary_info);
   void disableDictionary(const std::string& translator_info,
                          const std::string& dictionary_info);
+  void moveDictionary(const std::string& translator_info,
+                      const std::string& dictionary_info, bool enabled);
   void saveJson();
+
+  int size() const;
+
+  const std::map<std::string, DictionarySettings>& settings() const;
 
  private:
   fs::path json_file_;

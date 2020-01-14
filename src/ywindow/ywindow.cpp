@@ -33,6 +33,10 @@ YWindow::~YWindow() {
   SETTINGS->saveTextView(text_view_);
   SETTINGS->saveTranslationView(translation_view_);
   SETTINGS->sync();
+  delete text_model_;
+  delete text_view_;
+  delete text_controller_;
+  delete translation_view_;
 }
 
 void YWindow::newText(QString text) { return text_controller_->addText(text); }
@@ -42,12 +46,11 @@ void YWindow::initTextMVC() {
   //  dict::YomiTranslator("yomi_dicts"));
   //  text_model_ =
   //      new FullTranslateTextModel(new dict::YomiTranslator("dicts/yomi"));
-  text_model_ = new DefaultModel(
-      new dict::ChainTranslator(
-          {new dict::UserTranslator("dicts/user.txt"),
-           new dict::YomiTranslator(
-               "dicts/yomi",
-               new dict::DeinflectTranslator("dicts/deinflect.json"))}),
+  text_model_ = new DefaultModel(new dict::ChainTranslator(
+      {new dict::UserTranslator("dicts/user.txt"),
+       new dict::YomiTranslator("dicts/yomi", new dict::DeinflectTranslator(
+                                                  "dicts/deinflect.json"))}));
+  text_model_->setTranslatorsSettings(
       std::make_shared<dict::TranslatorsSettings>("dicts/translators.json"));
 
   text_controller_ = new TextController();

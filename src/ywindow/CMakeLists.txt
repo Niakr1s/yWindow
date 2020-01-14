@@ -25,6 +25,8 @@
     settings.cpp
     settingswindow.h
     settingswindow.cpp
+    translatorssettingsview.h
+    translatorssettingsview.cpp
 )
 
 file(COPY templates DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

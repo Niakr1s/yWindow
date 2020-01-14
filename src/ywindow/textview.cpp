@@ -24,6 +24,7 @@ void TextView::setModel(TextModel *model) {
   connect(model_, &TextModel::textChanged, this, &TextView::displayText);
   connect(model_, &TextModel::gotTranslationLength, this,
           &TextView::highlightTranslated);
+  doSetModel(model);
 }
 
 void TextView::displayText() { return doDisplayText(); }
@@ -33,6 +34,19 @@ void TextView::displayText() { return doDisplayText(); }
 DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
   highlighter_ = new HoverSyntaxHighlighter(document());
   setSearchPaths({"templates"});
+
+  translators_settings_view_ = new TranslatorsSettingsView();
+
+  menu_ = new QMenu(this);
+  show_translators_settings_view_ =
+      new QAction(tr("Show dictionaries settings"));
+  connect(show_translators_settings_view_, &QAction::triggered,
+          translators_settings_view_, &TranslatorsSettingsView::show);
+  menu_->addAction(show_translators_settings_view_);
+
+  setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this, &DefaultTextView::customContextMenuRequested, this,
+          &DefaultTextView::showMenu);
 }
 
 void DefaultTextView::doDisplayText() {
@@ -50,6 +64,10 @@ void DefaultTextView::doDisplayText() {
   document()->rootFrame()->setFrameFormat(format);
 
   scrollToAnchor(anchor_);
+}
+
+void DefaultTextView::doSetModel(TextModel *model) {
+  translators_settings_view_->setTextModel(model);
 }
 
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
@@ -82,6 +100,11 @@ void DefaultTextView::leaveEvent(QEvent *event) {
 
 void DefaultTextView::highlightTranslated(int length) {
   highlighter_->highlightSubstr(document(), last_hovered_.inner_pos, length);
+}
+
+void DefaultTextView::showMenu(QPoint pos) {
+  menu_->move(mapToGlobal(pos));
+  menu_->show();
 }
 
 std::pair<int, int> DefaultTextView::innerColToModelPos(int pos) {

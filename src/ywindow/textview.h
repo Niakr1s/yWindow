@@ -1,12 +1,14 @@
 #ifndef TEXTVIEW_H
 #define TEXTVIEW_H
 
+#include <QMenu>
 #include <QString>
 #include <QTextBrowser>
 
 #include "card.h"
 #include "hoversyntaxhighlighter.h"
 #include "translationresult.h"
+#include "translatorssettingsview.h"
 
 class TextController;
 class TextModel;
@@ -34,6 +36,7 @@ class TextView : public QTextBrowser {
   TextModel* model_;
 
   virtual void doDisplayText() = 0;
+  virtual void doSetModel(TextModel* model) = 0;
 };
 
 class DefaultTextView : public TextView {
@@ -54,12 +57,14 @@ class DefaultTextView : public TextView {
 
  public slots:
   void highlightTranslated(int length) override;
+  void showMenu(QPoint pos);
 
  private:
   const QString anchor_ = "last";
 
  protected:
   void doDisplayText() override;
+  void doSetModel(TextModel* model) override;
 
   void mouseMoveEvent(QMouseEvent* event) override;
   void leaveEvent(QEvent* event) override;
@@ -73,6 +78,10 @@ class DefaultTextView : public TextView {
 
   void emitCharHovered(std::pair<int, int> model_pos, QPoint point,
                        bool with_shift = false);
+
+  QMenu* menu_;
+  QAction* show_translators_settings_view_;
+  TranslatorsSettingsView* translators_settings_view_;
 };
 
 #endif  // TEXTVIEW_H
