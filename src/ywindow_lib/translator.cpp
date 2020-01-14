@@ -251,10 +251,12 @@ void dict::DictionaryTranslator::setTranslatorsState(
   }
 }
 
-dict::CardPtrs dict::DictionaryTranslator::queryAllDicts(
+dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
     const std::string &str) {
   CardPtrs res;
   for (auto &dict : dicts_) {
+    if (translators_state_->isInDisabled(info(), dict->info())) continue;
+
     auto query = dict->query(str);
     for (auto &card : query) {
       res.push_back(card);
@@ -320,7 +322,7 @@ dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
   if (transl_result.size() == 0)
     return std::make_shared<UntranslatedChunk>(str);
 
-  CardPtrs translations = queryAllDicts(str);
+  CardPtrs translations = queryAllNonDisabledDicts(str);
   if (translations.empty()) return std::make_shared<UntranslatedChunk>(str);
 
   CardPtrs sub_translations;
@@ -328,7 +330,7 @@ dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
             it_begin = transl_result.chunks().begin();
        it != it_begin; --it) {
     CardPtrs inner_sub_translations =
-        queryAllDicts(TranslationResult{it_begin, it}.orig_text());
+        queryAllNonDisabledDicts(TranslationResult{it_begin, it}.orig_text());
     sub_translations.insert(sub_translations.end(),
                             inner_sub_translations.cbegin(),
                             inner_sub_translations.cend());

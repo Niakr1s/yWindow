@@ -98,7 +98,7 @@ class DictionaryTranslator : public Translator {
   std::unique_ptr<Translator> deinflector_;
   std::shared_ptr<TranslatorsState> translators_state_;
 
-  CardPtrs queryAllDicts(const std::string& str);
+  CardPtrs queryAllNonDisabledDicts(const std::string& str);
 
   void prepareDictionaries() final;
 
