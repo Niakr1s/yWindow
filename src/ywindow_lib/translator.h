@@ -19,13 +19,13 @@ namespace dict {
 
 class Translator;
 
-struct DictionaryState {
+struct DictionarySettings {
   std::set<std::string> ordered, unordered, disabled;
 };
 
-class TranslatorsState {
+class TranslatorsSettings {
  public:
-  TranslatorsState(const fs::path& json_file);
+  TranslatorsSettings(const fs::path& json_file);
 
   void updateFromFS();
 
@@ -45,12 +45,10 @@ class TranslatorsState {
                               const std::string& dictionary_info);
   void saveJson();
 
-  const std::map<std::string, DictionaryState>& states() const;
-
  private:
   fs::path json_file_;
   fs::file_time_type last_write_time_;
-  std::map<std::string, DictionaryState> states_;
+  std::map<std::string, DictionarySettings> settings_;
 
   const std::string ORDERED = "ordered";
   const std::string UNORDERED = "unordered";
@@ -70,8 +68,8 @@ class Translator {
   TranslationResult translate(const std::wstring& wstr);
   TranslationResult translate(const std::string& str);
 
-  virtual void setTranslatorsState(
-      std::shared_ptr<TranslatorsState> translators_state) = 0;
+  virtual void setTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
 
   virtual std::string info() const = 0;
 
@@ -88,15 +86,15 @@ class DictionaryTranslator : public Translator {
 
   void addDict(Dictionary* dict);
   void setDeinflector(Translator* deinflector);
-  void setTranslatorsState(
-      std::shared_ptr<TranslatorsState> translators_state) override;
+  void setTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
  protected:
   // in children provide dicts via dicts_futures_ or dicts_
   std::vector<std::unique_ptr<Dictionary>> dicts_;
   std::vector<std::future<Dictionary*>> dicts_futures_;
   std::unique_ptr<Translator> deinflector_;
-  std::shared_ptr<TranslatorsState> translators_state_;
+  std::shared_ptr<TranslatorsSettings> translators_settings_;
 
   CardPtrs queryAllNonDisabledDicts(const std::string& str);
 
@@ -150,7 +148,7 @@ class UserTranslator : public DictionaryTranslator {
   std::string info() const override { return "UserTranslator"; }
 
  protected:
-  TranslationResult doTranslate(const std::string& str);
+  TranslationResult doTranslate(const std::string& str) override;
 };
 
 // Don't use DeinflectTranslator here, use it as inner of DictionaryTranslator
@@ -161,8 +159,8 @@ class ChainTranslator : public Translator {
 
   std::string info() const override { return "ChainTranslator"; }
 
-  void setTranslatorsState(
-      std::shared_ptr<TranslatorsState> translators_state) override;
+  void setTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
   void addTranslator(Translator* transl);
   void popTranslator();

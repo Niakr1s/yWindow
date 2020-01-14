@@ -8,7 +8,8 @@
 #include "stringconvert.h"
 #include "translationresult.h"
 
-dict::TranslatorsState::TranslatorsState(const std::filesystem::path &json_file)
+dict::TranslatorsSettings::TranslatorsSettings(
+    const std::filesystem::path &json_file)
     : json_file_(json_file) {
   if (!fs::exists(json_file_)) {
     fs::create_directories(json_file_.parent_path());
@@ -21,7 +22,7 @@ dict::TranslatorsState::TranslatorsState(const std::filesystem::path &json_file)
   }
 }
 
-void dict::TranslatorsState::updateFromFS() {
+void dict::TranslatorsSettings::updateFromFS() {
   if (fileChanged()) {
     try {
       loadJson();
@@ -30,75 +31,70 @@ void dict::TranslatorsState::updateFromFS() {
   }
 }
 
-bool dict::TranslatorsState::isInOrdered(const std::string &translator_info,
-                                         const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::isInOrdered(
+    const std::string &translator_info, const std::string &dictionary_info) {
   try {
-    auto &state = states_.at(translator_info);
+    auto &state = settings_.at(translator_info);
     return isIn(dictionary_info, state.ordered);
   } catch (std::out_of_range &) {
     return false;
   }
 }
 
-bool dict::TranslatorsState::isInUnordered(const std::string &translator_info,
-                                           const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::isInUnordered(
+    const std::string &translator_info, const std::string &dictionary_info) {
   try {
-    auto &state = states_.at(translator_info);
+    auto &state = settings_.at(translator_info);
     return isIn(dictionary_info, state.unordered);
   } catch (std::out_of_range &) {
     return false;
   }
 }
 
-bool dict::TranslatorsState::isInDisabled(const std::string &translator_info,
-                                          const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::isInDisabled(
+    const std::string &translator_info, const std::string &dictionary_info) {
   try {
-    auto &state = states_.at(translator_info);
+    auto &state = settings_.at(translator_info);
     return isIn(dictionary_info, state.disabled);
   } catch (std::out_of_range &) {
     return false;
   }
 }
 
-bool dict::TranslatorsState::isIn(const std::string &translator_info,
-                                  const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::isIn(const std::string &translator_info,
+                                     const std::string &dictionary_info) {
   return isInOrdered(translator_info, dictionary_info) ||
          isInUnordered(translator_info, dictionary_info) ||
          isInDisabled(translator_info, dictionary_info);
 }
 
-bool dict::TranslatorsState::notIn(const std::string &translator_info,
-                                   const std::string &dictionary_info) {
+bool dict::TranslatorsSettings::notIn(const std::string &translator_info,
+                                      const std::string &dictionary_info) {
   return !isInOrdered(translator_info, dictionary_info) &&
          !isInUnordered(translator_info, dictionary_info) &&
          !isInDisabled(translator_info, dictionary_info);
 }
 
-bool dict::TranslatorsState::isIn(const std::string &dictionary_info,
-                                  const std::set<std::string> &vec) {
+bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
+                                     const std::set<std::string> &vec) {
   if (std::find(vec.cbegin(), vec.cend(), dictionary_info) != vec.cend()) {
     return true;
   }
   return false;
 }
 
-void dict::TranslatorsState::addUnorderedDictionary(
+void dict::TranslatorsSettings::addUnorderedDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
-  states_[translator_info].unordered.insert(dictionary_info);
+  settings_[translator_info].unordered.insert(dictionary_info);
 }
 
-const std::map<std::string, dict::DictionaryState>
-    &dict::TranslatorsState::states() const {
-  return states_;
-}
-
-void dict::TranslatorsState::loadJson() {
+void dict::TranslatorsSettings::loadJson() {
   Json::Value root;
   std::ifstream is(json_file_);
   is >> root;
   if (root.empty()) return;
   for (size_t i = 0; i != root.size(); ++i) {
-    DictionaryState state;
+    DictionarySettings state;
     std::string translator_info = root[i].get("translator_info", "").asString();
     if (translator_info.empty()) continue;
 
@@ -124,9 +120,9 @@ void dict::TranslatorsState::loadJson() {
   }
 }
 
-void dict::TranslatorsState::saveJson() {
+void dict::TranslatorsSettings::saveJson() {
   Json::Value root;
-  for (auto &[translator_info, state] : states_) {
+  for (auto &[translator_info, state] : settings_) {
     Json::Value item;
     item["translator_info"] = translator_info;
     Json::Value ordered, unordered, disabled;
@@ -157,7 +153,7 @@ void dict::TranslatorsState::saveJson() {
   last_write_time_ = fs::last_write_time(json_file_);
 }
 
-bool dict::TranslatorsState::fileChanged() {
+bool dict::TranslatorsSettings::fileChanged() {
   fs::file_time_type current_write_time = fs::last_write_time(json_file_);
   bool changed = current_write_time != last_write_time_;
   if (changed) {
@@ -235,19 +231,19 @@ void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
   deinflector_ = std::unique_ptr<Translator>(deinflector);
 }
 
-void dict::DictionaryTranslator::setTranslatorsState(
-    std::shared_ptr<dict::TranslatorsState> translators_state) {
-  translators_state_ = translators_state;
+void dict::DictionaryTranslator::setTranslatorsSettings(
+    std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
+  translators_settings_ = translators_settings;
   prepareDictionaries();
   bool json_need_save = false;
   for (auto &dict : dicts_) {
-    if (translators_state_->notIn(info(), dict->info())) {
-      translators_state_->addUnorderedDictionary(info(), dict->info());
+    if (translators_settings_->notIn(info(), dict->info())) {
+      translators_settings_->addUnorderedDictionary(info(), dict->info());
       json_need_save = true;
     }
   }
   if (json_need_save) {
-    translators_state_->saveJson();
+    translators_settings_->saveJson();
   }
 }
 
@@ -255,7 +251,9 @@ dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
     const std::string &str) {
   CardPtrs res;
   for (auto &dict : dicts_) {
-    if (translators_state_->isInDisabled(info(), dict->info())) continue;
+    if (translators_settings_ &&
+        translators_settings_->isInDisabled(info(), dict->info()))
+      continue;
 
     auto query = dict->query(str);
     for (auto &card : query) {
@@ -397,10 +395,10 @@ dict::ChainTranslator::ChainTranslator(
   }
 }
 
-void dict::ChainTranslator::setTranslatorsState(
-    std::shared_ptr<dict::TranslatorsState> translators_state) {
+void dict::ChainTranslator::setTranslatorsSettings(
+    std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   for (auto &tr : translators_) {
-    tr->setTranslatorsState(translators_state);
+    tr->setTranslatorsSettings(translators_settings);
   }
 }
 

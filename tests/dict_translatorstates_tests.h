@@ -20,7 +20,8 @@ TEST(translator_states, test1) {
   chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
   chain.addTranslator(new YomiTranslator("data"));
-  chain.setTranslatorsState(std::make_shared<TranslatorsState>(json_path));
+  chain.setTranslatorsSettings(
+      std::make_shared<TranslatorsSettings>(json_path));
   chain.translate("asdf");
 
   Json::Value root;
