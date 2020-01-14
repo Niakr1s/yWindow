@@ -26,6 +26,9 @@ void dict::Translator::prepareDictionaries() {}
 dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
                                      Translator *deinflector)
     : DictionaryTranslator(deinflector) {
+  if (!fs::exists(root_dir)) {
+    fs::create_directories(root_dir);
+  }
   for (auto &path : fs::directory_iterator(root_dir)) {
     if (!path.is_directory()) {
       continue;
@@ -38,7 +41,9 @@ dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs,
                                      Translator *deinflector)
     : DictionaryTranslator(deinflector) {
   for (auto &dir : dicts_dirs) {
-    dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+    if (fs::exists(dir)) {
+      dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+    }
   }
 }
 
@@ -196,7 +201,9 @@ dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
 
 dict::DeinflectTranslator::DeinflectTranslator(const fs::path &file)
     : DictionaryTranslator() {
-  dicts_futures_.push_back(Loader::loadFromFS<DeinflectDictionary>(file));
+  if (fs::exists(file)) {
+    dicts_futures_.push_back(Loader::loadFromFS<DeinflectDictionary>(file));
+  }
 }
 
 dict::TranslationResult dict::DeinflectTranslator::doTranslate(
@@ -256,7 +263,9 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
 
 dict::UserTranslator::UserTranslator(const fs::path &file)
     : DictionaryTranslator() {
-  dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(file));
+  if (fs::exists(file)) {
+    dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(file));
+  }
 }
 
 dict::TranslationResult dict::UserTranslator::doTranslate(
