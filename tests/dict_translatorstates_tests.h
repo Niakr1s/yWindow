@@ -12,6 +12,38 @@ using namespace dict;
 
 namespace fs = std::filesystem;
 
+TEST(translator_states, test2) {
+  const fs::path json_path("data/states_copy.json");
+  fs::remove(json_path);
+  fs::copy_file("data/states.json", json_path);
+
+  ChainTranslator chain;
+  chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
+  chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
+  chain.addTranslator(new YomiTranslator("data"));
+  chain.setTranslatorsSettings(
+      std::make_shared<TranslatorsSettings>(json_path));
+  chain.translate("asdf");
+
+  Json::Value root;
+  std::ifstream is(json_path);
+  is >> root;
+
+  ASSERT_EQ(root.size(), 3);
+  ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
+  ASSERT_EQ(root[0]["unordered"].size(), 1);
+  ASSERT_TRUE(root[0]["ordered"].empty());
+  ASSERT_TRUE(root[0]["disabled"].empty());
+  ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
+  ASSERT_EQ(root[1]["unordered"].size(), 1);
+  ASSERT_TRUE(root[1]["ordered"].empty());
+  ASSERT_TRUE(root[1]["disabled"].empty());
+  ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
+  ASSERT_EQ(root[2]["disabled"].size(), 2);
+  ASSERT_TRUE(root[2]["ordered"].empty());
+  ASSERT_TRUE(root[2]["unordered"].empty());
+}
+
 TEST(translator_states, test1) {
   const fs::path json_path("data/empty_states.json");
   fs::remove(json_path);

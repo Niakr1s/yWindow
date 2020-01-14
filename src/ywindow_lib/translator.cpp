@@ -98,9 +98,9 @@ void dict::TranslatorsSettings::loadJson() {
     std::string translator_info = root[i].get("translator_info", "").asString();
     if (translator_info.empty()) continue;
 
-    Json::Value ordered = root[i][ORDERED];
-    Json::Value unordered = root[i][UNORDERED];
-    Json::Value disabled = root[i][DISABLED];
+    Json::Value &ordered = root[i][ORDERED];
+    Json::Value &unordered = root[i][UNORDERED];
+    Json::Value &disabled = root[i][DISABLED];
 
     if (!ordered.empty()) {
       for (size_t j = 0; j != ordered.size(); ++j) {
@@ -117,6 +117,7 @@ void dict::TranslatorsSettings::loadJson() {
         state.disabled.insert(disabled[j].asString());
       }
     }
+    settings_[translator_info] = state;
   }
 }
 
@@ -252,8 +253,9 @@ dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
   CardPtrs res;
   for (auto &dict : dicts_) {
     if (translators_settings_ &&
-        translators_settings_->isInDisabled(info(), dict->info()))
+        translators_settings_->isInDisabled(info(), dict->info())) {
       continue;
+    }
 
     auto query = dict->query(str);
     for (auto &card : query) {

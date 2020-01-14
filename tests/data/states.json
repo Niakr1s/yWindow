@@ -1,0 +1,24 @@
+[
+	{
+		"translator_info" : "DeinflectTranslator",
+		"unordered" : 
+		[
+			"deinflect.json"
+		]
+	},
+	{
+		"translator_info" : "UserTranslator",
+		"unordered" : 
+		[
+			"user_dictionary.txt"
+		]
+	},
+	{
+		"translator_info" : "YomiTranslator",
+		"disabled" : 
+		[
+			"JMdict (English)",
+			"KANJIDIC (English)"
+		]
+	}
+]
