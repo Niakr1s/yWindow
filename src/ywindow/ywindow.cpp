@@ -47,11 +47,12 @@ void YWindow::initTextMVC() {
   //  text_model_ =
   //      new FullTranslateTextModel(new dict::YomiTranslator("dicts/yomi"));
   text_model_ = new DefaultModel(new dict::ChainTranslator(
-      {new dict::UserTranslator("dicts/user.txt"),
-       new dict::YomiTranslator("dicts/yomi", new dict::DeinflectTranslator(
-                                                  "dicts/deinflect.json"))}));
+      {new dict::UserTranslator("yWindow/dicts/user.txt"),
+       new dict::YomiTranslator(
+           "yWindow/dicts/yomi",
+           new dict::DeinflectTranslator("yWindow/dicts/deinflect.json"))}));
   text_model_->setTranslatorsSettings(
-      std::make_shared<dict::TranslatorsSettings>("dicts/translators.json"));
+      std::make_shared<dict::TranslatorsSettings>("yWindow/dicts.json"));
 
   text_controller_ = new TextController();
   text_controller_->setModel(text_model_);

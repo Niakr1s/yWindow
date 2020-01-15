@@ -33,7 +33,7 @@ class Settings {
   const QString QSETTINGS_TEXT_FONT = "text_font";
   const QString QSETTINGS_TRANSLATION_FONT = "translation_font";
 
-  QSettings settings_{"Textractor.ini", QSettings::IniFormat};
+  QSettings settings_;
 
   void loadTextTranslationViewCommon(QTextBrowser* w);
 };

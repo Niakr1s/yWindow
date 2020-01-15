@@ -7,7 +7,8 @@
 #include "settingswindow.h"
 #include "ywindow.h"
 
-Settings::Settings() { settings_.beginGroup(TITLE); }
+Settings::Settings()
+    : settings_(QSettings{"yWindow/settings.ini", QSettings::IniFormat}) {}
 
 Settings* Settings::getInstance() {
   static Settings* instance;
