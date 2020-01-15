@@ -16,9 +16,18 @@ TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
           &TranslatorsSettingsView::tableItemClicked);
 }
 
-void TranslatorsSettingsView::setTextModel(TextModel *model) { model_ = model; }
+void TranslatorsSettingsView::setTextModel(TextModel *model) {
+  model_ = model;
+  connect(model_, &TextModel::translatorSettingsChanged, this,
+          &TranslatorsSettingsView::redraw);
+}
 
 void TranslatorsSettingsView::show() {
+  QWidget::show();
+  activateWindow();
+}
+
+void TranslatorsSettingsView::redraw() {
   if (!model_) return;
   auto ts = model_->translators_settings();
   if (!ts) return;
@@ -52,7 +61,6 @@ void TranslatorsSettingsView::show() {
       ++current_row;
     }
   }
-  QWidget::show();
 }
 
 void TranslatorsSettingsView::tableItemClicked(QTableWidgetItem *item) {

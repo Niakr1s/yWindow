@@ -21,7 +21,7 @@ TEST(translator_states, test2) {
   chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
   chain.addTranslator(new YomiTranslator("data"));
-  chain.setTranslatorsSettings(
+  chain.doSetTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
   chain.translate("asdf");
 
@@ -49,7 +49,7 @@ TEST(translator_states, test1) {
   chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
   chain.addTranslator(new YomiTranslator("data"));
-  chain.setTranslatorsSettings(
+  chain.doSetTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
   chain.translate("asdf");
 

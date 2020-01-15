@@ -6,6 +6,7 @@
 #include <future>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
@@ -72,16 +73,21 @@ class Translator {
   TranslationResult translate(const std::wstring& wstr);
   TranslationResult translate(const std::string& str);
 
-  virtual void setTranslatorsSettings(
-      std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
+  void setTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings);
 
   virtual std::string info() const = 0;
 
  protected:
   virtual TranslationResult doTranslate(const std::string& str) = 0;
   virtual void prepareDictionaries();
+  virtual void doSetTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
 
   static size_t MAX_CHUNK_SIZE;
+
+ private:
+  std::mutex mutex_;
 };
 
 class DictionaryTranslator : public Translator {
@@ -90,8 +96,6 @@ class DictionaryTranslator : public Translator {
 
   void addDict(Dictionary* dict);
   void setDeinflector(Translator* deinflector);
-  void setTranslatorsSettings(
-      std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
  protected:
   // in children provide dicts via dicts_futures_ or dicts_
@@ -103,6 +107,8 @@ class DictionaryTranslator : public Translator {
   CardPtrs queryAllNonDisabledDicts(const std::string& str);
 
   void prepareDictionaries() final;
+  void doSetTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
   // template main function, use it with TranslatedChunk or TranslatedChunkFinal
   template <class TranslatedChunk_T>
@@ -163,7 +169,7 @@ class ChainTranslator : public Translator {
 
   std::string info() const override { return "ChainTranslator"; }
 
-  void setTranslatorsSettings(
+  void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
   void addTranslator(Translator* transl);

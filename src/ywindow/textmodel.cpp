@@ -1,6 +1,7 @@
 #include "textmodel.h"
 
 #include <QDebug>
+#include <future>
 
 #include "texttohtml.h"
 
@@ -15,6 +16,8 @@ QStringList TextModel::toPlainText() { return doToPlainText(); }
 void TextModel::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
+  emit translatorSettingsChanged();
+  return doSetTranslatorSettings(translators_settings);
 }
 
 void TextModel::translate(std::pair<int, int> pos, QPoint point,
@@ -26,7 +29,6 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point,
     emit cancelTranslation();
     return;
   }
-  prepareTranslator();
   auto res =
       with_shift ? doTranslateFromPos(last_pos_) : doTranslate(last_pos_);
   if (res->translated()) {
@@ -39,14 +41,13 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point,
 }
 
 void TextModel::addText(QString text) {
-  prepareTranslator();
   qDebug() << " TextModel: adding text: " << text;
   current_pos_ = -1;
   doAddText(text);
   emit textChanged();
 }
 
-std::shared_ptr<dict::TranslatorsSettings> TextModel::translators_settings()
+std::shared_ptr<dict::TranslatorsSettings> DefaultModel::translators_settings()
     const {
   return translators_settings_;
 }
@@ -109,14 +110,10 @@ void DefaultModel::doAddText(const QString &text) {
   }
 }
 
-void DefaultModel::prepareTranslator() {
-  if (!translators_settings_applied_) {
-    translator_->setTranslatorsSettings(translators_settings_);
-    translators_settings_applied_ = true;
-  }
-}
-
-std::shared_ptr<dict::TranslatorsSettings> DefaultModel::translators_settings()
-    const {
-  return translators_settings_;
+void DefaultModel::doSetTranslatorSettings(
+    std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
+  std::thread([=] {
+    translator_->setTranslatorsSettings(translators_settings);
+    emit translatorSettingsChanged();
+  }).detach();
 }

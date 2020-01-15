@@ -21,6 +21,8 @@ class TextModel : public QObject {
 
   void setTranslatorsSettings(
       std::shared_ptr<dict::TranslatorsSettings> translators_settings);
+  virtual std::shared_ptr<dict::TranslatorsSettings> translators_settings()
+      const = 0;
 
   virtual bool isOnlyHovered() const = 0;
 
@@ -29,18 +31,16 @@ class TextModel : public QObject {
   void gotTranslation(dict::TranslationChunkPtr, QPoint point);
   void gotTranslationLength(int length);
   void cancelTranslation();
+  void translatorSettingsChanged();
 
  public slots:
   void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
   void addText(QString text);
 
-  std::shared_ptr<dict::TranslatorsSettings> translators_settings() const;
-
  protected:
   std::pair<int, int> last_pos_ = {-1, -1};
   int current_pos_ = -1;
   std::shared_ptr<dict::TranslatorsSettings> translators_settings_;
-  bool translators_settings_applied_ = false;
 
   virtual QStringList doToHtml() = 0;
   virtual QStringList doToPlainText() = 0;
@@ -48,7 +48,8 @@ class TextModel : public QObject {
   virtual dict::TranslationChunkPtr doTranslateFromPos(
       std::pair<int, int> pos) = 0;
   virtual void doAddText(const QString& text) = 0;
-  virtual void prepareTranslator() = 0;
+  virtual void doSetTranslatorSettings(
+      std::shared_ptr<dict::TranslatorsSettings> translators_settings) = 0;
 };
 
 class DefaultModel : public TextModel {
@@ -57,7 +58,8 @@ class DefaultModel : public TextModel {
 
   bool isOnlyHovered() const override;
 
-  std::shared_ptr<dict::TranslatorsSettings> translators_settings() const;
+  std::shared_ptr<dict::TranslatorsSettings> translators_settings()
+      const override;
 
  protected:
   QStringList doToHtml() override;
@@ -66,7 +68,8 @@ class DefaultModel : public TextModel {
   dict::TranslationChunkPtr doTranslateFromPos(
       std::pair<int, int> pos) override;
   void doAddText(const QString& text) override;
-  void prepareTranslator() override;
+  void doSetTranslatorSettings(
+      std::shared_ptr<dict::TranslatorsSettings> translators_settings) override;
 
  private:
   const size_t max_size_ = 10;

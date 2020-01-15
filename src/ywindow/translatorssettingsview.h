@@ -14,6 +14,7 @@ class TranslatorsSettingsView : public QWidget {
 
  public slots:
   void show();
+  void redraw();
 
   void tableItemClicked(QTableWidgetItem* item);
 

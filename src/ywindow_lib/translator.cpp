@@ -169,10 +169,17 @@ dict::TranslationResult dict::Translator::translate(const std::wstring &wstr) {
 }
 
 dict::TranslationResult dict::Translator::translate(const std::string &str) {
+  std::lock_guard<std::mutex> lock(mutex_);
   prepareDictionaries();
   auto res = doTranslate(str);
   //  res.normalize();
   return res;
+}
+
+void dict::Translator::setTranslatorsSettings(
+    std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  doSetTranslatorsSettings(translators_settings);
 }
 
 void dict::Translator::prepareDictionaries() {}
@@ -238,7 +245,7 @@ void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
   deinflector_ = std::unique_ptr<Translator>(deinflector);
 }
 
-void dict::DictionaryTranslator::setTranslatorsSettings(
+void dict::DictionaryTranslator::doSetTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
   prepareDictionaries();
@@ -393,7 +400,7 @@ dict::ChainTranslator::ChainTranslator(
   }
 }
 
-void dict::ChainTranslator::setTranslatorsSettings(
+void dict::ChainTranslator::doSetTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   for (auto &tr : translators_) {
     tr->setTranslatorsSettings(translators_settings);
