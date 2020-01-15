@@ -221,6 +221,7 @@ void dict::DictionaryTranslator::prepareDictionaries() {
         translators_settings_->enableDictionary(info(), dict->info());
       }
     }
+    translators_settings_->saveJson();
   }
 }
 

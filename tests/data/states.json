@@ -1,14 +1,14 @@
 [
 	{
 		"translator_info" : "DeinflectTranslator",
-		"unordered" : 
+		"enabled" : 
 		[
 			"deinflect.json"
 		]
 	},
 	{
 		"translator_info" : "UserTranslator",
-		"unordered" : 
+		"enabled" : 
 		[
 			"user_dictionary.txt"
 		]
