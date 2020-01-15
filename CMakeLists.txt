@@ -36,3 +36,5 @@ option(WITH_TESTS OFF)
 if (WITH_TESTS)
     add_subdirectory(tests)
 endif ()
+
+file(COPY data/yWindow DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

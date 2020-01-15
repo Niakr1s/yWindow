@@ -46,7 +46,7 @@ void DefaultTranslationView::leaveEvent(QEvent* event) {
 DefaultTranslationView::DefaultTranslationView(QWidget* widget)
     : TranslationView(widget) {
   converter_ = std::make_unique<YTranslationConverter>();
-  setSearchPaths({"templates"});
+  setSearchPaths({"yWindow/templates"});
 }
 
 void DefaultTranslationView::append(const std::string& str) {

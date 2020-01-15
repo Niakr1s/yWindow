@@ -34,7 +34,7 @@ void TextView::displayText() { return doDisplayText(); }
 
 DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
   highlighter_ = new HoverSyntaxHighlighter(document());
-  setSearchPaths({"templates"});
+  setSearchPaths({"yWindow/templates"});
 
   translators_settings_view_ = new TranslatorsSettingsView();
 
@@ -53,7 +53,7 @@ void DefaultTextView::initMenu() {
   auto open_css_file_ = new QAction(tr("Edit css"));
   connect(open_css_file_, &QAction::triggered, this, [] {
     QDesktopServices::openUrl(
-        QUrl::fromLocalFile("templates/ytranslation.css"));
+        QUrl::fromLocalFile("yWindow/templates/ytranslation.css"));
   });
   menu_->addAction(open_css_file_);
 

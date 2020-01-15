@@ -16,7 +16,7 @@ std::string YTranslationConverter::doToHtml(
 
   LoaderFile loader;
   Template t(loader);
-  t.load("templates/ytranslation.html");
+  t.load("yWindow/templates/ytranslation.html");
 
   appendDictCardPtrMap(t.block("cards"), cards);
   appendDictCardPtrMap(t.block("sub_cards"), sub_cards);
