@@ -106,7 +106,7 @@ class DictionaryTranslator : public Translator {
 
   CardPtrs queryAllNonDisabledDicts(const std::string& str);
 
-  void prepareDictionaries() final;
+  void prepareDictionaries() override;
   void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
@@ -159,6 +159,13 @@ class UserTranslator : public DictionaryTranslator {
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
+  void prepareDictionaries() override;
+
+ private:
+  fs::path dir_;
+  fs::file_time_type last_write_time_;
+
+  fs::file_time_type getDirLastWriteTime();
 };
 
 // Don't use DeinflectTranslator here, use it as inner of DictionaryTranslator

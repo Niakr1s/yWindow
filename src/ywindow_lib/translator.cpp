@@ -449,13 +449,36 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
 }
 
 dict::UserTranslator::UserTranslator(const fs::path &dir)
-    : DictionaryTranslator() {
+    : DictionaryTranslator(), dir_(dir) {
   if (fs::exists(dir)) {
     dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(dir));
+    last_write_time_ = getDirLastWriteTime();
   }
 }
 
 dict::TranslationResult dict::UserTranslator::doTranslate(
     const std::string &str) {
   return doTranslateAll<TranslatedUserChunk>(str);
+}
+
+void dict::UserTranslator::prepareDictionaries() {
+  if (fs::exists(dir_)) {
+    fs::file_time_type changed_time = getDirLastWriteTime();
+    if (changed_time != last_write_time_) {
+      dicts_.clear();
+      dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(dir_));
+      last_write_time_ = changed_time;
+    }
+  }
+  DictionaryTranslator::prepareDictionaries();
+}
+
+fs::file_time_type dict::UserTranslator::getDirLastWriteTime() {
+  fs::file_time_type res = fs::last_write_time(dir_);
+  for (auto &file : fs::directory_iterator(dir_)) {
+    if (auto file_last_time = fs::last_write_time(file); file_last_time > res) {
+      res = file_last_time;
+    }
+  }
+  return res;
 }
