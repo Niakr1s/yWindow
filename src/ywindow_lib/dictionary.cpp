@@ -8,13 +8,14 @@ dict::CardPtrs dict::Dictionary::query(const std::string &text) const {
   return doQuery(text);
 }
 
-dict::DefaultDictionary::DefaultDictionary() : Dictionary() {}
+dict::DefaultDictionary::DefaultDictionary()
+    : Dictionary(), info_(std::make_shared<std::string>()) {}
 
 dict::YomiDictionary::YomiDictionary()
     : DefaultDictionary(), tags_(std::make_shared<TagMap>()) {}
 
 void dict::DefaultDictionary::doUpdateInfo(const std::string &info) {
-  info_ = info;
+  *info_ = info;
 }
 
 void dict::YomiDictionary::addTag(const Tag &tag) {
@@ -27,7 +28,7 @@ void dict::DefaultDictionary::doAddCard(Card *card) {
   cards_.insert({card_to_insert->word(), std::move(card_to_insert)});
 }
 
-dict::Dictionary::dictionary_info_t dict::DefaultDictionary::info() const {
+std::shared_ptr<std::string> dict::DefaultDictionary::info() const {
   return info_;
 }
 
@@ -39,7 +40,7 @@ dict::CardPtrs dict::DefaultDictionary::doQuery(const std::string &text) const {
   CardPtrs res;
   auto range = cards_.equal_range(text);
   for (auto card = range.first; card != range.second; ++card) {
-    res.push_back(card->second.get());
+    res.push_back(card->second);
   }
   return res;
 }

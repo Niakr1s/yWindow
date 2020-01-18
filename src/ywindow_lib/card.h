@@ -33,7 +33,8 @@ class Card {
   virtual std::vector<std::string> readings() const = 0;
   virtual std::string meaning() const = 0;
   virtual std::string dictionaryInfo() const = 0;
-  virtual std::string etc() const = 0;
+  virtual void setDictionaryInfo(std::shared_ptr<std::string> info) = 0;
+  virtual std::string etc() const;
 };
 
 class DefaultCard : public Card {
@@ -44,10 +45,11 @@ class DefaultCard : public Card {
 
   Dictionary* dict() const;
   std::string dictionaryInfo() const override;
+  void setDictionaryInfo(std::shared_ptr<std::string> info) override;
   std::string word() const override;
 
  protected:
-  Dictionary* dict_;
+  std::shared_ptr<std::string> dict_info_;
   std::string word_;
 };
 
@@ -63,7 +65,6 @@ class YomiCard : public DefaultCard {
 
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
-  std::string etc() const override;
 
   void setReading(const std::vector<std::string>& readings);
 
@@ -83,7 +84,6 @@ class DeinflectCard : public DefaultCard {
 
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
-  std::string etc() const override;
 
  private:
   std::string reading_;
@@ -98,7 +98,6 @@ class UserCard : public DefaultCard {
 
   std::vector<std::string> readings() const override;
   std::string meaning() const override;
-  std::string etc() const override;
 
  private:
   std::string reading_, meaning_;
@@ -114,15 +113,15 @@ class ProxyCard : public Card {
   std::string meaning() const override;
   std::string dictionaryInfo() const override;
   std::string etc() const override;
+  void setDictionaryInfo(std::shared_ptr<std::string> info) override;
 
  private:
   Card* card_;
   std::string word_;
 };
 
-using CardUniquePtrMap = std::multimap<std::string, std::unique_ptr<Card>>;
-using CardPtrMultiMap = std::multimap<std::string, Card*>;
-using CardPtrs = std::vector<Card*>;
+using CardPtrMap = std::multimap<std::string, std::shared_ptr<Card>>;
+using CardPtrs = std::vector<std::shared_ptr<Card>>;
 
 }  // namespace dict
 

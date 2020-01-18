@@ -17,7 +17,7 @@ using namespace dict;
 TEST(fs_dict_loader, term) {
   auto future = Loader::loadFromFS<YomiDictionary>("data/yomi/jmdict_english");
   auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
-  ASSERT_EQ(dictionary->info(), "JMdict (English)");
+  ASSERT_EQ(*dictionary->info(), "JMdict (English)");
   ASSERT_EQ(dictionary->tags().size(), 4);
 }
 
@@ -25,14 +25,14 @@ TEST(fs_dict_loader, kanji) {
   auto future =
       Loader::loadFromFS<YomiDictionary>("data/yomi/kanjidic_english");
   auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
-  ASSERT_EQ(dictionary->info(), "KANJIDIC (English)");
+  ASSERT_EQ(*dictionary->info(), "KANJIDIC (English)");
   ASSERT_EQ(dictionary->tags().size(), 3);
 }
 
 TEST(fs_dict_loader, deinflect) {
   auto future = Loader::loadFromFS<DeinflectDictionary>("data/deinflect.json");
   auto dictionary = dynamic_cast<DeinflectDictionary*>(future.get());
-  ASSERT_EQ(dictionary->info(), "deinflect.json");
+  ASSERT_EQ(*dictionary->info(), "deinflect.json");
 }
 
 TEST(fs_dict_loader, empty) {
@@ -49,7 +49,7 @@ TEST(fs_dict_loader, non_existent_dir) {
 TEST(fs_dict_loader, userDictionary) {
   auto future = Loader::loadFromFS<UserDictionary>("data/user/user.txt");
   auto dictionary = dynamic_cast<UserDictionary*>(future.get());
-  ASSERT_EQ(dictionary->info(), "user.txt");
+  ASSERT_EQ(*dictionary->info(), "user.txt");
   ASSERT_EQ(dictionary->size(), 2);
 }
 

@@ -224,8 +224,8 @@ void dict::DictionaryTranslator::prepareDictionaries() {
   }
   if (translators_settings_) {
     for (auto &dict : dicts_) {
-      if (translators_settings_->isNotIn(info(), dict->info())) {
-        translators_settings_->enableDictionary(info(), dict->info());
+      if (translators_settings_->isNotIn(info(), *dict->info())) {
+        translators_settings_->enableDictionary(info(), *dict->info());
       }
     }
     translators_settings_->saveJson();
@@ -256,7 +256,7 @@ dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
   CardPtrs res;
   for (auto &dict : dicts_) {
     if (translators_settings_ &&
-        translators_settings_->isDisabled(info(), dict->info())) {
+        translators_settings_->isDisabled(info(), *dict->info())) {
       continue;
     }
 

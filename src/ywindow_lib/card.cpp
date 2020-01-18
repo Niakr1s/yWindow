@@ -20,7 +20,7 @@ void dict::DefaultCard::setWord(const std::string& name) { word_ = name; }
 
 dict::Tag::Tag() {}
 
-dict::DefaultCard::DefaultCard(Dictionary* dict) : dict_(dict) {}
+dict::DefaultCard::DefaultCard(Dictionary* dict) { dict_info_ = dict->info(); }
 
 dict::Card::~Card() {}
 
@@ -28,31 +28,18 @@ std::string dict::Card::reading() { return boost::join(readings(), " "); }
 
 std::string dict::Card::originWord() const { return word(); }
 
-dict::Dictionary* dict::DefaultCard::dict() const { return dict_; }
+std::string dict::Card::etc() const { return ""; }
 
-std::string dict::DefaultCard::dictionaryInfo() const { return dict_->info(); }
+std::string dict::DefaultCard::dictionaryInfo() const { return *dict_info_; }
+
+void dict::DefaultCard::setDictionaryInfo(std::shared_ptr<std::string> info) {
+  dict_info_ = info;
+}
 
 std::string dict::DefaultCard::word() const { return word_; }
 
 std::string dict::YomiCard::meaning() const {
   return boost::join(meanings_, "; ");
-}
-
-std::string dict::YomiCard::etc() const {
-  std::string res;
-  auto yomi_dict = dynamic_cast<YomiDictionary*>(dict_);
-  if (!yomi_dict) return res;
-
-  std::vector<std::string> to_append;
-  for (auto& tag : tags_) {
-    try {
-      to_append.push_back(tag + ": " + yomi_dict->tags().at(tag).description);
-    } catch (...) {
-    }
-  }
-  res.append(boost::join(to_append, "; "));
-
-  return res;
 }
 
 void dict::YomiCard::setReading(const std::vector<std::string>& reading) {
@@ -72,8 +59,6 @@ std::vector<std::string> dict::DeinflectCard::readings() const {
 
 std::string dict::DeinflectCard::meaning() const { return ""; }
 
-std::string dict::DeinflectCard::etc() const { return ""; }
-
 dict::UserCard::UserCard(dict::Dictionary* dict) : DefaultCard(dict) {}
 
 void dict::UserCard::setReading(const std::string& reading) {
@@ -87,8 +72,6 @@ void dict::UserCard::setMeaning(const std::string& meaning) {
 std::vector<std::string> dict::UserCard::readings() const { return {reading_}; }
 
 std::string dict::UserCard::meaning() const { return meaning_; }
-
-std::string dict::UserCard::etc() const { return ""; }
 
 dict::ProxyCard::ProxyCard(dict::Card* card, const std::string& name)
     : card_(card), word_(name) {}
@@ -108,3 +91,7 @@ std::string dict::ProxyCard::dictionaryInfo() const {
 }
 
 std::string dict::ProxyCard::etc() const { return card_->etc(); }
+
+void dict::ProxyCard::setDictionaryInfo(std::shared_ptr<std::string> info) {
+  card_->setDictionaryInfo(info);
+}

@@ -28,7 +28,8 @@ class YTranslationConverter : public TranslationConverter {
   YTranslationConverter() {}
 
   using DictCardPtrMap =
-      std::map<std::string, std::map<std::string, std::vector<dict::Card*>>>;
+      std::map<std::string,
+               std::map<std::string, std::vector<std::shared_ptr<dict::Card>>>>;
 
  protected:
   std::string doToHtml(const dict::TranslationChunk& translation) override;
