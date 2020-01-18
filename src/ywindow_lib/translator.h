@@ -153,7 +153,7 @@ class DeinflectTranslator : public DictionaryTranslator {
 
 class UserTranslator : public DictionaryTranslator {
  public:
-  UserTranslator(const fs::path& file);
+  UserTranslator(const fs::path& dir);
 
   std::string info() const override { return "UserTranslator"; }
 

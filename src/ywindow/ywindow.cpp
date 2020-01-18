@@ -47,7 +47,7 @@ void YWindow::initTextMVC() {
   //  text_model_ =
   //      new FullTranslateTextModel(new dict::YomiTranslator("dicts/yomi"));
   text_model_ = new DefaultModel(new dict::ChainTranslator(
-      {new dict::UserTranslator("yWindow/dicts/user.txt"),
+      {new dict::UserTranslator("yWindow/dicts/user"),
        new dict::YomiTranslator(
            "yWindow/dicts/yomi",
            new dict::DeinflectTranslator("yWindow/dicts/deinflect.json"))}));

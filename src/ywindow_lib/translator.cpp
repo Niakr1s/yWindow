@@ -448,10 +448,10 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
   return res;
 }
 
-dict::UserTranslator::UserTranslator(const fs::path &file)
+dict::UserTranslator::UserTranslator(const fs::path &dir)
     : DictionaryTranslator() {
-  if (fs::exists(file)) {
-    dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(file));
+  if (fs::exists(dir)) {
+    dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(dir));
   }
 }
 
