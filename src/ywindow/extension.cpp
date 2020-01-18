@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QString>
 
+#include "settings.h"
 #include "ywindow.h"
 
 static YWindow* ywindow;
@@ -14,18 +15,14 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call,
       ywindow = new YWindow();
       QMetaObject::invokeMethod(
           ywindow, [] { ywindow->show(); }, Qt::QueuedConnection);
-      //      MessageBoxW(NULL, L"Extension Loaded", L"Example", MB_OK);
       break;
     case DLL_PROCESS_DETACH:
       delete ywindow;
-      //      MessageBoxW(NULL, L"Extension Removed", L"Example", MB_OK);
+      delete SETTINGS;
       break;
   }
   return TRUE;
 }
-
-//#define COPY_CLIPBOARD
-//#define EXTRA_NEWLINES
 
 /*
         Param sentence: sentence received by Textractor (UTF-16). Can be
