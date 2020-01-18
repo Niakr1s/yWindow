@@ -9,7 +9,8 @@
 using namespace dict;
 
 TEST(defaultdict_query, test1) {
-  auto future = Loader::loadFromFS<YomiDictionary>("data/kanjidic_english");
+  auto future =
+      Loader::loadFromFS<YomiDictionary>("data/yomi/kanjidic_english");
   auto dictionary = dynamic_cast<YomiDictionary*>(future.get());
 
   auto cards = dictionary->query("㝢");

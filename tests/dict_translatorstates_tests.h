@@ -18,9 +18,9 @@ TEST(translator_states, test2) {
   fs::copy_file("data/states.json", json_path);
 
   ChainTranslator chain;
-  chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
+  chain.addTranslator(new UserTranslator("data/user"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
-  chain.addTranslator(new YomiTranslator("data"));
+  chain.addTranslator(new YomiTranslator("data/yomi"));
   chain.doSetTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
   chain.translate("asdf");
@@ -46,9 +46,9 @@ TEST(translator_states, test1) {
   fs::remove(json_path);
 
   ChainTranslator chain;
-  chain.addTranslator(new UserTranslator("data/user_dictionary.txt"));
+  chain.addTranslator(new UserTranslator("data/user"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
-  chain.addTranslator(new YomiTranslator("data"));
+  chain.addTranslator(new YomiTranslator("data/yomi"));
   chain.doSetTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
   chain.translate("asdf");

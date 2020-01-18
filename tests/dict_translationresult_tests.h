@@ -14,7 +14,7 @@ TEST(translationresult, test1) {
   ASSERT_EQ(deinflected.chunks().size(), 4);
   auto deinflected_translated_text = deinflected.toTexts();
   ASSERT_EQ(deinflected_translated_text.size(), 3);
-  auto yomi = new YomiTranslator("data");
+  auto yomi = new YomiTranslator("data/yomi");
 
   for (auto &t : deinflected_translated_text) {
     auto to_translate = t.string();

@@ -11,7 +11,7 @@
 using namespace dict;
 
 TEST(yomi_translator, test1) {
-  auto yomi = new YomiTranslator("data");
+  auto yomi = new YomiTranslator("data/yomi");
   ASSERT_NO_THROW(yomi->translate("９日"));
   auto res = yomi->translate("９日");
   ASSERT_EQ(res.orig_text(), "９日");
@@ -24,7 +24,7 @@ TEST(yomi_translator, test1) {
 }
 
 TEST(yomi_translator, translation_result) {
-  auto yomi = new YomiTranslator("data");
+  auto yomi = new YomiTranslator("data/yomi");
   auto res = yomi->translate("９日etc");
   ASSERT_EQ(res.chunks().size(), 4);
   ASSERT_TRUE(res.chunks()[0]->translated());
@@ -36,7 +36,7 @@ TEST(yomi_translator, translation_result) {
 }
 
 TEST(yomi_translator, translation_result_all_true2) {
-  auto yomi = new YomiTranslator("data");
+  auto yomi = new YomiTranslator("data/yomi");
   auto res = yomi->translate("見る笑う");
   ASSERT_EQ(res.chunks().size(), 2);
   ASSERT_TRUE(res.chunks()[0]->translated());
@@ -45,7 +45,7 @@ TEST(yomi_translator, translation_result_all_true2) {
 
 TEST(yomi_translator, with_deinflector) {
   auto yomi = new YomiTranslator(
-      "data", new DeinflectTranslator("data/deinflect.json"));
+      "data/yomi", new DeinflectTranslator("data/deinflect.json"));
   auto res = yomi->translate("見れば笑って");
   ASSERT_EQ(res.chunks().size(), 2);
   ASSERT_TRUE(res.chunks()[0]->translated());
@@ -75,7 +75,7 @@ TEST(deinflector, test1) {
 }
 
 TEST(usertranslator, test1) {
-  auto de = new UserTranslator("data/user_dictionary.txt");
+  auto de = new UserTranslator("data/user");
   auto res = de->translate("Niakr1s#1");
   ASSERT_EQ(res.chunks().size(), 3);
   ASSERT_EQ(res.chunks()[0]->originText(), "Niakr1s");
