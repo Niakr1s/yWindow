@@ -2,6 +2,7 @@
 #define DICTIONARY_H
 
 #include <filesystem>
+#include <memory>
 #include <mutex>
 #include <string>
 
@@ -18,7 +19,7 @@ class Dictionary {
 
   CardPtrs query(const std::string& text) const;
 
-  virtual void addCard(Card* card) {
+  virtual void addCard(std::shared_ptr<Card> card) {
     std::unique_lock<std::mutex> lock(mutex_);
     return doAddCard(card);
   }
@@ -35,7 +36,7 @@ class Dictionary {
 
  protected:
   virtual CardPtrs doQuery(const std::string& text) const = 0;
-  virtual void doAddCard(Card* card) = 0;
+  virtual void doAddCard(std::shared_ptr<Card> card) = 0;
   virtual void doUpdateInfo(const std::string& info) = 0;
   std::mutex mutex_;
 };
@@ -52,7 +53,7 @@ class DefaultDictionary : public Dictionary {
   CardPtrMap cards_;
 
   CardPtrs doQuery(const std::string& text) const override;
-  virtual void doAddCard(Card* card) override;
+  virtual void doAddCard(std::shared_ptr<Card> card) override;
   void doUpdateInfo(const std::string& info) override;
 };
 

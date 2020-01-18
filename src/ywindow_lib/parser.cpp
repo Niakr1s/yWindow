@@ -87,7 +87,7 @@ void dict::YomiTagParser::doParseInto(Dictionary *dict) {
 void dict::YomiTermParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    YomiCard *card = new YomiCard(dict);
+    auto card = std::make_shared<YomiCard>(dict);
     card->setWord(root[i][0].asString());
 
     auto json_readings = root[i][1].asString();
@@ -114,7 +114,7 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 
     for (auto &reading : card->readings()) {
       if (reading != card->word()) {
-        ProxyCard *reading_card = new ProxyCard(card, reading);
+        auto reading_card = std::make_shared<ProxyCard>(card, reading);
         dict->addCard(reading_card);
       }
     }
@@ -124,7 +124,7 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    YomiCard *card = new YomiCard(dict);
+    auto card = std::make_shared<YomiCard>(dict);
     card->setWord(root[i][0].asString());
 
     auto json_readings = root[i][1].asString() + " " + root[i][2].asString();
@@ -151,7 +151,7 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
 
     for (auto &reading : card->readings()) {
       if (reading != card->word()) {
-        ProxyCard *reading_card = new ProxyCard(card, reading);
+        auto reading_card = std::make_shared<ProxyCard>(card, reading);
         dict->addCard(reading_card);
       }
     }
@@ -167,7 +167,7 @@ void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
   dict->updateInfo(info_);
   for (auto it = root.begin(), it_max = root.end(); it != it_max; ++it) {
     for (int i = 0, i_max = it->size(); i != i_max; ++i) {
-      DeinflectCard *card = new DeinflectCard(dict);
+      auto card = std::make_shared<DeinflectCard>(dict);
       card->setWord((*it)[i]["kanaIn"].asString());
       card->setReading((*it)[i]["kanaOut"].asString());
       dict->addCard(card);
@@ -193,7 +193,7 @@ void dict::UserParser::doParseInto(dict::Dictionary *dict) {
 
     if (pair.size() != 2) continue;
 
-    auto card = new UserCard(dict);
+    auto card = std::make_shared<UserCard>(dict);
     card->setWord(pair[0]);
 
     std::vector<std::string> reading_and_meaning;

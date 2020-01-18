@@ -73,7 +73,7 @@ std::vector<std::string> dict::UserCard::readings() const { return {reading_}; }
 
 std::string dict::UserCard::meaning() const { return meaning_; }
 
-dict::ProxyCard::ProxyCard(dict::Card* card, const std::string& name)
+dict::ProxyCard::ProxyCard(std::shared_ptr<Card> card, const std::string& name)
     : card_(card), word_(name) {}
 
 std::string dict::ProxyCard::originWord() const { return card_->word(); }

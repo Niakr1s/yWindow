@@ -105,7 +105,7 @@ class UserCard : public DefaultCard {
 
 class ProxyCard : public Card {
  public:
-  ProxyCard(Card* card, const std::string& word);
+  ProxyCard(std::shared_ptr<Card> card, const std::string& word);
 
   std::string originWord() const override;
   std::string word() const override;
@@ -116,7 +116,7 @@ class ProxyCard : public Card {
   void setDictionaryInfo(std::shared_ptr<std::string> info) override;
 
  private:
-  Card* card_;
+  std::shared_ptr<Card> card_;
   std::string word_;
 };
 
