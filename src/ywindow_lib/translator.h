@@ -46,7 +46,8 @@ class Translator {
 
 class DictionaryTranslator : public Translator {
  public:
-  DictionaryTranslator(Translator* deinflector = nullptr);
+  DictionaryTranslator(const fs::path& root_dir,
+                       Translator* deinflector = nullptr);
 
   void setDeinflector(Translator* deinflector);
 
@@ -56,6 +57,11 @@ class DictionaryTranslator : public Translator {
   std::map<fs::path, std::future<Dictionary*>> dicts_futures_;
   std::unique_ptr<Translator> deinflector_;
   std::shared_ptr<TranslatorsSettings> translators_settings_;
+  fs::path root_dir_;
+  std::map<fs::path, fs::file_time_type> paths_;
+
+  template <class Dict>
+  void addFutureAndUpdateLastWriteTime(const fs::path& path);
 
   CardPtrs queryAllNonDisabledDicts(const std::string& str);
 
@@ -90,15 +96,13 @@ class YomiTranslator : public DictionaryTranslator {
   void doReload() override;
 
  protected:
-  fs::path root_dir_;
-  std::map<fs::path, fs::file_time_type> paths_;
   TranslationResult doTranslate(const std::string& str) override;
 };
 
 // Use only as inner of DictionaryTranslator
 class DeinflectTranslator : public DictionaryTranslator {
  public:
-  DeinflectTranslator(const fs::path& file);
+  DeinflectTranslator(const fs::path& root_dir);
 
   std::string info() const override { return "DeinflectTranslator"; }
 
@@ -110,7 +114,7 @@ class DeinflectTranslator : public DictionaryTranslator {
 
 class UserTranslator : public DictionaryTranslator {
  public:
-  UserTranslator(const fs::path& dir);
+  UserTranslator(const fs::path& root_dir);
 
   std::string info() const override { return "UserTranslator"; }
 
@@ -118,14 +122,6 @@ class UserTranslator : public DictionaryTranslator {
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
-  void prepareDictionaries() override;
-
- private:
-  fs::path dir_;
-  fs::file_time_type last_write_time_;
-
-  fs::file_time_type getDirLastWriteTime();
-  void reloadFromFS();
 };
 
 // Don't use DeinflectTranslator here, use it as inner of DictionaryTranslator

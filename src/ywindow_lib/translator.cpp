@@ -39,16 +39,9 @@ void dict::Translator::prepareDictionaries() {}
 
 dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
                                      Translator *deinflector)
-    : DictionaryTranslator(deinflector), root_dir_(root_dir) {
-  if (!fs::exists(root_dir)) {
-    fs::create_directories(root_dir);
-  }
+    : DictionaryTranslator(root_dir, deinflector) {
   for (auto &dir : fs::directory_iterator(root_dir)) {
-    if (!dir.is_directory()) {
-      continue;
-    }
-    dicts_futures_[dir] = Loader::loadFromFS<YomiDictionary>(dir);
-    paths_[dir] = fs::last_write_time(dir);
+    addFutureAndUpdateLastWriteTime<YomiDictionary>(dir);
   }
 }
 
@@ -93,8 +86,16 @@ void dict::DictionaryTranslator::prepareDictionaries() {
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
-dict::DictionaryTranslator::DictionaryTranslator(Translator *deinflector)
-    : deinflector_(std::unique_ptr<Translator>(deinflector)) {}
+dict::DictionaryTranslator::DictionaryTranslator(
+    const std::filesystem::path &root_dir, Translator *deinflector)
+    : deinflector_(std::unique_ptr<Translator>(deinflector)),
+      root_dir_(root_dir) {
+  if (!fs::exists(root_dir)) {
+    fs::create_directories(root_dir);
+  }
+  // in childs you should propagate dicts_futures_ with Dictionaries now!
+  // prefer to use addFutureAndUpdateLastWriteTime<YourDictionary>
+}
 
 void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
   deinflector_ = std::unique_ptr<Translator>(deinflector);
@@ -234,10 +235,10 @@ dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
   return std::make_shared<UntranslatedChunk>(str);
 }
 
-dict::DeinflectTranslator::DeinflectTranslator(const fs::path &file)
-    : DictionaryTranslator() {
-  if (fs::exists(file)) {
-    dicts_futures_[file] = Loader::loadFromFS<DeinflectDictionary>(file);
+dict::DeinflectTranslator::DeinflectTranslator(const fs::path &root_dir)
+    : DictionaryTranslator(root_dir) {
+  for (auto &dir : fs::directory_iterator(root_dir)) {
+    addFutureAndUpdateLastWriteTime<DeinflectDictionary>(dir);
   }
 }
 
@@ -311,43 +312,23 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
   return res;
 }
 
-dict::UserTranslator::UserTranslator(const fs::path &dir)
-    : DictionaryTranslator(), dir_(dir) {
-  if (fs::exists(dir)) {
-    dicts_futures_[dir] = Loader::loadFromFS<UserDictionary>(dir);
-    last_write_time_ = getDirLastWriteTime();
+dict::UserTranslator::UserTranslator(const fs::path &root_dir)
+    : DictionaryTranslator(root_dir) {
+  for (auto &dir : fs::directory_iterator(root_dir)) {
+    addFutureAndUpdateLastWriteTime<UserDictionary>(dir);
   }
 }
 
 void dict::UserTranslator::doReload() {}
-
-void dict::UserTranslator::reloadFromFS() {
-  if (fs::exists(dir_)) {
-    fs::file_time_type changed_time = getDirLastWriteTime();
-    if (changed_time != last_write_time_) {
-      dicts_.clear();
-      dicts_futures_[dir_] = Loader::loadFromFS<UserDictionary>(dir_);
-      last_write_time_ = changed_time;
-    }
-  }
-}
 
 dict::TranslationResult dict::UserTranslator::doTranslate(
     const std::string &str) {
   return doTranslateAll<TranslatedUserChunk>(str);
 }
 
-void dict::UserTranslator::prepareDictionaries() {
-  reloadFromFS();
-  DictionaryTranslator::prepareDictionaries();
-}
-
-fs::file_time_type dict::UserTranslator::getDirLastWriteTime() {
-  fs::file_time_type res = fs::last_write_time(dir_);
-  for (auto &file : fs::directory_iterator(dir_)) {
-    if (auto file_last_time = fs::last_write_time(file); file_last_time > res) {
-      res = file_last_time;
-    }
-  }
-  return res;
+template <class Dict>
+void dict::DictionaryTranslator::addFutureAndUpdateLastWriteTime(
+    const std::filesystem::path &path) {
+  dicts_futures_[path] = Loader::loadFromFS<Dict>(path);
+  //  paths_[path] = fs::last_write_time(path);
 }

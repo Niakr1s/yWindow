@@ -19,7 +19,7 @@ TEST(translator_states, test2) {
 
   ChainTranslator chain;
   chain.addTranslator(new UserTranslator("data/user"));
-  chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
+  chain.addTranslator(new DeinflectTranslator("data/deinflect"));
   chain.addTranslator(new YomiTranslator("data/yomi"));
   chain.doSetTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
@@ -47,7 +47,7 @@ TEST(translator_states, test1) {
 
   ChainTranslator chain;
   chain.addTranslator(new UserTranslator("data/user"));
-  chain.addTranslator(new DeinflectTranslator("data/deinflect.json"));
+  chain.addTranslator(new DeinflectTranslator("data/deinflect"));
   chain.addTranslator(new YomiTranslator("data/yomi"));
   chain.doSetTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));

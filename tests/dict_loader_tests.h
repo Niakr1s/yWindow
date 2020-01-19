@@ -30,7 +30,7 @@ TEST(fs_dict_loader, kanji) {
 }
 
 TEST(fs_dict_loader, deinflect) {
-  auto future = Loader::loadFromFS<DeinflectDictionary>("data/deinflect.json");
+  auto future = Loader::loadFromFS<DeinflectDictionary>("data/deinflect");
   auto dictionary = dynamic_cast<DeinflectDictionary*>(future.get());
   ASSERT_EQ(*dictionary->info(), "deinflect.json");
 }
