@@ -44,10 +44,10 @@ class Translator {
   std::mutex mutex_;
 };
 
-class DictionaryTranslator : public Translator {
+class DirectoryTranslator : public Translator {
  public:
-  DictionaryTranslator(const fs::path& root_dir,
-                       Translator* deinflector = nullptr);
+  DirectoryTranslator(const fs::path& root_dir,
+                      Translator* deinflector = nullptr);
 
   void setDeinflector(Translator* deinflector);
 
@@ -87,7 +87,7 @@ class DictionaryTranslator : public Translator {
   TranslationChunkPtr doDeinflectAndTranslateFullStr(const std::string& str);
 };
 
-class YomiTranslator : public DictionaryTranslator {
+class YomiTranslator : public DirectoryTranslator {
  public:
   YomiTranslator(const fs::path& root_dir, Translator* deinflector = nullptr);
 
@@ -100,7 +100,7 @@ class YomiTranslator : public DictionaryTranslator {
 };
 
 // Use only as inner of DictionaryTranslator
-class DeinflectTranslator : public DictionaryTranslator {
+class DeinflectTranslator : public DirectoryTranslator {
  public:
   DeinflectTranslator(const fs::path& root_dir);
 
@@ -112,7 +112,7 @@ class DeinflectTranslator : public DictionaryTranslator {
   TranslationResult doTranslate(const std::string& str) override;
 };
 
-class UserTranslator : public DictionaryTranslator {
+class UserTranslator : public DirectoryTranslator {
  public:
   UserTranslator(const fs::path& root_dir);
 

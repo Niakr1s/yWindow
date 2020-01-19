@@ -39,7 +39,7 @@ void dict::Translator::prepareDictionaries() {}
 
 dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
                                      Translator *deinflector)
-    : DictionaryTranslator(root_dir, deinflector) {
+    : DirectoryTranslator(root_dir, deinflector) {
   for (auto &dir : fs::directory_iterator(root_dir)) {
     addFutureAndUpdateLastWriteTime<YomiDictionary>(dir);
   }
@@ -63,7 +63,7 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
   return doTranslateAll<TranslatedChunkFinal>(str);
 }
 
-void dict::DictionaryTranslator::prepareDictionaries() {
+void dict::DirectoryTranslator::prepareDictionaries() {
   for (auto &[dir, dict] : dicts_futures_) {
     try {
       dicts_[dir] = std::unique_ptr<Dictionary>(dict.get());
@@ -86,7 +86,7 @@ void dict::DictionaryTranslator::prepareDictionaries() {
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
-dict::DictionaryTranslator::DictionaryTranslator(
+dict::DirectoryTranslator::DirectoryTranslator(
     const std::filesystem::path &root_dir, Translator *deinflector)
     : deinflector_(std::unique_ptr<Translator>(deinflector)),
       root_dir_(root_dir) {
@@ -97,17 +97,17 @@ dict::DictionaryTranslator::DictionaryTranslator(
   // prefer to use addFutureAndUpdateLastWriteTime<YourDictionary>
 }
 
-void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
+void dict::DirectoryTranslator::setDeinflector(Translator *deinflector) {
   deinflector_ = std::unique_ptr<Translator>(deinflector);
 }
 
-void dict::DictionaryTranslator::doSetTranslatorsSettings(
+void dict::DirectoryTranslator::doSetTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
   prepareDictionaries();
 }
 
-dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
+dict::CardPtrs dict::DirectoryTranslator::queryAllNonDisabledDicts(
     const std::string &str) {
   CardPtrs res;
   for (auto &[dir, dict] : dicts_) {
@@ -125,7 +125,7 @@ dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
 }
 
 template <class TranslatedChunk_T>
-dict::TranslationResult dict::DictionaryTranslator::doTranslateAll(
+dict::TranslationResult dict::DirectoryTranslator::doTranslateAll(
     const std::string &str) {
   TranslationResult transl_res{str};
   if (str.empty()) return transl_res;
@@ -149,7 +149,7 @@ dict::TranslationResult dict::DictionaryTranslator::doTranslateAll(
 
 template <class TranslatedChunk_T>
 std::pair<dict::TranslationChunkPtr, int>
-dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
+dict::DirectoryTranslator::doTranslateFirstOf(const std::string &str) {
   TranslationResult transl_result{str};
 
   auto diff = std::min(transl_result.chunks().size(), MAX_CHUNK_SIZE);
@@ -175,7 +175,7 @@ dict::DictionaryTranslator::doTranslateFirstOf(const std::string &str) {
 }
 
 template <class TranslatedChunk_T>
-dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
+dict::TranslationChunkPtr dict::DirectoryTranslator::doTranslateFullStr(
     const std::string &str) {
   TranslationResult transl_result{str};
   if (transl_result.size() == 0)
@@ -200,7 +200,7 @@ dict::TranslationChunkPtr dict::DictionaryTranslator::doTranslateFullStr(
 
 template <class TranslatedChunk_T>
 dict::TranslationChunkPtr
-dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
+dict::DirectoryTranslator::doDeinflectAndTranslateFullStr(
     const std::string &str) {
   TranslationResult transl_result{str};
   TranslationChunkPtrs chunks_with_deinflection{transl_result.chunks().front()};
@@ -236,7 +236,7 @@ dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
 }
 
 dict::DeinflectTranslator::DeinflectTranslator(const fs::path &root_dir)
-    : DictionaryTranslator(root_dir) {
+    : DirectoryTranslator(root_dir) {
   for (auto &dir : fs::directory_iterator(root_dir)) {
     addFutureAndUpdateLastWriteTime<DeinflectDictionary>(dir);
   }
@@ -313,7 +313,7 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
 }
 
 dict::UserTranslator::UserTranslator(const fs::path &root_dir)
-    : DictionaryTranslator(root_dir) {
+    : DirectoryTranslator(root_dir) {
   for (auto &dir : fs::directory_iterator(root_dir)) {
     addFutureAndUpdateLastWriteTime<UserDictionary>(dir);
   }
@@ -327,7 +327,7 @@ dict::TranslationResult dict::UserTranslator::doTranslate(
 }
 
 template <class Dict>
-void dict::DictionaryTranslator::addFutureAndUpdateLastWriteTime(
+void dict::DirectoryTranslator::addFutureAndUpdateLastWriteTime(
     const std::filesystem::path &path) {
   dicts_futures_[path] = Loader::loadFromFS<Dict>(path);
   //  paths_[path] = fs::last_write_time(path);
