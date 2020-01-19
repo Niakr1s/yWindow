@@ -456,12 +456,7 @@ dict::UserTranslator::UserTranslator(const fs::path &dir)
   }
 }
 
-dict::TranslationResult dict::UserTranslator::doTranslate(
-    const std::string &str) {
-  return doTranslateAll<TranslatedUserChunk>(str);
-}
-
-void dict::UserTranslator::prepareDictionaries() {
+void dict::UserTranslator::reloadFromFS() {
   if (fs::exists(dir_)) {
     fs::file_time_type changed_time = getDirLastWriteTime();
     if (changed_time != last_write_time_) {
@@ -470,6 +465,15 @@ void dict::UserTranslator::prepareDictionaries() {
       last_write_time_ = changed_time;
     }
   }
+}
+
+dict::TranslationResult dict::UserTranslator::doTranslate(
+    const std::string &str) {
+  return doTranslateAll<TranslatedUserChunk>(str);
+}
+
+void dict::UserTranslator::prepareDictionaries() {
+  reloadFromFS();
   DictionaryTranslator::prepareDictionaries();
 }
 

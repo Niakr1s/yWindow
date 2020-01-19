@@ -157,6 +157,8 @@ class UserTranslator : public DictionaryTranslator {
 
   std::string info() const override { return "UserTranslator"; }
 
+  void reloadFromFS();
+
  protected:
   TranslationResult doTranslate(const std::string& str) override;
   void prepareDictionaries() override;
