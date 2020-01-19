@@ -27,6 +27,7 @@ dict::TranslationResult dict::Translator::translate(const std::string &str) {
 }
 
 void dict::Translator::reload() {
+  std::lock_guard<std::mutex> lock(mutex_);
   prepareDictionaries();
   doReload();
 }
