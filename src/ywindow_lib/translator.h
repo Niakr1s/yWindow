@@ -44,6 +44,7 @@ class Translator {
   std::mutex mutex_;
 };
 
+template <class Dict>
 class DirectoryTranslator : public Translator {
  public:
   DirectoryTranslator(const fs::path& root_dir,
@@ -60,7 +61,10 @@ class DirectoryTranslator : public Translator {
   fs::path root_dir_;
   std::map<fs::path, fs::file_time_type> paths_;
 
-  template <class Dict>
+  /*
+  prefer to use this function to load future,
+  because it's easy to forget update last_write_time
+  */
   void addFutureAndUpdateLastWriteTime(const fs::path& path);
 
   CardPtrs queryAllNonDisabledDicts(const std::string& str);
@@ -68,6 +72,7 @@ class DirectoryTranslator : public Translator {
   void prepareDictionaries() override;
   void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) override;
+  void doReload() override;
 
   // template main function, use it with TranslatedChunk or TranslatedChunkFinal
   template <class TranslatedChunk_T>
@@ -87,38 +92,32 @@ class DirectoryTranslator : public Translator {
   TranslationChunkPtr doDeinflectAndTranslateFullStr(const std::string& str);
 };
 
-class YomiTranslator : public DirectoryTranslator {
+class YomiTranslator : public DirectoryTranslator<YomiDictionary> {
  public:
   YomiTranslator(const fs::path& root_dir, Translator* deinflector = nullptr);
 
   std::string info() const override { return "YomiTranslator"; }
-
-  void doReload() override;
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
 };
 
 // Use only as inner of DictionaryTranslator
-class DeinflectTranslator : public DirectoryTranslator {
+class DeinflectTranslator : public DirectoryTranslator<DeinflectDictionary> {
  public:
   DeinflectTranslator(const fs::path& root_dir);
 
   std::string info() const override { return "DeinflectTranslator"; }
 
-  void doReload() override;
-
  protected:
   TranslationResult doTranslate(const std::string& str) override;
 };
 
-class UserTranslator : public DirectoryTranslator {
+class UserTranslator : public DirectoryTranslator<UserDictionary> {
  public:
   UserTranslator(const fs::path& root_dir);
 
   std::string info() const override { return "UserTranslator"; }
-
-  void doReload() override;
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
