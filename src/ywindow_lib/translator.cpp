@@ -330,5 +330,5 @@ template <class Dict>
 void dict::DirectoryTranslator::addFutureAndUpdateLastWriteTime(
     const std::filesystem::path &path) {
   dicts_futures_[path] = Loader::loadFromFS<Dict>(path);
-  //  paths_[path] = fs::last_write_time(path);
+  paths_[path] = fs::last_write_time(path);
 }
