@@ -30,6 +30,7 @@ class Translator {
 
   void setTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings);
+  void updateTranslatorsSettings();
 
   virtual std::string info() const = 0;
 
@@ -38,11 +39,11 @@ class Translator {
   virtual void prepareDictionaries() = 0;
   virtual void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
+  virtual void doUpdateTranslatorsSettings() = 0;
   virtual void doReload() = 0;
 
   static size_t MAX_CHUNK_SIZE;
 
- private:
   std::mutex mutex_;
 };
 
@@ -74,6 +75,7 @@ class DirectoryTranslator : public Translator {
   void prepareDictionaries() override;
   void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) override;
+  void doUpdateTranslatorsSettings() override;
   void doReload() override;
 
   // template main function, use it with TranslatedChunk or TranslatedChunkFinal
@@ -94,7 +96,6 @@ class DirectoryTranslator : public Translator {
   TranslationChunkPtr doDeinflectAndTranslateFullStr(const std::string& str);
 
   void futuresToDicts();
-  void updateTranslatorsSettings();
 };
 
 class YomiTranslator : public DirectoryTranslator<YomiDictionary> {
@@ -147,6 +148,7 @@ class ChainTranslator : public Translator {
  protected:
   TranslationResult doTranslate(const std::string& str) override;
   void prepareDictionaries() override;
+  void doUpdateTranslatorsSettings() override;
 
  private:
   std::vector<std::unique_ptr<Translator>> translators_;

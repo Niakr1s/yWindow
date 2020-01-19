@@ -21,9 +21,8 @@ dict::TranslationResult dict::Translator::translate(const std::wstring &wstr) {
 dict::TranslationResult dict::Translator::translate(const std::string &str) {
   std::lock_guard<std::mutex> lock(mutex_);
   prepareDictionaries();
-  auto res = doTranslate(str);
-  //  res.normalize();
-  return res;
+  doUpdateTranslatorsSettings();
+  return doTranslate(str);
 }
 
 void dict::Translator::reload() {
@@ -36,6 +35,13 @@ void dict::Translator::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   std::lock_guard<std::mutex> lock(mutex_);
   doSetTranslatorsSettings(translators_settings);
+}
+
+void dict::Translator::updateTranslatorsSettings() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  prepareDictionaries();
+  doUpdateTranslatorsSettings();
+  // don't forget to save them in childs
 }
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
@@ -58,7 +64,6 @@ dict::DirectoryTranslator<Dict>::DirectoryTranslator(
 template <class Dict>
 void dict::DirectoryTranslator<Dict>::prepareDictionaries() {
   futuresToDicts();
-  if (translators_settings_) updateTranslatorsSettings();
 }
 
 template <class Dict>
@@ -71,6 +76,18 @@ void dict::DirectoryTranslator<Dict>::doSetTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
   prepareDictionaries();
+}
+
+template <class Dict>
+void dict::DirectoryTranslator<Dict>::doUpdateTranslatorsSettings() {
+  if (!translators_settings_) return;
+
+  for (auto &[dir, dict] : dicts_) {
+    if (translators_settings_->isNotIn(info(), *dict->info())) {
+      translators_settings_->enableDictionary(info(), *dict->info());
+    }
+  }
+  translators_settings_->saveJson();
 }
 
 template <class Dict>
@@ -96,16 +113,6 @@ void dict::DirectoryTranslator<Dict>::futuresToDicts() {
     }
   }
   dicts_futures_.clear();
-}
-
-template <class Dict>
-void dict::DirectoryTranslator<Dict>::updateTranslatorsSettings() {
-  for (auto &[dir, dict] : dicts_) {
-    if (translators_settings_->isNotIn(info(), *dict->info())) {
-      translators_settings_->enableDictionary(info(), *dict->info());
-    }
-  }
-  translators_settings_->saveJson();
 }
 
 template <class Dict>
@@ -344,8 +351,10 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
   return res;
 }
 
-void dict::ChainTranslator::prepareDictionaries() {
+void dict::ChainTranslator::prepareDictionaries() {}
+
+void dict::ChainTranslator::doUpdateTranslatorsSettings() {
   for (auto &t : translators_) {
-    t->prepareDictionaries();
+    t->updateTranslatorsSettings();
   }
 }
