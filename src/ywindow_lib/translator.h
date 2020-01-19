@@ -23,6 +23,7 @@ class Translator {
 
   TranslationResult translate(const std::wstring& wstr);
   TranslationResult translate(const std::string& str);
+  //  void reload();
 
   void setTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings);
@@ -34,6 +35,7 @@ class Translator {
   virtual void prepareDictionaries();
   virtual void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
+  //  virtual void doReload() = 0;
 
   static size_t MAX_CHUNK_SIZE;
 

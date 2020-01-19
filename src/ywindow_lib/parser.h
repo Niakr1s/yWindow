@@ -19,7 +19,8 @@ class Parser {
 
   void parseInto(Dictionary* dict);
 
-  static Parser* getParser(Dictionary* dict, const fs::path& path);
+  static Parser* getParser(Dictionary* dict, const fs::path& path,
+                           bool only_info);
 
  protected:
   virtual void doParseInto(Dictionary* dict) = 0;
@@ -32,32 +33,33 @@ class DummyParser : public Parser {
   DummyParser();
 
  protected:
-  void doParseInto(Dictionary*) override;
+  void doParseInto(Dictionary* dict) override;
 };
 
 class JsonParser : public Parser {
  protected:
-  JsonParser(std::istream* iss);
+  JsonParser(std::istream* iss, bool only_info);
   virtual ~JsonParser();
 
   Json::Value getRoot();
 
  protected:
   std::istream* iss_;
+  bool only_info_;
 };
 
 class YomiParser : public JsonParser {
   friend Parser;
 
  protected:
-  YomiParser(std::istream* iss);
+  using JsonParser::JsonParser;
 };
 
 class YomiIndexParser : public YomiParser {
   friend Parser;
 
  protected:
-  YomiIndexParser(std::istream* iss);
+  using YomiParser::YomiParser;
 
  protected:
   void doParseInto(Dictionary* dict) override;
@@ -67,7 +69,7 @@ class YomiTagParser : public YomiParser {
   friend Parser;
 
  protected:
-  YomiTagParser(std::istream* iss);
+  using YomiParser::YomiParser;
 
  protected:
   void doParseInto(Dictionary* dict) override;
@@ -77,7 +79,7 @@ class YomiTermParser : public YomiParser {
   friend Parser;
 
  protected:
-  YomiTermParser(std::istream* iss);
+  using YomiParser::YomiParser;
 
  protected:
   void doParseInto(Dictionary* dict) override;
@@ -87,7 +89,7 @@ class YomiKanjiParser : public YomiParser {
   friend Parser;
 
  protected:
-  YomiKanjiParser(std::istream* iss);
+  using YomiParser::YomiParser;
 
  protected:
   void doParseInto(Dictionary* dict) override;
@@ -97,12 +99,13 @@ class UserParser : public Parser {
   friend Parser;
 
  protected:
-  UserParser(const fs::path& path);
+  UserParser(const fs::path& path, bool only_info);
 
   void doParseInto(Dictionary* dict) override;
 
  private:
   fs::path path_;
+  bool only_info_;
 };
 
 class DeinflectDictionary;
@@ -111,7 +114,7 @@ class DeinflectParser : public JsonParser {
   friend Parser;
 
  protected:
-  DeinflectParser(std::istream* iss, const std::string& info);
+  DeinflectParser(std::istream* iss, bool only_info, const std::string& info);
 
  protected:
   std::string info_;

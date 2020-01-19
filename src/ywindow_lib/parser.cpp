@@ -11,38 +11,43 @@
 
 void dict::Parser::parseInto(Dictionary *dict) { return doParseInto(dict); }
 
-dict::Parser *dict::Parser::getParser(Dictionary *dict, const fs::path &path) {
+dict::Parser *dict::Parser::getParser(Dictionary *dict, const fs::path &path,
+                                      bool only_info) {
   if (fs::is_directory(path)) {
     throw std::invalid_argument("Parser::getJsonParser: path is directory");
   }
   if (YomiDictionary *yomi = dynamic_cast<YomiDictionary *>(dict); yomi) {
     auto ifs = new std::ifstream(path);
     if (path.filename() == "index.json") {
-      return new YomiIndexParser(ifs);
+      return new YomiIndexParser(ifs, only_info);
     }
     auto stem = path.stem().string();
     if (stem.find("tag") != std::string::npos) {
-      return new YomiTagParser(ifs);
+      return new YomiTagParser(ifs, only_info);
     } else if (stem.find("term") != std::string::npos) {
-      return new YomiTermParser(ifs);
+      return new YomiTermParser(ifs, only_info);
     } else if (stem.find("kanji") != std::string::npos) {
-      return new YomiKanjiParser(ifs);
+      return new YomiKanjiParser(ifs, only_info);
     }
   } else if (auto deinflect = dynamic_cast<DeinflectDictionary *>(dict);
              deinflect) {
     auto ifs = new std::ifstream(path);
-    return new DeinflectParser(ifs, path.filename().string());
+    return new DeinflectParser(ifs, only_info, path.filename().string());
   } else if (auto user = dynamic_cast<UserDictionary *>(dict); user) {
-    return new UserParser(path);
+    return new UserParser(path, only_info);
   }
   return new DummyParser();
 }
 
 dict::DummyParser::DummyParser() {}
 
-void dict::DummyParser::doParseInto(Dictionary *) {}
+void dict::DummyParser::doParseInto(Dictionary *dict) {
+  static int num = 0;
+  dict->updateInfo("DummyParser" + std::to_string(++num));
+}
 
-dict::JsonParser::JsonParser(std::istream *iss) : iss_(iss) {}
+dict::JsonParser::JsonParser(std::istream *iss, bool only_info)
+    : iss_(iss), only_info_(only_info) {}
 
 dict::JsonParser::~JsonParser() { delete iss_; }
 
@@ -52,16 +57,6 @@ Json::Value dict::JsonParser::getRoot() {
   return root;
 }
 
-dict::YomiParser::YomiParser(std::istream *iss) : JsonParser(iss) {}
-
-dict::YomiIndexParser::YomiIndexParser(std::istream *iss) : YomiParser(iss) {}
-
-dict::YomiTagParser::YomiTagParser(std::istream *iss) : YomiParser(iss) {}
-
-dict::YomiTermParser::YomiTermParser(std::istream *iss) : YomiParser(iss) {}
-
-dict::YomiKanjiParser::YomiKanjiParser(std::istream *iss) : YomiParser(iss) {}
-
 void dict::YomiIndexParser::doParseInto(Dictionary *dict) {
   Json::Value root = getRoot();
   std::string info = root.get("title", "").asString();
@@ -69,6 +64,8 @@ void dict::YomiIndexParser::doParseInto(Dictionary *dict) {
 }
 
 void dict::YomiTagParser::doParseInto(Dictionary *dict) {
+  if (only_info_) return;
+
   auto yomi = dynamic_cast<YomiDictionary *>(dict);
   if (!yomi) {
     return;
@@ -85,6 +82,8 @@ void dict::YomiTagParser::doParseInto(Dictionary *dict) {
 }
 
 void dict::YomiTermParser::doParseInto(Dictionary *dict) {
+  if (only_info_) return;
+
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     auto card = std::make_shared<YomiCard>(dict);
@@ -122,6 +121,8 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 }
 
 void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
+  if (only_info_) return;
+
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
     auto card = std::make_shared<YomiCard>(dict);
@@ -158,13 +159,15 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
   }
 }
 
-dict::DeinflectParser::DeinflectParser(std::istream *iss,
+dict::DeinflectParser::DeinflectParser(std::istream *iss, bool only_info,
                                        const std::string &info)
-    : JsonParser(iss), info_(info) {}
+    : JsonParser(iss, only_info), info_(info) {}
 
 void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
-  Json::Value root = getRoot();
   dict->updateInfo(info_);
+  if (only_info_) return;
+
+  Json::Value root = getRoot();
   for (auto it = root.begin(), it_max = root.end(); it != it_max; ++it) {
     for (int i = 0, i_max = it->size(); i != i_max; ++i) {
       auto card = std::make_shared<DeinflectCard>(dict);
@@ -175,11 +178,14 @@ void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
   }
 }
 
-dict::UserParser::UserParser(const fs::path &path) : Parser(), path_(path) {}
+dict::UserParser::UserParser(const fs::path &path, bool only_info)
+    : Parser(), path_(path), only_info_(only_info) {}
 
 void dict::UserParser::doParseInto(dict::Dictionary *dict) {
-  std::ifstream is(path_);
   dict->updateInfo(path_.filename().string());
+  if (only_info_) return;
+
+  std::ifstream is(path_);
   if (!is.is_open()) {
     return;
   }
