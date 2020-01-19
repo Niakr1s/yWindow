@@ -9,6 +9,8 @@
 #include "stringconvert.h"
 #include "translationresult.h"
 
+// Translator
+
 dict::Translator::~Translator() {}
 
 dict::TranslationResult dict::Translator::translate(const std::wstring &wstr) {
@@ -37,13 +39,21 @@ void dict::Translator::setTranslatorsSettings(
 
 void dict::Translator::prepareDictionaries() {}
 
-dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
-                                     Translator *deinflector)
-    : DirectoryTranslator(root_dir, deinflector) {}
+size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
-dict::TranslationResult dict::YomiTranslator::doTranslate(
-    const std::string &str) {
-  return doTranslateAll<TranslatedChunkFinal>(str);
+// DirectoryTranslator
+
+template <class Dict>
+dict::DirectoryTranslator<Dict>::DirectoryTranslator(
+    const std::filesystem::path &root_dir, Translator *deinflector)
+    : deinflector_(std::unique_ptr<Translator>(deinflector)),
+      root_dir_(root_dir) {
+  if (!fs::exists(root_dir)) {
+    fs::create_directories(root_dir);
+  }
+  for (auto &dir : fs::directory_iterator(root_dir)) {
+    addFutureAndUpdateLastWriteTime(dir);
+  }
 }
 
 template <class Dict>
@@ -65,21 +75,6 @@ void dict::DirectoryTranslator<Dict>::prepareDictionaries() {
       }
     }
     translators_settings_->saveJson();
-  }
-}
-
-size_t dict::Translator::MAX_CHUNK_SIZE = 12;
-
-template <class Dict>
-dict::DirectoryTranslator<Dict>::DirectoryTranslator(
-    const std::filesystem::path &root_dir, Translator *deinflector)
-    : deinflector_(std::unique_ptr<Translator>(deinflector)),
-      root_dir_(root_dir) {
-  if (!fs::exists(root_dir)) {
-    fs::create_directories(root_dir);
-  }
-  for (auto &dir : fs::directory_iterator(root_dir)) {
-    addFutureAndUpdateLastWriteTime(dir);
   }
 }
 
@@ -242,6 +237,26 @@ dict::DirectoryTranslator<Dict>::doDeinflectAndTranslateFullStr(
   return std::make_shared<UntranslatedChunk>(str);
 }
 
+template <class Dict>
+void dict::DirectoryTranslator<Dict>::addFutureAndUpdateLastWriteTime(
+    const std::filesystem::path &path) {
+  dicts_futures_[path] = Loader::loadFromFS<Dict>(path);
+  paths_[path] = fs::last_write_time(path);
+}
+
+// YomiTranslator
+
+dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
+                                     Translator *deinflector)
+    : DirectoryTranslator(root_dir, deinflector) {}
+
+dict::TranslationResult dict::YomiTranslator::doTranslate(
+    const std::string &str) {
+  return doTranslateAll<TranslatedChunkFinal>(str);
+}
+
+// DeinflectTranslator
+
 dict::DeinflectTranslator::DeinflectTranslator(const fs::path &root_dir)
     : DirectoryTranslator(root_dir) {}
 
@@ -249,6 +264,18 @@ dict::TranslationResult dict::DeinflectTranslator::doTranslate(
     const std::string &str) {
   return doTranslateAll<TranslatedChunk>(str);
 }
+
+// UserTranslator
+
+dict::UserTranslator::UserTranslator(const fs::path &root_dir)
+    : DirectoryTranslator(root_dir) {}
+
+dict::TranslationResult dict::UserTranslator::doTranslate(
+    const std::string &str) {
+  return doTranslateAll<TranslatedUserChunk>(str);
+}
+
+// ChainTranslator
 
 dict::ChainTranslator::ChainTranslator() {}
 
@@ -311,19 +338,4 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
     }
   }
   return res;
-}
-
-dict::UserTranslator::UserTranslator(const fs::path &root_dir)
-    : DirectoryTranslator(root_dir) {}
-
-dict::TranslationResult dict::UserTranslator::doTranslate(
-    const std::string &str) {
-  return doTranslateAll<TranslatedUserChunk>(str);
-}
-
-template <class Dict>
-void dict::DirectoryTranslator<Dict>::addFutureAndUpdateLastWriteTime(
-    const std::filesystem::path &path) {
-  dicts_futures_[path] = Loader::loadFromFS<Dict>(path);
-  paths_[path] = fs::last_write_time(path);
 }
