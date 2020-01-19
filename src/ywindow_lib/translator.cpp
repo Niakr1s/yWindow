@@ -58,24 +58,8 @@ dict::DirectoryTranslator<Dict>::DirectoryTranslator(
 
 template <class Dict>
 void dict::DirectoryTranslator<Dict>::prepareDictionaries() {
-  for (auto &[dir, dict] : dicts_futures_) {
-    try {
-      dicts_[dir] = std::unique_ptr<Dictionary>(dict.get());
-    } catch (std::exception &e) {
-      std::cout << "Couldn't load dictionary from " << dir
-                << " , reason: " << e.what() << std::endl;
-    }
-  }
-  dicts_futures_.clear();
-
-  if (translators_settings_) {
-    for (auto &[dir, dict] : dicts_) {
-      if (translators_settings_->isNotIn(info(), *dict->info())) {
-        translators_settings_->enableDictionary(info(), *dict->info());
-      }
-    }
-    translators_settings_->saveJson();
-  }
+  futuresToDicts();
+  if (translators_settings_) updateTranslatorsSettings();
 }
 
 template <class Dict>
@@ -100,6 +84,29 @@ void dict::DirectoryTranslator<Dict>::doReload() {
       addFutureAndUpdateLastWriteTime(dir);
     }
   }
+}
+
+template <class Dict>
+void dict::DirectoryTranslator<Dict>::futuresToDicts() {
+  for (auto &[dir, dict] : dicts_futures_) {
+    try {
+      dicts_[dir] = std::unique_ptr<Dictionary>(dict.get());
+    } catch (std::exception &e) {
+      std::cout << "Couldn't load dictionary from " << dir
+                << " , reason: " << e.what() << std::endl;
+    }
+  }
+  dicts_futures_.clear();
+}
+
+template <class Dict>
+void dict::DirectoryTranslator<Dict>::updateTranslatorsSettings() {
+  for (auto &[dir, dict] : dicts_) {
+    if (translators_settings_->isNotIn(info(), *dict->info())) {
+      translators_settings_->enableDictionary(info(), *dict->info());
+    }
+  }
+  translators_settings_->saveJson();
 }
 
 template <class Dict>

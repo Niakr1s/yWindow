@@ -90,6 +90,9 @@ class DirectoryTranslator : public Translator {
 
   template <class TranslatedChunk_T>
   TranslationChunkPtr doDeinflectAndTranslateFullStr(const std::string& str);
+
+  void futuresToDicts();
+  void updateTranslatorsSettings();
 };
 
 class YomiTranslator : public DirectoryTranslator<YomiDictionary> {
