@@ -48,13 +48,12 @@ class DictionaryTranslator : public Translator {
  public:
   DictionaryTranslator(Translator* deinflector = nullptr);
 
-  void addDict(Dictionary* dict);
   void setDeinflector(Translator* deinflector);
 
  protected:
   // in children provide dicts via dicts_futures_ or dicts_
-  std::vector<std::unique_ptr<Dictionary>> dicts_;
-  std::vector<std::future<Dictionary*>> dicts_futures_;
+  std::map<fs::path, std::unique_ptr<Dictionary>> dicts_;
+  std::map<fs::path, std::future<Dictionary*>> dicts_futures_;
   std::unique_ptr<Translator> deinflector_;
   std::shared_ptr<TranslatorsSettings> translators_settings_;
 

@@ -1,6 +1,7 @@
 #include "translator.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include "dictionary.h"
 #include "json/json.h"
@@ -46,29 +47,20 @@ dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
     if (!dir.is_directory()) {
       continue;
     }
-    dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+    dicts_futures_[dir] = Loader::loadFromFS<YomiDictionary>(dir);
     paths_[dir] = fs::last_write_time(dir);
   }
 }
 
 void dict::YomiTranslator::doReload() {
   for (auto &dir : fs::directory_iterator(root_dir_)) {
-    if (paths_.find(dir) == paths_.end()) {
-      dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+    if (auto iter = paths_.find(dir); iter == paths_.end()) {
+      dicts_futures_[dir] = Loader::loadFromFS<YomiDictionary>(dir);
       paths_[dir] = fs::last_write_time(dir);
-    } else {
-      if (paths_[dir] != fs::last_write_time(dir)) {
-        Dictionary *dict_only_info =
-            Loader::loadFromFSInfo<YomiDictionary>(dir).get();
-        dicts_.erase(std::find_if(dicts_.begin(), dicts_.end(),
-                                  [=](const std::unique_ptr<Dictionary> &dict) {
-                                    return dict->info() ==
-                                           dict_only_info->info();
-                                  }));
-        dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
-        paths_[dir] = fs::last_write_time(dir);
-        delete dict_only_info;
-      }
+    } else if (paths_[dir] != fs::last_write_time(dir)) {
+      dicts_.erase(dir);
+      dicts_futures_[dir] = Loader::loadFromFS<YomiDictionary>(dir);
+      paths_[dir] = fs::last_write_time(dir);
     }
   }
 }
@@ -79,16 +71,18 @@ dict::TranslationResult dict::YomiTranslator::doTranslate(
 }
 
 void dict::DictionaryTranslator::prepareDictionaries() {
-  while (!dicts_futures_.empty()) {
+  for (auto &[dir, dict] : dicts_futures_) {
     try {
-      dicts_.push_back(
-          std::unique_ptr<Dictionary>(dicts_futures_.back().get()));
-    } catch (...) {
+      dicts_[dir] = std::unique_ptr<Dictionary>(dict.get());
+    } catch (std::exception &e) {
+      std::cout << "Couldn't load dictionary from " << dir
+                << " , reason: " << e.what() << std::endl;
     }
-    dicts_futures_.pop_back();
   }
+  dicts_futures_.clear();
+
   if (translators_settings_) {
-    for (auto &dict : dicts_) {
+    for (auto &[dir, dict] : dicts_) {
       if (translators_settings_->isNotIn(info(), *dict->info())) {
         translators_settings_->enableDictionary(info(), *dict->info());
       }
@@ -101,10 +95,6 @@ size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
 dict::DictionaryTranslator::DictionaryTranslator(Translator *deinflector)
     : deinflector_(std::unique_ptr<Translator>(deinflector)) {}
-
-void dict::DictionaryTranslator::addDict(dict::Dictionary *dict) {
-  dicts_.push_back(std::unique_ptr<Dictionary>(dict));
-}
 
 void dict::DictionaryTranslator::setDeinflector(Translator *deinflector) {
   deinflector_ = std::unique_ptr<Translator>(deinflector);
@@ -119,7 +109,7 @@ void dict::DictionaryTranslator::doSetTranslatorsSettings(
 dict::CardPtrs dict::DictionaryTranslator::queryAllNonDisabledDicts(
     const std::string &str) {
   CardPtrs res;
-  for (auto &dict : dicts_) {
+  for (auto &[dir, dict] : dicts_) {
     if (translators_settings_ &&
         translators_settings_->isDisabled(info(), *dict->info())) {
       continue;
@@ -247,7 +237,7 @@ dict::DictionaryTranslator::doDeinflectAndTranslateFullStr(
 dict::DeinflectTranslator::DeinflectTranslator(const fs::path &file)
     : DictionaryTranslator() {
   if (fs::exists(file)) {
-    dicts_futures_.push_back(Loader::loadFromFS<DeinflectDictionary>(file));
+    dicts_futures_[file] = Loader::loadFromFS<DeinflectDictionary>(file);
   }
 }
 
@@ -324,7 +314,7 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
 dict::UserTranslator::UserTranslator(const fs::path &dir)
     : DictionaryTranslator(), dir_(dir) {
   if (fs::exists(dir)) {
-    dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(dir));
+    dicts_futures_[dir] = Loader::loadFromFS<UserDictionary>(dir);
     last_write_time_ = getDirLastWriteTime();
   }
 }
@@ -336,7 +326,7 @@ void dict::UserTranslator::reloadFromFS() {
     fs::file_time_type changed_time = getDirLastWriteTime();
     if (changed_time != last_write_time_) {
       dicts_.clear();
-      dicts_futures_.push_back(Loader::loadFromFS<UserDictionary>(dir_));
+      dicts_futures_[dir_] = Loader::loadFromFS<UserDictionary>(dir_);
       last_write_time_ = changed_time;
     }
   }
