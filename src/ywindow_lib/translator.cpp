@@ -94,12 +94,10 @@ template <class Dict>
 void dict::DirectoryTranslator<Dict>::doReload() {
   for (auto &dir : fs::directory_iterator(root_dir_)) {
     if (auto iter = paths_.find(dir); iter == paths_.end()) {
-      dicts_futures_[dir] = Loader::loadFromFS<YomiDictionary>(dir);
-      paths_[dir] = fs::last_write_time(dir);
+      addFutureAndUpdateLastWriteTime(dir);
     } else if (paths_[dir] != fs::last_write_time(dir)) {
       dicts_.erase(dir);
-      dicts_futures_[dir] = Loader::loadFromFS<YomiDictionary>(dir);
-      paths_[dir] = fs::last_write_time(dir);
+      addFutureAndUpdateLastWriteTime(dir);
     }
   }
 }
