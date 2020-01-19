@@ -19,6 +19,8 @@ namespace fs = std::filesystem;
 namespace dict {
 
 class Translator {
+  friend class ChainTranslator;
+
  public:
   virtual ~Translator();
 
@@ -33,7 +35,7 @@ class Translator {
 
  protected:
   virtual TranslationResult doTranslate(const std::string& str) = 0;
-  virtual void prepareDictionaries();
+  virtual void prepareDictionaries() = 0;
   virtual void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
   virtual void doReload() = 0;
@@ -144,6 +146,7 @@ class ChainTranslator : public Translator {
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
+  void prepareDictionaries() override;
 
  private:
   std::vector<std::unique_ptr<Translator>> translators_;

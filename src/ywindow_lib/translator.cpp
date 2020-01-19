@@ -37,8 +37,6 @@ void dict::Translator::setTranslatorsSettings(
   doSetTranslatorsSettings(translators_settings);
 }
 
-void dict::Translator::prepareDictionaries() {}
-
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
 
 // DirectoryTranslator
@@ -343,4 +341,10 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
     }
   }
   return res;
+}
+
+void dict::ChainTranslator::prepareDictionaries() {
+  for (auto &t : translators_) {
+    t->prepareDictionaries();
+  }
 }
