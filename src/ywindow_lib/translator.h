@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <future>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -23,7 +24,7 @@ class Translator {
 
   TranslationResult translate(const std::wstring& wstr);
   TranslationResult translate(const std::string& str);
-  //  void reload();
+  void reload();
 
   void setTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings);
@@ -35,7 +36,7 @@ class Translator {
   virtual void prepareDictionaries();
   virtual void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
-  //  virtual void doReload() = 0;
+  virtual void doReload() = 0;
 
   static size_t MAX_CHUNK_SIZE;
 
@@ -84,12 +85,14 @@ class DictionaryTranslator : public Translator {
 class YomiTranslator : public DictionaryTranslator {
  public:
   YomiTranslator(const fs::path& root_dir, Translator* deinflector = nullptr);
-  YomiTranslator(std::initializer_list<fs::path> dicts_dirs,
-                 Translator* deinflector = nullptr);
 
   std::string info() const override { return "YomiTranslator"; }
 
+  void doReload() override;
+
  protected:
+  fs::path root_dir_;
+  std::map<fs::path, fs::file_time_type> paths_;
   TranslationResult doTranslate(const std::string& str) override;
 };
 
@@ -99,6 +102,8 @@ class DeinflectTranslator : public DictionaryTranslator {
   DeinflectTranslator(const fs::path& file);
 
   std::string info() const override { return "DeinflectTranslator"; }
+
+  void doReload() override;
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
@@ -110,7 +115,7 @@ class UserTranslator : public DictionaryTranslator {
 
   std::string info() const override { return "UserTranslator"; }
 
-  void reloadFromFS();
+  void doReload() override;
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
@@ -121,6 +126,7 @@ class UserTranslator : public DictionaryTranslator {
   fs::file_time_type last_write_time_;
 
   fs::file_time_type getDirLastWriteTime();
+  void reloadFromFS();
 };
 
 // Don't use DeinflectTranslator here, use it as inner of DictionaryTranslator
@@ -136,6 +142,8 @@ class ChainTranslator : public Translator {
 
   void addTranslator(Translator* transl);
   void popTranslator();
+
+  void doReload() override;
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;

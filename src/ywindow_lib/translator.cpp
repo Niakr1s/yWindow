@@ -23,6 +23,11 @@ dict::TranslationResult dict::Translator::translate(const std::string &str) {
   return res;
 }
 
+void dict::Translator::reload() {
+  prepareDictionaries();
+  doReload();
+}
+
 void dict::Translator::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -33,24 +38,37 @@ void dict::Translator::prepareDictionaries() {}
 
 dict::YomiTranslator::YomiTranslator(const fs::path &root_dir,
                                      Translator *deinflector)
-    : DictionaryTranslator(deinflector) {
+    : DictionaryTranslator(deinflector), root_dir_(root_dir) {
   if (!fs::exists(root_dir)) {
     fs::create_directories(root_dir);
   }
-  for (auto &path : fs::directory_iterator(root_dir)) {
-    if (!path.is_directory()) {
+  for (auto &dir : fs::directory_iterator(root_dir)) {
+    if (!dir.is_directory()) {
       continue;
     }
-    dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(path));
+    dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+    paths_[dir] = fs::last_write_time(dir);
   }
 }
 
-dict::YomiTranslator::YomiTranslator(std::initializer_list<fs::path> dicts_dirs,
-                                     Translator *deinflector)
-    : DictionaryTranslator(deinflector) {
-  for (auto &dir : dicts_dirs) {
-    if (fs::exists(dir)) {
+void dict::YomiTranslator::doReload() {
+  for (auto &dir : fs::directory_iterator(root_dir_)) {
+    if (paths_.find(dir) == paths_.end()) {
       dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+      paths_[dir] = fs::last_write_time(dir);
+    } else {
+      if (paths_[dir] != fs::last_write_time(dir)) {
+        Dictionary *dict_only_info =
+            Loader::loadFromFSInfo<YomiDictionary>(dir).get();
+        dicts_.erase(std::find_if(dicts_.begin(), dicts_.end(),
+                                  [=](const std::unique_ptr<Dictionary> &dict) {
+                                    return dict->info() ==
+                                           dict_only_info->info();
+                                  }));
+        dicts_futures_.push_back(Loader::loadFromFS<YomiDictionary>(dir));
+        paths_[dir] = fs::last_write_time(dir);
+        delete dict_only_info;
+      }
     }
   }
 }
@@ -233,6 +251,8 @@ dict::DeinflectTranslator::DeinflectTranslator(const fs::path &file)
   }
 }
 
+void dict::DeinflectTranslator::doReload() {}
+
 dict::TranslationResult dict::DeinflectTranslator::doTranslate(
     const std::string &str) {
   return doTranslateAll<TranslatedChunk>(str);
@@ -259,6 +279,12 @@ void dict::ChainTranslator::addTranslator(Translator *transl) {
 }
 
 void dict::ChainTranslator::popTranslator() { translators_.pop_back(); }
+
+void dict::ChainTranslator::doReload() {
+  for (auto &t : translators_) {
+    t->reload();
+  }
+}
 
 dict::TranslationResult dict::ChainTranslator::doTranslate(
     const std::string &str) {
@@ -302,6 +328,8 @@ dict::UserTranslator::UserTranslator(const fs::path &dir)
     last_write_time_ = getDirLastWriteTime();
   }
 }
+
+void dict::UserTranslator::doReload() {}
 
 void dict::UserTranslator::reloadFromFS() {
   if (fs::exists(dir_)) {
