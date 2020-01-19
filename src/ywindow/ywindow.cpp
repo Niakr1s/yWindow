@@ -50,7 +50,7 @@ void YWindow::initTextMVC() {
       {new dict::UserTranslator("yWindow/dicts/user"),
        new dict::YomiTranslator(
            "yWindow/dicts/yomi",
-           new dict::DeinflectTranslator("yWindow/dicts/deinflect.json"))}));
+           new dict::DeinflectTranslator("yWindow/dicts/deinflect"))}));
   text_model_->setTranslatorsSettings(
       std::make_shared<dict::TranslatorsSettings>("yWindow/dicts.json"));
 
