@@ -13,25 +13,37 @@ namespace dict {
 class Dictionary;
 
 class Loader {
- public:
-  virtual ~Loader() = default;
-
+ private:
   template <class Dict>
   static std::future<Dictionary*> loadFromFS(const fs::path& dir,
-                                             bool only_info = false) {
+                                             bool with_info) {
     return std::async([=] {
       Dictionary* dict = new Dict();
-      auto loader = getFilesystemLoader(dir, only_info);
+      auto loader = getFilesystemLoader(dir, with_info);
       loader->doLoadInto(dict);
       delete loader;
       return dict;
     });
   }
 
+ public:
+  virtual ~Loader() = default;
+
+  template <class Dict>
+  static std::future<Dictionary*> loadFromFS(const fs::path& dir) {
+    return loadFromFS<Dict>(dir, false);
+  }
+
+  template <class Dict>
+  static std::future<Dictionary*> loadFromFSInfo(const fs::path& dir) {
+    return loadFromFS<Dict>(dir, true);
+  }
+
  protected:
   virtual void doLoadInto(Dictionary* dict) = 0;
 
-  static Loader* getFilesystemLoader(const fs::path& path, bool only_info);
+  static Loader* getFilesystemLoader(const fs::path& path,
+                                     bool only_info = false);
 };
 
 class FilesystemLoader : public Loader {
