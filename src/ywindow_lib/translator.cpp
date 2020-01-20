@@ -21,6 +21,8 @@ dict::TranslationResult dict::Translator::translate(const std::wstring &wstr) {
 dict::TranslationResult dict::Translator::translate(const std::string &str) {
   std::lock_guard<std::mutex> lock(mutex_);
   prepareDictionaries();
+  doReload();
+  prepareDictionaries();
   doUpdateTranslatorsSettings();
   return doTranslate(str);
 }
