@@ -30,13 +30,12 @@ class Translator {
 
   void setTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings);
-  void updateTranslatorsSettings();
 
   virtual std::string info() const = 0;
 
  protected:
   virtual TranslationResult doTranslate(const std::string& str) = 0;
-  virtual void prepareDictionaries() = 0;
+  virtual void doPrepareDictionaries() = 0;
   virtual void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) = 0;
   virtual void doUpdateTranslatorsSettings() = 0;
@@ -72,7 +71,7 @@ class DirectoryTranslator : public Translator {
 
   CardPtrs queryAllNonDisabledDicts(const std::string& str);
 
-  void prepareDictionaries() override;
+  void doPrepareDictionaries() override;
   void doSetTranslatorsSettings(
       std::shared_ptr<TranslatorsSettings> translators_settings) override;
   void doUpdateTranslatorsSettings() override;
@@ -137,9 +136,6 @@ class ChainTranslator : public Translator {
 
   std::string info() const override { return "ChainTranslator"; }
 
-  void doSetTranslatorsSettings(
-      std::shared_ptr<TranslatorsSettings> translators_settings) override;
-
   void addTranslator(Translator* transl);
   void popTranslator();
 
@@ -147,8 +143,10 @@ class ChainTranslator : public Translator {
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
-  void prepareDictionaries() override;
+  void doPrepareDictionaries() override;
   void doUpdateTranslatorsSettings() override;
+  void doSetTranslatorsSettings(
+      std::shared_ptr<TranslatorsSettings> translators_settings) override;
 
  private:
   std::vector<std::unique_ptr<Translator>> translators_;

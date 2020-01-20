@@ -16,8 +16,10 @@ QStringList TextModel::toPlainText() { return doToPlainText(); }
 void TextModel::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
-  emit translatorSettingsChanged();
-  return doSetTranslatorSettings(translators_settings);
+  std::thread([=] {
+    doSetTranslatorSettings(translators_settings_);
+    emit translatorSettingsChanged();
+  }).detach();
 }
 
 void TextModel::translate(std::pair<int, int> pos, QPoint point,
@@ -50,7 +52,7 @@ void TextModel::addText(QString text) {
 void TextModel::reloadDicts() {
   std::thread([this] {
     doReloadDicts();
-    emit dictsReloaded();
+    emit translatorSettingsChanged();
   }).detach();
 }
 
@@ -119,10 +121,7 @@ void DefaultModel::doAddText(const QString &text) {
 
 void DefaultModel::doSetTranslatorSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
-  std::thread([=] {
-    translator_->setTranslatorsSettings(translators_settings);
-    emit translatorSettingsChanged();
-  }).detach();
+  translator_->setTranslatorsSettings(translators_settings);
 }
 
 void DefaultModel::doReloadDicts() { translator_->reload(); }

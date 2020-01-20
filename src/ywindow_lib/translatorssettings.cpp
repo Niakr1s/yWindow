@@ -80,6 +80,34 @@ void dict::TranslatorsSettings::moveDictionary(
   }
 }
 
+void dict::TranslatorsSettings::deleteDictionary(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  settings_[translator_info].enabled.erase(dictionary_info);
+  settings_[translator_info].disabled.erase(dictionary_info);
+}
+
+void dict::TranslatorsSettings::deleteOtherDictionaries(
+    const std::string &translator_info,
+    const std::set<std::string> &dictionary_infos) {
+  std::set<std::string> to_delete;
+
+  auto fill = [&](const std::set<std::string> &from) {
+    for (auto &dict_info : from) {
+      if (dictionary_infos.find(dict_info) ==
+          dictionary_infos.end()) {  // if not in
+        to_delete.insert(dict_info);
+      }
+    }
+  };
+
+  fill(settings_[translator_info].enabled);
+  fill(settings_[translator_info].disabled);
+
+  for (auto &dict_info : to_delete) {
+    deleteDictionary(translator_info, dict_info);
+  }
+}
+
 void dict::TranslatorsSettings::loadJson() {
   Json::Value root;
   std::ifstream is(json_file_);

@@ -21,9 +21,8 @@ TEST(translator_states, test2) {
   chain.addTranslator(new UserTranslator("data/user"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect"));
   chain.addTranslator(new YomiTranslator("data/yomi"));
-  chain.doSetTranslatorsSettings(
+  chain.setTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
-  chain.translate("asdf");
 
   Json::Value root;
   std::ifstream is(json_path);
@@ -49,9 +48,8 @@ TEST(translator_states, test1) {
   chain.addTranslator(new UserTranslator("data/user"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect"));
   chain.addTranslator(new YomiTranslator("data/yomi"));
-  chain.doSetTranslatorsSettings(
+  chain.setTranslatorsSettings(
       std::make_shared<TranslatorsSettings>(json_path));
-  chain.translate("asdf");
 
   Json::Value root;
   std::ifstream is(json_path);
@@ -67,6 +65,76 @@ TEST(translator_states, test1) {
   ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
   ASSERT_EQ(root[2]["enabled"].size(), 2);
   ASSERT_TRUE(root[2]["disabled"].empty());
+}
+
+TEST(translator_states, test3) {
+  const fs::path tmp_data = "tmp_data";
+  const fs::path json_path(tmp_data / "translator_states_test3.json");
+
+  fs::remove_all(tmp_data);
+
+  fs::copy("data", tmp_data, fs::copy_options::recursive);
+
+  std::vector<fs::path> tmp_dicts{tmp_data / "user/tmp_dict.txt",
+                                  tmp_data / "user/tmp_dict2.txt"};
+
+  auto remove_tmp_dicts = [&] {
+    for (auto& dict : tmp_dicts) {
+      if (fs::exists(dict)) fs::remove(dict);
+    }
+  };
+
+  remove_tmp_dicts();
+
+  ChainTranslator chain;
+  chain.addTranslator(new UserTranslator(tmp_data / "user"));
+  chain.addTranslator(new DeinflectTranslator(tmp_data / "deinflect"));
+  chain.addTranslator(new YomiTranslator(tmp_data / "yomi"));
+  chain.setTranslatorsSettings(
+      std::make_shared<TranslatorsSettings>(json_path));
+
+  auto assert_initial = [&] {
+    Json::Value root;
+    std::ifstream is(json_path);
+    is >> root;
+
+    ASSERT_EQ(root.size(), 3);
+    ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
+    ASSERT_EQ(root[0]["enabled"].size(), 1);
+    ASSERT_TRUE(root[0]["disabled"].empty());
+    ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
+    ASSERT_EQ(root[1]["enabled"].size(), 1);
+    ASSERT_TRUE(root[1]["disabled"].empty());
+    ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
+    ASSERT_EQ(root[2]["enabled"].size(), 2);
+    ASSERT_TRUE(root[2]["disabled"].empty());
+  };
+
+  assert_initial();
+
+  for (auto& tmp_dict : tmp_dicts) {
+    std::ofstream os(tmp_dict.string());
+    os << "tmp = tmp";
+  }
+
+  chain.reload();
+
+  {
+    Json::Value root;
+    std::ifstream is(json_path);
+    is >> root;
+
+    ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
+    ASSERT_EQ(root[1]["enabled"].size(), 3);
+    ASSERT_TRUE(root[1]["disabled"].empty());
+  }
+
+  remove_tmp_dicts();
+  chain.reload();
+
+  assert_initial();
+
+  fs::remove_all(tmp_data);
 }
 
 #endif  // DICT_TRANSLATORSTATES_TESTS_H

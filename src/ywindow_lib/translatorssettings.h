@@ -36,6 +36,12 @@ class TranslatorsSettings {
                          const std::string& dictionary_info);
   void moveDictionary(const std::string& translator_info,
                       const std::string& dictionary_info, bool enabled);
+  void deleteDictionary(const std::string& translator_info,
+                        const std::string& dictionary_info);
+
+  // deletes dictionaries NOT IN dictionary_infos
+  void deleteOtherDictionaries(const std::string& translator_info,
+                               const std::set<std::string>& dictionary_infos);
   void saveJson();
 
   int size() const;

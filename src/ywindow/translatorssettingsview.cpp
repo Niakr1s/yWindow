@@ -31,8 +31,6 @@ void TranslatorsSettingsView::setTextModel(TextModel *model) {
   model_ = model;
   connect(model_, &TextModel::translatorSettingsChanged, this,
           &TranslatorsSettingsView::redraw);
-  connect(model_, &TextModel::dictsReloaded, this,
-          &TranslatorsSettingsView::redraw);
 }
 
 void TranslatorsSettingsView::setTextController(TextController *controller) {

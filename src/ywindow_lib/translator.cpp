@@ -20,18 +20,18 @@ dict::TranslationResult dict::Translator::translate(const std::wstring &wstr) {
 
 dict::TranslationResult dict::Translator::translate(const std::string &str) {
   std::lock_guard<std::mutex> lock(mutex_);
-  prepareDictionaries();
+  doPrepareDictionaries();
   doReload();
-  prepareDictionaries();
+  doPrepareDictionaries();
   doUpdateTranslatorsSettings();
   return doTranslate(str);
 }
 
 void dict::Translator::reload() {
   std::lock_guard<std::mutex> lock(mutex_);
-  prepareDictionaries();
+  doPrepareDictionaries();
   doReload();
-  prepareDictionaries();
+  doPrepareDictionaries();
   doUpdateTranslatorsSettings();
 }
 
@@ -39,13 +39,8 @@ void dict::Translator::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   std::lock_guard<std::mutex> lock(mutex_);
   doSetTranslatorsSettings(translators_settings);
-}
-
-void dict::Translator::updateTranslatorsSettings() {
-  std::lock_guard<std::mutex> lock(mutex_);
-  prepareDictionaries();
+  doPrepareDictionaries();
   doUpdateTranslatorsSettings();
-  // don't forget to save them in childs
 }
 
 size_t dict::Translator::MAX_CHUNK_SIZE = 12;
@@ -66,7 +61,7 @@ dict::DirectoryTranslator<Dict>::DirectoryTranslator(
 }
 
 template <class Dict>
-void dict::DirectoryTranslator<Dict>::prepareDictionaries() {
+void dict::DirectoryTranslator<Dict>::doPrepareDictionaries() {
   futuresToDicts();
 }
 
@@ -79,7 +74,6 @@ template <class Dict>
 void dict::DirectoryTranslator<Dict>::doSetTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
-  prepareDictionaries();
 }
 
 template <class Dict>
@@ -91,18 +85,39 @@ void dict::DirectoryTranslator<Dict>::doUpdateTranslatorsSettings() {
       translators_settings_->enableDictionary(info(), *dict->info());
     }
   }
+
+  std::set<std::string> infos;
+  for (auto &[dir, dict] : dicts_) {
+    infos.insert(*dict->info());
+  }
+  translators_settings_->deleteOtherDictionaries(info(), infos);
+
   translators_settings_->saveJson();
 }
 
 template <class Dict>
 void dict::DirectoryTranslator<Dict>::doReload() {
+  std::set<fs::path> dirs_in_root_dir, to_delete;
+
   for (auto &dir : fs::directory_iterator(root_dir_)) {
-    if (auto iter = paths_.find(dir); iter == paths_.end()) {
+    dirs_in_root_dir.insert(dir);
+
+    if (auto iter = dicts_.find(dir); iter == dicts_.end()) {
       addFutureAndUpdateLastWriteTime(dir);
     } else if (paths_[dir] != fs::last_write_time(dir)) {
       dicts_.erase(dir);
       addFutureAndUpdateLastWriteTime(dir);
     }
+  }
+
+  for (auto &[dir, _] : dicts_) {
+    if (dirs_in_root_dir.find(dir) == dirs_in_root_dir.end()) {
+      to_delete.insert(dir);
+    }
+  }
+
+  for (auto &dir : to_delete) {
+    dicts_.erase(dir);
   }
 }
 
@@ -355,10 +370,10 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
   return res;
 }
 
-void dict::ChainTranslator::prepareDictionaries() {}
+void dict::ChainTranslator::doPrepareDictionaries() {}
 
 void dict::ChainTranslator::doUpdateTranslatorsSettings() {
   for (auto &t : translators_) {
-    t->updateTranslatorsSettings();
+    t->doUpdateTranslatorsSettings();
   }
 }

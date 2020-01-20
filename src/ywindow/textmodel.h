@@ -32,7 +32,6 @@ class TextModel : public QObject {
   void gotTranslationLength(int length);
   void cancelTranslation();
   void translatorSettingsChanged();
-  void dictsReloaded();
 
  public slots:
   void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
