@@ -3,12 +3,17 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <thread>
+
 #include "dictionary.h"
 #include "loader.h"
 #include "translationresult.h"
 #include "translator.h"
 
 using namespace dict;
+
+using namespace std::chrono_literals;
 
 TEST(yomi_translator, test1) {
   auto yomi = new YomiTranslator("data/yomi");
@@ -111,6 +116,7 @@ TEST(translator, reload1) {
   {
     std::ofstream os{tmp / "tmp.txt"};
     os << "2 = second";
+    std::this_thread::sleep_for(500ms);
   }
 
   res = de->translate("Niakr1s#2");
@@ -118,7 +124,10 @@ TEST(translator, reload1) {
   ASSERT_EQ(res.chunks()[0]->originText(), "Niakr1s");
   ASSERT_EQ(res.chunks()[1]->originText(), "#");
   ASSERT_EQ(res.chunks()[2]->originText(), "2");
+  ASSERT_EQ(res.chunks()[2]->translations().size(), 1);
   ASSERT_EQ(res.chunks()[2]->translations().front()->reading(), "second");
+
+  fs::remove_all(tmp);
 }
 
 #endif  // DICT_TRANSLATOR_TESTS_H
