@@ -31,6 +31,8 @@ void dict::Translator::reload() {
   std::lock_guard<std::mutex> lock(mutex_);
   prepareDictionaries();
   doReload();
+  prepareDictionaries();
+  doUpdateTranslatorsSettings();
 }
 
 void dict::Translator::setTranslatorsSettings(

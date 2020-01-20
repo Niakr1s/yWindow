@@ -18,6 +18,7 @@ void TextView::setController(TextController *controller) {
   controller_ = controller;
   connect(this, &TextView::charHovered, controller_,
           &TextController::charHovered);
+  doSetController(controller);
 }
 
 void TextView::setModel(TextModel *model) {
@@ -81,6 +82,10 @@ void DefaultTextView::doDisplayText() {
 
 void DefaultTextView::doSetModel(TextModel *model) {
   translators_settings_view_->setTextModel(model);
+}
+
+void DefaultTextView::doSetController(TextController *controller) {
+  translators_settings_view_->setTextController(controller);
 }
 
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {

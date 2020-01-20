@@ -24,6 +24,7 @@ class TextController : public QObject {
   void newText(QString);
   void charHovered(std::pair<int, int> model_pos, QPoint point,
                    bool with_shift);
+  void needReloadDicts();
 
  protected:
   TextModel* model_;

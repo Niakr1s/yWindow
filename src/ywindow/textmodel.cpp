@@ -47,6 +47,13 @@ void TextModel::addText(QString text) {
   emit textChanged();
 }
 
+void TextModel::reloadDicts() {
+  std::thread([this] {
+    doReloadDicts();
+    emit dictsReloaded();
+  }).detach();
+}
+
 std::shared_ptr<dict::TranslatorsSettings> DefaultModel::translators_settings()
     const {
   return translators_settings_;
@@ -117,3 +124,5 @@ void DefaultModel::doSetTranslatorSettings(
     emit translatorSettingsChanged();
   }).detach();
 }
+
+void DefaultModel::doReloadDicts() { translator_->reload(); }

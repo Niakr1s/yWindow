@@ -1,5 +1,6 @@
 #include "translatorssettingsview.h"
 
+#include <QButtonGroup>
 #include <QDebug>
 #include <QHeaderView>
 #include <QScrollBar>
@@ -14,12 +15,30 @@ TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
 
   connect(table_, &QTableWidget::itemClicked, this,
           &TranslatorsSettingsView::tableItemClicked);
+
+  auto button_hbox = new QHBoxLayout(this);
+  vbox->addLayout(button_hbox);
+
+  new_dict_btn_ = new QPushButton(tr("New dict"));
+
+  reload_btn_ = new QPushButton(tr("Reload"));
+
+  button_hbox->addWidget(new_dict_btn_);
+  button_hbox->addWidget(reload_btn_);
 }
 
 void TranslatorsSettingsView::setTextModel(TextModel *model) {
   model_ = model;
   connect(model_, &TextModel::translatorSettingsChanged, this,
           &TranslatorsSettingsView::redraw);
+  connect(model_, &TextModel::dictsReloaded, this,
+          &TranslatorsSettingsView::redraw);
+}
+
+void TranslatorsSettingsView::setTextController(TextController *controller) {
+  controller_ = controller;
+  connect(reload_btn_, &QPushButton::clicked, controller_,
+          &TextController::needReloadDicts);
 }
 
 void TranslatorsSettingsView::show() {

@@ -1,8 +1,10 @@
 #ifndef TRANSLATORSSETTINGSVIEW_H
 #define TRANSLATORSSETTINGSVIEW_H
 
+#include <QPushButton>
 #include <QTableWidget>
 
+#include "textcontroller.h"
 #include "textmodel.h"
 #include "translator.h"
 
@@ -11,6 +13,7 @@ class TranslatorsSettingsView : public QWidget {
   TranslatorsSettingsView(QWidget* parent = nullptr);
 
   void setTextModel(TextModel* model);
+  void setTextController(TextController* controller);
 
  public slots:
   void show();
@@ -20,7 +23,9 @@ class TranslatorsSettingsView : public QWidget {
 
  private:
   TextModel* model_;
+  TextController* controller_;
   QTableWidget* table_;
+  QPushButton *new_dict_btn_, *reload_btn_;
 
   const int COLS = 3;
 

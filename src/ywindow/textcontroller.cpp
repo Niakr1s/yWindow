@@ -23,4 +23,6 @@ void TextController::setModel(TextModel *model) {
   model_ = model;
   connect(this, &TextController::newText, model_, &TextModel::addText);
   connect(this, &TextController::charHovered, model_, &TextModel::translate);
+  connect(this, &TextController::needReloadDicts, model_,
+          &TextModel::reloadDicts);
 }

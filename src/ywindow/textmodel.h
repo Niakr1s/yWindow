@@ -32,10 +32,12 @@ class TextModel : public QObject {
   void gotTranslationLength(int length);
   void cancelTranslation();
   void translatorSettingsChanged();
+  void dictsReloaded();
 
  public slots:
   void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
   void addText(QString text);
+  void reloadDicts();
 
  protected:
   std::pair<int, int> last_pos_ = {-1, -1};
@@ -50,6 +52,7 @@ class TextModel : public QObject {
   virtual void doAddText(const QString& text) = 0;
   virtual void doSetTranslatorSettings(
       std::shared_ptr<dict::TranslatorsSettings> translators_settings) = 0;
+  virtual void doReloadDicts() = 0;
 };
 
 class DefaultModel : public TextModel {
@@ -70,6 +73,7 @@ class DefaultModel : public TextModel {
   void doAddText(const QString& text) override;
   void doSetTranslatorSettings(
       std::shared_ptr<dict::TranslatorsSettings> translators_settings) override;
+  void doReloadDicts() override;
 
  private:
   const size_t max_size_ = 10;

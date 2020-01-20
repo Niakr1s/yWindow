@@ -37,6 +37,7 @@ class TextView : public QTextBrowser {
 
   virtual void doDisplayText() = 0;
   virtual void doSetModel(TextModel* model) = 0;
+  virtual void doSetController(TextController* controller) = 0;
 };
 
 class DefaultTextView : public TextView {
@@ -65,6 +66,7 @@ class DefaultTextView : public TextView {
  protected:
   void doDisplayText() override;
   void doSetModel(TextModel* model) override;
+  void doSetController(TextController* controller) override;
 
   void mouseMoveEvent(QMouseEvent* event) override;
   void leaveEvent(QEvent* event) override;
