@@ -33,6 +33,7 @@ YWindow::~YWindow() {
   SETTINGS->saveYWindow(this);
   SETTINGS->saveTextView(text_view_.get());
   SETTINGS->saveTranslationView(translation_view_.get());
+  SETTINGS->saveTranslatorsSettingsView(translators_settings_view_.get());
   SETTINGS->sync();
 }
 
@@ -66,4 +67,5 @@ void YWindow::initTextMVC() {
   translators_settings_view_ = std::make_unique<TranslatorsSettingsView>();
   translators_settings_view_->setModel(text_model_.get());
   translators_settings_view_->setController(text_controller_.get());
+  SETTINGS->loadTranslatorsSettingsView(translators_settings_view_.get());
 }

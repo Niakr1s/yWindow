@@ -8,6 +8,7 @@
 class YWindow;
 class QTextBrowser;
 class SettingsWindow;
+class TranslatorsSettingsView;
 
 class Settings {
  public:
@@ -24,6 +25,9 @@ class Settings {
   void loadTranslationView(QTextBrowser* w);
   void saveTranslationView(QTextBrowser* w);
 
+  void loadTranslatorsSettingsView(TranslatorsSettingsView* w);
+  void saveTranslatorsSettingsView(TranslatorsSettingsView* w);
+
  private:
   Settings();
   const QString TITLE = "yWindow";
@@ -32,6 +36,9 @@ class Settings {
   const QString QSETTINGS_GEOMETRY = "geometry";
   const QString QSETTINGS_TEXT_FONT = "text_font";
   const QString QSETTINGS_TRANSLATION_FONT = "translation_font";
+
+  const QString QSETTINGS_TRANSLATORS_SETTINGS_VIEW_GEOMETRY =
+      "translators_settings_geometry";
 
   QSettings settings_;
 

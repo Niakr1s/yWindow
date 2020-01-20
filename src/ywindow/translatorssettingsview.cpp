@@ -19,25 +19,9 @@ namespace fs = std::filesystem;
 
 TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
     : QWidget(parent) {
-  auto vbox = new QVBoxLayout(this);
-
-  table_ = new QTableWidget(this);
-  vbox->addWidget(table_);
-
-  connect(table_, &QTableWidget::itemClicked, this,
-          &TranslatorsSettingsView::tableItemClicked);
-
-  auto button_hbox = new QHBoxLayout(this);
-  vbox->addLayout(button_hbox);
-
-  new_dict_btn_ = new QPushButton(tr("New dict"));
-  connect(new_dict_btn_, &QPushButton::clicked, this,
-          &TranslatorsSettingsView::addUserDictionary);
-
-  reload_btn_ = new QPushButton(tr("Reload"));
-
-  button_hbox->addWidget(new_dict_btn_);
-  button_hbox->addWidget(reload_btn_);
+  initButtons();
+  initTable();
+  initLayout();
 }
 
 void TranslatorsSettingsView::setModel(TextModel *model) {
@@ -161,4 +145,30 @@ QVector<QTableWidgetItem *> TranslatorsSettingsView::makeRow(
   res.back()->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
   res.back()->setCheckState(enabled ? Qt::Checked : Qt::Unchecked);
   return res;
+}
+
+void TranslatorsSettingsView::initButtons() {
+  new_dict_btn_ = new QPushButton(tr("New dict"));
+  connect(new_dict_btn_, &QPushButton::clicked, this,
+          &TranslatorsSettingsView::addUserDictionary);
+
+  reload_btn_ = new QPushButton(tr("Reload"));
+}
+
+void TranslatorsSettingsView::initTable() {
+  table_ = new QTableWidget(this);
+  connect(table_, &QTableWidget::itemClicked, this,
+          &TranslatorsSettingsView::tableItemClicked);
+}
+
+void TranslatorsSettingsView::initLayout() {
+  auto vbox = new QVBoxLayout(this);
+
+  vbox->addWidget(table_);
+
+  auto button_hbox = new QHBoxLayout(this);
+  vbox->addLayout(button_hbox);
+
+  button_hbox->addWidget(new_dict_btn_);
+  button_hbox->addWidget(reload_btn_);
 }

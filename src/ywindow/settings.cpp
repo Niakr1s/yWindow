@@ -6,6 +6,7 @@
 
 #include "paths.h"
 #include "settingswindow.h"
+#include "translatorssettingsview.h"
 #include "ywindow.h"
 
 Settings::Settings()
@@ -52,6 +53,18 @@ void Settings::loadTranslationView(QTextBrowser* w) {
 
 void Settings::saveTranslationView(QTextBrowser* w) {
   settings_.setValue(QSETTINGS_TRANSLATION_FONT, w->font());
+}
+
+void Settings::loadTranslatorsSettingsView(TranslatorsSettingsView* w) {
+  w->setGeometry(
+      settings_
+          .value(QSETTINGS_TRANSLATORS_SETTINGS_VIEW_GEOMETRY, w->geometry())
+          .toRect());
+}
+
+void Settings::saveTranslatorsSettingsView(TranslatorsSettingsView* w) {
+  settings_.setValue(QSETTINGS_TRANSLATORS_SETTINGS_VIEW_GEOMETRY,
+                     w->geometry());
 }
 
 void Settings::loadTextTranslationViewCommon(QTextBrowser* w) {

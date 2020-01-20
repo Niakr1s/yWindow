@@ -42,6 +42,10 @@ class TranslatorsSettingsView : public QWidget {
   QVector<QTableWidgetItem*> makeRow(const std::string& transl_info,
                                      const std::string& dict_info,
                                      bool enabled);
+
+  void initButtons();
+  void initTable();
+  void initLayout();
 };
 
 #endif  // TRANSLATORSSETTINGSVIEW_H
