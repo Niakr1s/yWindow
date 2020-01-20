@@ -18,7 +18,8 @@ void TextView::setController(TextController *controller) {
   controller_ = controller;
   connect(this, &TextView::charHovered, controller_,
           &TextController::charHovered);
-  doSetController(controller);
+  connect(this, &TextView::needShowTranslatorsSettingsView, controller_,
+          &TextController::needShowTranslatorsSettingsView);
 }
 
 void TextView::setModel(TextModel *model) {
@@ -26,7 +27,6 @@ void TextView::setModel(TextModel *model) {
   connect(model_, &TextModel::textChanged, this, &TextView::displayText);
   connect(model_, &TextModel::gotTranslationLength, this,
           &TextView::highlightTranslated);
-  doSetModel(model);
 }
 
 void TextView::displayText() { return doDisplayText(); }
@@ -37,8 +37,6 @@ DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
   highlighter_ = new HoverSyntaxHighlighter(document());
   setSearchPaths({"yWindow/templates"});
 
-  translators_settings_view_ = new TranslatorsSettingsView();
-
   initMenu();
 }
 
@@ -47,8 +45,8 @@ void DefaultTextView::initMenu() {
 
   auto show_translators_settings_view_ =
       new QAction(tr("Show dictionaries settings"));
-  connect(show_translators_settings_view_, &QAction::triggered,
-          translators_settings_view_, &TranslatorsSettingsView::show);
+  connect(show_translators_settings_view_, &QAction::triggered, this,
+          &TextView::needShowTranslatorsSettingsView);
   menu_->addAction(show_translators_settings_view_);
 
   auto open_css_file_ = new QAction(tr("Edit css"));
@@ -78,14 +76,6 @@ void DefaultTextView::doDisplayText() {
   document()->rootFrame()->setFrameFormat(format);
 
   scrollToAnchor(anchor_);
-}
-
-void DefaultTextView::doSetModel(TextModel *model) {
-  translators_settings_view_->setTextModel(model);
-}
-
-void DefaultTextView::doSetController(TextController *controller) {
-  translators_settings_view_->setTextController(controller);
 }
 
 void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {

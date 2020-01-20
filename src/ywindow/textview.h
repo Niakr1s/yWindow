@@ -26,6 +26,7 @@ class TextView : public QTextBrowser {
  signals:
   void charHovered(std::pair<int, int> model_pos, QPoint point,
                    bool with_shift);
+  void needShowTranslatorsSettingsView();
 
  public slots:
   void displayText();
@@ -36,8 +37,6 @@ class TextView : public QTextBrowser {
   TextModel* model_;
 
   virtual void doDisplayText() = 0;
-  virtual void doSetModel(TextModel* model) = 0;
-  virtual void doSetController(TextController* controller) = 0;
 };
 
 class DefaultTextView : public TextView {
@@ -65,8 +64,6 @@ class DefaultTextView : public TextView {
 
  protected:
   void doDisplayText() override;
-  void doSetModel(TextModel* model) override;
-  void doSetController(TextController* controller) override;
 
   void mouseMoveEvent(QMouseEvent* event) override;
   void leaveEvent(QEvent* event) override;
@@ -83,7 +80,6 @@ class DefaultTextView : public TextView {
   void initMenu();
 
   QMenu* menu_;
-  TranslatorsSettingsView* translators_settings_view_;
 };
 
 #endif  // TEXTVIEW_H

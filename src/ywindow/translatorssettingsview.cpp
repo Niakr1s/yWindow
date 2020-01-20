@@ -27,16 +27,18 @@ TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
   button_hbox->addWidget(reload_btn_);
 }
 
-void TranslatorsSettingsView::setTextModel(TextModel *model) {
+void TranslatorsSettingsView::setModel(TextModel *model) {
   model_ = model;
   connect(model_, &TextModel::translatorSettingsChanged, this,
           &TranslatorsSettingsView::redraw);
 }
 
-void TranslatorsSettingsView::setTextController(TextController *controller) {
+void TranslatorsSettingsView::setController(TextController *controller) {
   controller_ = controller;
   connect(reload_btn_, &QPushButton::clicked, controller_,
           &TextController::needReloadDicts);
+  connect(controller_, &TextController::needShowTranslatorsSettingsView, this,
+          &TranslatorsSettingsView::show);
 }
 
 void TranslatorsSettingsView::show() {

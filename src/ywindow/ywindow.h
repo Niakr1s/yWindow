@@ -11,6 +11,7 @@
 #include "status.h"
 #include "textview.h"
 #include "translationview.h"
+#include "translatorssettingsview.h"
 
 class YWindow : public QWidget {
   Q_OBJECT
@@ -32,6 +33,7 @@ class YWindow : public QWidget {
   DefaultTextView* text_view_;
   TranslationView* translation_view_;
   TextController* text_controller_;
+  TranslatorsSettingsView* translators_settings_view_;
 
   void initTextMVC();
 };

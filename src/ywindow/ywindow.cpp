@@ -66,4 +66,8 @@ void YWindow::initTextMVC() {
   translation_view_ = new DefaultTranslationView();
   translation_view_->setModel(text_model_);
   SETTINGS->loadTranslationView(translation_view_);
+
+  translators_settings_view_ = new TranslatorsSettingsView();
+  translators_settings_view_->setModel(text_model_);
+  translators_settings_view_->setController(text_controller_);
 }

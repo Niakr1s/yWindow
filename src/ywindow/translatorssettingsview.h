@@ -12,8 +12,8 @@ class TranslatorsSettingsView : public QWidget {
  public:
   TranslatorsSettingsView(QWidget* parent = nullptr);
 
-  void setTextModel(TextModel* model);
-  void setTextController(TextController* controller);
+  void setModel(TextModel* model);
+  void setController(TextController* controller);
 
  public slots:
   void show();

@@ -25,6 +25,7 @@ class TextController : public QObject {
   void charHovered(std::pair<int, int> model_pos, QPoint point,
                    bool with_shift);
   void needReloadDicts();
+  void needShowTranslatorsSettingsView();
 
  protected:
   TextModel* model_;
