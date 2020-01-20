@@ -7,6 +7,7 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <memory>
 
 #include "status.h"
 #include "textview.h"
@@ -29,11 +30,12 @@ class YWindow : public QWidget {
 
   QVBoxLayout* vbox_;
 
-  TextModel* text_model_;
-  DefaultTextView* text_view_;
-  TranslationView* translation_view_;
-  TextController* text_controller_;
-  TranslatorsSettingsView* translators_settings_view_;
+  std::unique_ptr<TextModel> text_model_;
+  std::unique_ptr<TextController> text_controller_;
+
+  std::unique_ptr<DefaultTextView> text_view_;
+  std::unique_ptr<TranslationView> translation_view_;
+  std::unique_ptr<TranslatorsSettingsView> translators_settings_view_;
 
   void initTextMVC();
 };

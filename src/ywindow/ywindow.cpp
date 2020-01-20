@@ -23,7 +23,7 @@ YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   vbox_->setMargin(0);
 
   initTextMVC();
-  vbox_->addWidget(text_view_);
+  vbox_->addWidget(text_view_.get());
 
   status_ = new Status(this);
   vbox_->addWidget(status_);
@@ -31,13 +31,9 @@ YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
 
 YWindow::~YWindow() {
   SETTINGS->saveYWindow(this);
-  SETTINGS->saveTextView(text_view_);
-  SETTINGS->saveTranslationView(translation_view_);
+  SETTINGS->saveTextView(text_view_.get());
+  SETTINGS->saveTranslationView(translation_view_.get());
   SETTINGS->sync();
-  delete text_model_;
-  delete text_view_;
-  delete text_controller_;
-  delete translation_view_;
 }
 
 void YWindow::newText(QString text) { return text_controller_->addText(text); }
@@ -47,7 +43,7 @@ void YWindow::initTextMVC() {
   //  dict::YomiTranslator("yomi_dicts"));
   //  text_model_ =
   //      new FullTranslateTextModel(new dict::YomiTranslator("dicts/yomi"));
-  text_model_ = new DefaultModel(new dict::ChainTranslator(
+  text_model_ = std::make_unique<DefaultModel>(new dict::ChainTranslator(
       {new dict::UserTranslator(Y_USER_DICTS_PATH),
        new dict::YomiTranslator(
            Y_YOMI_DICTS_PATH,
@@ -55,19 +51,19 @@ void YWindow::initTextMVC() {
   text_model_->setTranslatorsSettings(
       std::make_shared<dict::TranslatorsSettings>(Y_TRANSLATORS_SETTINGS_PATH));
 
-  text_controller_ = new TextController();
-  text_controller_->setModel(text_model_);
+  text_controller_ = std::make_unique<TextController>();
+  text_controller_->setModel(text_model_.get());
 
-  text_view_ = new DefaultTextView(this);
-  text_view_->setModel(text_model_);
-  text_view_->setController(text_controller_);
-  SETTINGS->loadTextView(text_view_);
+  text_view_ = std::make_unique<DefaultTextView>(this);
+  text_view_->setModel(text_model_.get());
+  text_view_->setController(text_controller_.get());
+  SETTINGS->loadTextView(text_view_.get());
 
-  translation_view_ = new DefaultTranslationView();
-  translation_view_->setModel(text_model_);
-  SETTINGS->loadTranslationView(translation_view_);
+  translation_view_ = std::make_unique<DefaultTranslationView>();
+  translation_view_->setModel(text_model_.get());
+  SETTINGS->loadTranslationView(translation_view_.get());
 
-  translators_settings_view_ = new TranslatorsSettingsView();
-  translators_settings_view_->setModel(text_model_);
-  translators_settings_view_->setController(text_controller_);
+  translators_settings_view_ = std::make_unique<TranslatorsSettingsView>();
+  translators_settings_view_->setModel(text_model_.get());
+  translators_settings_view_->setController(text_controller_.get());
 }
