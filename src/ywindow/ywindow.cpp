@@ -9,6 +9,7 @@
 #include <QTextBlock>
 #include <QVBoxLayout>
 
+#include "paths.h"
 #include "settings.h"
 #include "textcontroller.h"
 #include "textmodel.h"
@@ -47,12 +48,12 @@ void YWindow::initTextMVC() {
   //  text_model_ =
   //      new FullTranslateTextModel(new dict::YomiTranslator("dicts/yomi"));
   text_model_ = new DefaultModel(new dict::ChainTranslator(
-      {new dict::UserTranslator("yWindow/dicts/user"),
+      {new dict::UserTranslator(Y_USER_DICTS_PATH),
        new dict::YomiTranslator(
-           "yWindow/dicts/yomi",
-           new dict::DeinflectTranslator("yWindow/dicts/deinflect"))}));
+           Y_YOMI_DICTS_PATH,
+           new dict::DeinflectTranslator(Y_DEINFLECT_DICTS_PATH))}));
   text_model_->setTranslatorsSettings(
-      std::make_shared<dict::TranslatorsSettings>("yWindow/dicts.json"));
+      std::make_shared<dict::TranslatorsSettings>(Y_TRANSLATORS_SETTINGS_PATH));
 
   text_controller_ = new TextController();
   text_controller_->setModel(text_model_);

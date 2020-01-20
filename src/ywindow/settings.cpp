@@ -4,11 +4,13 @@
 #include <QFont>
 #include <QSettings>
 
+#include "paths.h"
 #include "settingswindow.h"
 #include "ywindow.h"
 
 Settings::Settings()
-    : settings_(QSettings{"yWindow/settings.ini", QSettings::IniFormat}) {}
+    : settings_(QSettings{QString::fromStdString(Y_SETTINGS_PATH.string()),
+                          QSettings::IniFormat}) {}
 
 Settings* Settings::getInstance() {
   static Settings* instance;
