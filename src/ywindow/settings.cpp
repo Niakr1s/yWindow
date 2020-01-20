@@ -24,47 +24,58 @@ Settings* Settings::getInstance() {
 void Settings::sync() { settings_.sync(); }
 
 void Settings::loadYWindow(YWindow* w) {
+  settings_.beginGroup(YWINDOW_GROUP);
   w->setWindowTitle(TITLE);
-  w->setGeometry(
-      settings_.value(QSETTINGS_GEOMETRY, QRect(0, 0, 600, 100)).toRect());
+  w->setGeometry(settings_.value(GEOMETRY, QRect(0, 0, 600, 100)).toRect());
   w->setWindowOpacity(0.8);
-  w->setStyleSheet(default_style_sheet);
+  w->setStyleSheet(DEFAULT_STYLE_SHEET);
+  settings_.endGroup();
 }
 
 void Settings::saveYWindow(YWindow* w) {
-  settings_.setValue(QSETTINGS_GEOMETRY, w->geometry());
+  settings_.beginGroup(YWINDOW_GROUP);
+  settings_.setValue(GEOMETRY, w->geometry());
+  settings_.endGroup();
 }
 
 void Settings::loadTextView(QTextBrowser* w) {
+  settings_.beginGroup(TEXT_VIEW_GROUP);
   loadTextTranslationViewCommon(w);
+  settings_.endGroup();
 }
 
 void Settings::saveTextView(QTextBrowser* w) {
-  settings_.setValue(QSETTINGS_TEXT_FONT, w->font());
+  settings_.beginGroup(TEXT_VIEW_GROUP);
+  settings_.setValue(TEXT_FONT, w->font());
+  settings_.endGroup();
 }
 
 void Settings::loadTranslationView(QTextBrowser* w) {
+  settings_.beginGroup(TRANSLATION_VIEW_GROUP);
   loadTextTranslationViewCommon(w);
 
   w->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
   w->setMaximumHeight(400);
   w->resize(400, 200);
+  settings_.endGroup();
 }
 
 void Settings::saveTranslationView(QTextBrowser* w) {
-  settings_.setValue(QSETTINGS_TRANSLATION_FONT, w->font());
+  settings_.beginGroup(TRANSLATION_VIEW_GROUP);
+  settings_.setValue(TRANSLATION_FONT, w->font());
+  settings_.endGroup();
 }
 
 void Settings::loadTranslatorsSettingsView(TranslatorsSettingsView* w) {
-  w->setGeometry(
-      settings_
-          .value(QSETTINGS_TRANSLATORS_SETTINGS_VIEW_GEOMETRY, w->geometry())
-          .toRect());
+  settings_.beginGroup(TRANSLATORS_SETTINGS_VIEW_GROUP);
+  w->setGeometry(settings_.value(GEOMETRY, w->geometry()).toRect());
+  settings_.endGroup();
 }
 
 void Settings::saveTranslatorsSettingsView(TranslatorsSettingsView* w) {
-  settings_.setValue(QSETTINGS_TRANSLATORS_SETTINGS_VIEW_GEOMETRY,
-                     w->geometry());
+  settings_.beginGroup(TRANSLATORS_SETTINGS_VIEW_GROUP);
+  settings_.setValue(GEOMETRY, w->geometry());
+  settings_.endGroup();
 }
 
 void Settings::loadTextTranslationViewCommon(QTextBrowser* w) {
@@ -78,7 +89,7 @@ void Settings::loadTextTranslationViewCommon(QTextBrowser* w) {
   w->setMouseTracking(true);
 
   w->setWindowOpacity(0.8);
-  w->setStyleSheet(default_style_sheet);
+  w->setStyleSheet(DEFAULT_STYLE_SHEET);
 
   auto pal = w->palette();
   pal.setColor(QPalette::Text, Qt::lightGray);

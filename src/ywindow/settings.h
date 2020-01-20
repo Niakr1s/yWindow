@@ -31,14 +31,17 @@ class Settings {
  private:
   Settings();
   const QString TITLE = "yWindow";
-  const QString default_style_sheet = "background: black; color: lightGray;";
 
-  const QString QSETTINGS_GEOMETRY = "geometry";
-  const QString QSETTINGS_TEXT_FONT = "text_font";
-  const QString QSETTINGS_TRANSLATION_FONT = "translation_font";
+  const QString DEFAULT_STYLE_SHEET = "background: black; color: lightGray;";
 
-  const QString QSETTINGS_TRANSLATORS_SETTINGS_VIEW_GEOMETRY =
-      "translators_settings_geometry";
+  const QString GEOMETRY = "geometry";
+  const QString TEXT_FONT = "text_font";
+  const QString TRANSLATION_FONT = "translation_font";
+
+  const QString YWINDOW_GROUP = "yWindow";
+  const QString TEXT_VIEW_GROUP = "text_view";
+  const QString TRANSLATION_VIEW_GROUP = "translation_view";
+  const QString TRANSLATORS_SETTINGS_VIEW_GROUP = "translators_settings_view";
 
   QSettings settings_;
 
