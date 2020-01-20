@@ -18,6 +18,11 @@ namespace fs = std::filesystem;
 
 namespace dict {
 
+extern const std::string YOMI_TRANSLATOR_INFO;
+extern const std::string DEINFLECT_TRANSLATOR_INFO;
+extern const std::string USER_TRANSLATOR_INFO;
+extern const std::string CHAIN_TRANSLATOR_INFO;
+
 class Translator {
   friend class ChainTranslator;
 
@@ -101,7 +106,7 @@ class YomiTranslator : public DirectoryTranslator<YomiDictionary> {
  public:
   YomiTranslator(const fs::path& root_dir, Translator* deinflector = nullptr);
 
-  std::string info() const override { return "YomiTranslator"; }
+  std::string info() const override { return YOMI_TRANSLATOR_INFO; }
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
@@ -112,7 +117,7 @@ class DeinflectTranslator : public DirectoryTranslator<DeinflectDictionary> {
  public:
   DeinflectTranslator(const fs::path& root_dir);
 
-  std::string info() const override { return "DeinflectTranslator"; }
+  std::string info() const override { return DEINFLECT_TRANSLATOR_INFO; }
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
@@ -122,7 +127,7 @@ class UserTranslator : public DirectoryTranslator<UserDictionary> {
  public:
   UserTranslator(const fs::path& root_dir);
 
-  std::string info() const override { return "UserTranslator"; }
+  std::string info() const override { return USER_TRANSLATOR_INFO; }
 
  protected:
   TranslationResult doTranslate(const std::string& str) override;
@@ -134,7 +139,7 @@ class ChainTranslator : public Translator {
   ChainTranslator();
   ChainTranslator(std::initializer_list<Translator*> translators);
 
-  std::string info() const override { return "ChainTranslator"; }
+  std::string info() const override { return CHAIN_TRANSLATOR_INFO; }
 
   void addTranslator(Translator* transl);
   void popTranslator();

@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <future>
 
+#include "paths.h"
 #include "texttohtml.h"
 
 TextModel::TextModel(QObject *parent) : QObject(parent) {}
@@ -54,6 +55,10 @@ void TextModel::reloadDicts() {
     doReloadDicts();
     emit translatorSettingsChanged();
   }).detach();
+}
+
+void TextModel::addUserDictionary(const QString &filename) {
+  doAddUserDictionary(filename);
 }
 
 std::shared_ptr<dict::TranslatorsSettings> DefaultModel::translators_settings()
@@ -125,3 +130,15 @@ void DefaultModel::doSetTranslatorSettings(
 }
 
 void DefaultModel::doReloadDicts() { translator_->reload(); }
+
+void DefaultModel::doAddUserDictionary(const QString &filename) {
+  std::ofstream os(filename.toStdString());
+  os << R"(# Example usage, just uncomment line. ", meaning" part is optional.
+# word = reading, meaning
+)";
+  os.close();
+
+  emit userDictionaryCreated(filename);
+
+  reloadDicts();
+}

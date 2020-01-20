@@ -377,3 +377,8 @@ void dict::ChainTranslator::doUpdateTranslatorsSettings() {
     t->doUpdateTranslatorsSettings();
   }
 }
+
+const std::string dict::YOMI_TRANSLATOR_INFO = "YomiTranslator";
+const std::string dict::DEINFLECT_TRANSLATOR_INFO = "DeinflectTranslator";
+const std::string dict::USER_TRANSLATOR_INFO = "UserTranslator";
+const std::string dict::CHAIN_TRANSLATOR_INFO = "ChainTranslator";

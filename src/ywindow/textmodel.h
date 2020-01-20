@@ -4,10 +4,13 @@
 #include <QObject>
 #include <QPoint>
 #include <deque>
+#include <filesystem>
 
 #include "card.h"
 #include "translationresult.h"
 #include "translator.h"
+
+namespace fs = std::filesystem;
 
 class TextModel : public QObject {
   Q_OBJECT
@@ -32,11 +35,13 @@ class TextModel : public QObject {
   void gotTranslationLength(int length);
   void cancelTranslation();
   void translatorSettingsChanged();
+  void userDictionaryCreated(const QString& filename);
 
  public slots:
   void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
   void addText(QString text);
   void reloadDicts();
+  void addUserDictionary(const QString& filename);
 
  protected:
   std::pair<int, int> last_pos_ = {-1, -1};
@@ -52,6 +57,7 @@ class TextModel : public QObject {
   virtual void doSetTranslatorSettings(
       std::shared_ptr<dict::TranslatorsSettings> translators_settings) = 0;
   virtual void doReloadDicts() = 0;
+  virtual void doAddUserDictionary(const QString& filename) = 0;
 };
 
 class DefaultModel : public TextModel {
@@ -73,6 +79,7 @@ class DefaultModel : public TextModel {
   void doSetTranslatorSettings(
       std::shared_ptr<dict::TranslatorsSettings> translators_settings) override;
   void doReloadDicts() override;
+  void doAddUserDictionary(const QString& filename) override;
 
  private:
   const size_t max_size_ = 10;

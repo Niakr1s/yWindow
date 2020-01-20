@@ -4,7 +4,10 @@
 #include <QObject>
 #include <QPoint>
 #include <QString>
+#include <filesystem>
 #include <string>
+
+namespace fs = std::filesystem;
 
 class TextModel;
 
@@ -26,6 +29,7 @@ class TextController : public QObject {
                    bool with_shift);
   void needReloadDicts();
   void needShowTranslatorsSettingsView();
+  void needAddUserDictionary(const QString& filename);
 
  protected:
   TextModel* model_;

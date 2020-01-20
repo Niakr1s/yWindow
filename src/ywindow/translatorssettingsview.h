@@ -3,23 +3,33 @@
 
 #include <QPushButton>
 #include <QTableWidget>
+#include <filesystem>
 
 #include "textcontroller.h"
 #include "textmodel.h"
 #include "translator.h"
 
+namespace fs = std::filesystem;
+
 class TranslatorsSettingsView : public QWidget {
+  Q_OBJECT
+
  public:
   TranslatorsSettingsView(QWidget* parent = nullptr);
 
   void setModel(TextModel* model);
   void setController(TextController* controller);
 
+ signals:
+  void needAddUserDictionary(const QString& filename);
+
  public slots:
   void show();
   void redraw();
 
   void tableItemClicked(QTableWidgetItem* item);
+  void addUserDictionary();
+  void openUserDictionary(const QString& filename);
 
  private:
   TextModel* model_;

@@ -25,4 +25,6 @@ void TextController::setModel(TextModel *model) {
   connect(this, &TextController::charHovered, model_, &TextModel::translate);
   connect(this, &TextController::needReloadDicts, model_,
           &TextModel::reloadDicts);
+  connect(this, &TextController::needAddUserDictionary, model_,
+          &TextModel::addUserDictionary);
 }

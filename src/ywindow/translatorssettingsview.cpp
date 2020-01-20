@@ -2,9 +2,20 @@
 
 #include <QButtonGroup>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QErrorMessage>
 #include <QHeaderView>
+#include <QInputDialog>
+#include <QMessageBox>
 #include <QScrollBar>
+#include <QUrl>
 #include <QVBoxLayout>
+#include <filesystem>
+
+#include "paths.h"
+#include "translator.h"
+
+namespace fs = std::filesystem;
 
 TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
     : QWidget(parent) {
@@ -20,6 +31,8 @@ TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
   vbox->addLayout(button_hbox);
 
   new_dict_btn_ = new QPushButton(tr("New dict"));
+  connect(new_dict_btn_, &QPushButton::clicked, this,
+          &TranslatorsSettingsView::addUserDictionary);
 
   reload_btn_ = new QPushButton(tr("Reload"));
 
@@ -31,12 +44,16 @@ void TranslatorsSettingsView::setModel(TextModel *model) {
   model_ = model;
   connect(model_, &TextModel::translatorSettingsChanged, this,
           &TranslatorsSettingsView::redraw);
+  connect(model_, &TextModel::userDictionaryCreated, this,
+          &TranslatorsSettingsView::openUserDictionary);
 }
 
 void TranslatorsSettingsView::setController(TextController *controller) {
   controller_ = controller;
   connect(reload_btn_, &QPushButton::clicked, controller_,
           &TextController::needReloadDicts);
+  connect(this, &TranslatorsSettingsView::needAddUserDictionary, controller_,
+          &TextController::needAddUserDictionary);
   connect(controller_, &TextController::needShowTranslatorsSettingsView, this,
           &TranslatorsSettingsView::show);
 }
@@ -91,6 +108,45 @@ void TranslatorsSettingsView::tableItemClicked(QTableWidgetItem *item) {
   auto enabled = item->checkState();
   model_->translators_settings()->moveDictionary(transl_info, dict_info,
                                                  enabled);
+}
+
+void TranslatorsSettingsView::addUserDictionary() {
+  bool ok;
+  QString dict_filename =
+      QInputDialog::getText(this, tr("New dictionary dialog"), tr("Dict name:"),
+                            QLineEdit::Normal, QString(), &ok);
+
+  if (ok && !dict_filename.isEmpty()) {
+    fs::path path(dict_filename.toStdString());
+    path = path.stem();
+    path.replace_extension(".txt");
+    path = Y_USER_DICTS_PATH / path;
+
+    bool is_in = model_->translators_settings()->isIn(
+        dict::USER_TRANSLATOR_INFO, path.string());
+    if (is_in) {
+      auto btn = QMessageBox::warning(
+          this, tr("Warning"),
+          QString(tr("%1 is already exists. "
+                     "This operation will completely erase "
+                     "data in it. Are you sure?")
+                      .arg(QString::fromStdString(path.string()))),
+          QMessageBox::Ok | QMessageBox::Cancel);
+      if (btn == QMessageBox::Ok) {
+        emit needAddUserDictionary(QString::fromStdString(path.string()));
+      }
+    } else {
+      emit needAddUserDictionary(QString::fromStdString(path.string()));
+    }
+  } else {
+    QMessageBox::critical(this, tr("Error"),
+                          QString(tr("Something went wrong.")),
+                          QMessageBox::Ok);
+  }
+}
+
+void TranslatorsSettingsView::openUserDictionary(const QString &filename) {
+  QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
 }
 
 QVector<QTableWidgetItem *> TranslatorsSettingsView::makeRow(

@@ -28,6 +28,7 @@
     translatorssettingsview.h
     translatorssettingsview.cpp
     paths.h
+    paths.cpp
 )
 
 set(CMAKE_AUTOMOC ON)
