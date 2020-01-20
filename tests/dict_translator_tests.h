@@ -83,4 +83,42 @@ TEST(usertranslator, test1) {
   ASSERT_EQ(res.chunks()[2]->originText(), "1");
 }
 
+TEST(translator, reload1) {
+  fs::path tmp{"data/tmp"};
+  fs::remove_all(tmp);
+  fs::copy("data/user", tmp);
+  auto de = new UserTranslator(tmp);
+  auto res = de->translate("Niakr1s#2");
+  ASSERT_EQ(res.chunks().size(), 3);
+  ASSERT_EQ(res.chunks()[0]->originText(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[1]->originText(), "#");
+  ASSERT_EQ(res.chunks()[2]->originText(), "2");
+  ASSERT_FALSE(res.chunks()[2]->translated());
+
+  {
+    std::ofstream os{tmp / "tmp.txt"};
+    os << "2 = two";
+  }
+
+  res = de->translate("Niakr1s#2");
+  ASSERT_EQ(res.chunks().size(), 3);
+  ASSERT_EQ(res.chunks()[0]->originText(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[1]->originText(), "#");
+  ASSERT_EQ(res.chunks()[2]->originText(), "2");
+  ASSERT_TRUE(res.chunks()[2]->translated());
+  ASSERT_EQ(res.chunks()[2]->translations().front()->reading(), "two");
+
+  {
+    std::ofstream os{tmp / "tmp.txt"};
+    os << "2 = second";
+  }
+
+  res = de->translate("Niakr1s#2");
+  ASSERT_EQ(res.chunks().size(), 3);
+  ASSERT_EQ(res.chunks()[0]->originText(), "Niakr1s");
+  ASSERT_EQ(res.chunks()[1]->originText(), "#");
+  ASSERT_EQ(res.chunks()[2]->originText(), "2");
+  ASSERT_EQ(res.chunks()[2]->translations().front()->reading(), "second");
+}
+
 #endif  // DICT_TRANSLATOR_TESTS_H
