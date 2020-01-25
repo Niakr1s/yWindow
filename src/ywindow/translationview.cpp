@@ -21,7 +21,7 @@ void TranslationView::setModel(TextModel* model) {
   connect(model_, &TextModel::gotTranslation, this,
           &TranslationView::displayTranslation);
   connect(model_, &TextModel::cancelTranslation, this,
-          &TranslationView::cancelTranslation);
+          &TranslationView::hideTranslation);
 }
 
 void TranslationView::setController(TextController* controller) {
@@ -29,7 +29,7 @@ void TranslationView::setController(TextController* controller) {
   connect(controller_, &TextController::needMoveTranslationView, this,
           &TranslationView::move);
   connect(controller_, &TextController::needHideTranslationView, this,
-          &TranslationView::cancelTranslation);
+          &TranslationView::hideTranslation);
 }
 
 void DefaultTranslationView::move(QPoint pos) {
@@ -45,15 +45,15 @@ void TranslationView::displayTranslation(
   return doDisplayTranslation(translation);
 }
 
-void TranslationView::cancelTranslation() {
+void TranslationView::hideTranslation() {
   if (active_) {
     active_ = false;
-    return doCancelTranslation();
+    return doHideTranslation();
   }
 }
 
 void DefaultTranslationView::leaveEvent(QEvent* event) {
-  doCancelTranslation();
+  doHideTranslation();
   event->ignore();
 }
 
@@ -90,7 +90,7 @@ void DefaultTranslationView::doDisplayTranslation(
   show();
 }
 
-void DefaultTranslationView::doCancelTranslation() {
+void DefaultTranslationView::doHideTranslation() {
   qDebug() << "Cancel translation timer started";
   QTimer* auto_hide_timer = new QTimer(this);
   auto_hide_timer->setSingleShot(true);

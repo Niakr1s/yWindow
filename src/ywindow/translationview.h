@@ -22,7 +22,7 @@ class TranslationView : public QTextBrowser {
  public slots:
   virtual void move(QPoint pos) = 0;
   void displayTranslation(dict::TranslationChunkPtr translation);
-  void cancelTranslation();
+  void hideTranslation();
 
  protected:
   TextModel* model_;
@@ -30,7 +30,7 @@ class TranslationView : public QTextBrowser {
   bool active_ = false;
 
   virtual void doDisplayTranslation(dict::TranslationChunkPtr translation) = 0;
-  virtual void doCancelTranslation() = 0;
+  virtual void doHideTranslation() = 0;
 };
 
 class DefaultTranslationView : public TranslationView {
@@ -47,7 +47,7 @@ class DefaultTranslationView : public TranslationView {
 
  protected:
   void doDisplayTranslation(dict::TranslationChunkPtr translation) override;
-  void doCancelTranslation() override;
+  void doHideTranslation() override;
 
   void leaveEvent(QEvent* event) override;
 
