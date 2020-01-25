@@ -21,8 +21,8 @@ TEST(translator_states, test2) {
   chain.addTranslator(new UserTranslator("data/user"));
   chain.addTranslator(new DeinflectTranslator("data/deinflect"));
   chain.addTranslator(new YomiTranslator("data/yomi"));
-  chain.setTranslatorsSettings(
-      std::make_shared<TranslatorsSettings>(json_path));
+  auto translators_settings = std::make_shared<TranslatorsSettings>(json_path);
+  chain.setTranslatorsSettings(translators_settings);
 
   Json::Value root;
   std::ifstream is(json_path);
@@ -30,14 +30,17 @@ TEST(translator_states, test2) {
 
   ASSERT_EQ(root.size(), 3);
   ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
-  ASSERT_EQ(root[0]["enabled"].size(), 1);
-  ASSERT_TRUE(root[0]["disabled"].empty());
+  ASSERT_EQ(root[0]["dictionaries"].size(), 1);
+  ASSERT_TRUE(root[0]["dictionaries"][0]["enabled"].asBool());
+
   ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
-  ASSERT_EQ(root[1]["enabled"].size(), 1);
-  ASSERT_TRUE(root[1]["disabled"].empty());
+  ASSERT_EQ(root[1]["dictionaries"].size(), 1);
+  ASSERT_TRUE(root[1]["dictionaries"][0]["enabled"].asBool());
+
   ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
-  ASSERT_EQ(root[2]["disabled"].size(), 2);
-  ASSERT_TRUE(root[2]["enabled"].empty());
+  ASSERT_EQ(root[2]["dictionaries"].size(), 2);
+  ASSERT_FALSE(root[2]["dictionaries"][0]["enabled"].asBool());
+  ASSERT_FALSE(root[2]["dictionaries"][1]["enabled"].asBool());
 }
 
 TEST(translator_states, test1) {
@@ -57,14 +60,15 @@ TEST(translator_states, test1) {
 
   ASSERT_EQ(root.size(), 3);
   ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
-  ASSERT_EQ(root[0]["enabled"].size(), 1);
-  ASSERT_TRUE(root[0]["disabled"].empty());
+  ASSERT_EQ(root[0]["dictionaries"].size(), 1);
+  ASSERT_TRUE(root[0]["dictionaries"][0]["enabled"].asBool());
+
   ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
-  ASSERT_EQ(root[1]["enabled"].size(), 1);
-  ASSERT_TRUE(root[1]["disabled"].empty());
+  ASSERT_EQ(root[1]["dictionaries"].size(), 1);
+  ASSERT_TRUE(root[1]["dictionaries"][0]["enabled"].asBool());
+
   ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
-  ASSERT_EQ(root[2]["enabled"].size(), 2);
-  ASSERT_TRUE(root[2]["disabled"].empty());
+  ASSERT_EQ(root[2]["dictionaries"].size(), 2);
 }
 
 TEST(translator_states, test3) {
@@ -100,14 +104,13 @@ TEST(translator_states, test3) {
 
     ASSERT_EQ(root.size(), 3);
     ASSERT_EQ(root[0]["translator_info"].asString(), "DeinflectTranslator");
-    ASSERT_EQ(root[0]["enabled"].size(), 1);
-    ASSERT_TRUE(root[0]["disabled"].empty());
+    ASSERT_EQ(root[0]["dictionaries"].size(), 1);
+
     ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
-    ASSERT_EQ(root[1]["enabled"].size(), 1);
-    ASSERT_TRUE(root[1]["disabled"].empty());
+    ASSERT_EQ(root[1]["dictionaries"].size(), 1);
+
     ASSERT_EQ(root[2]["translator_info"].asString(), "YomiTranslator");
-    ASSERT_EQ(root[2]["enabled"].size(), 2);
-    ASSERT_TRUE(root[2]["disabled"].empty());
+    ASSERT_EQ(root[2]["dictionaries"].size(), 2);
   };
 
   assert_initial();
@@ -125,8 +128,7 @@ TEST(translator_states, test3) {
     is >> root;
 
     ASSERT_EQ(root[1]["translator_info"].asString(), "UserTranslator");
-    ASSERT_EQ(root[1]["enabled"].size(), 3);
-    ASSERT_TRUE(root[1]["disabled"].empty());
+    ASSERT_EQ(root[1]["dictionaries"].size(), 3);
   }
 
   remove_tmp_dicts();

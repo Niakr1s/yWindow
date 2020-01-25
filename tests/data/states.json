@@ -1,24 +1,36 @@
 [
 	{
 		"translator_info" : "DeinflectTranslator",
-		"enabled" : 
+		"dictionaries" : 
 		[
-			"deinflect.json"
+			{
+				"dictionary_info": "deinflect.json",
+				"enabled": true
+			}
 		]
 	},
 	{
 		"translator_info" : "UserTranslator",
-		"enabled" : 
+		"dictionaries":
 		[
-			"user.txt"
+			{
+				"dictionary_info": "user.txt",
+				"enabled": true
+			}
 		]
 	},
 	{
 		"translator_info" : "YomiTranslator",
-		"disabled" : 
+		"dictionaries":
 		[
-			"JMdict (English)",
-			"KANJIDIC (English)"
+			{
+				"dictionary_info": "JMdict (English)",
+				"enabled": false
+			},
+			{
+				"dictionary_info": "KANJIDIC (English)",
+				"enabled": false
+			}
 		]
 	}
 ]

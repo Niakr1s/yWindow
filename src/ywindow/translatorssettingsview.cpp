@@ -66,16 +66,10 @@ void TranslatorsSettingsView::redraw() {
 
   int current_row = 0;
   auto &settings = ts->settings();
-  for (auto &[trans_info, dict_settings] : settings) {
-    for (auto &dict_info : dict_settings.enabled) {
-      QVector<QTableWidgetItem *> items = makeRow(trans_info, dict_info, true);
-      for (int col = 0; col != COLS; ++col) {
-        table_->setItem(current_row, col, items[col]);
-      }
-      ++current_row;
-    }
-    for (auto &dict_info : dict_settings.disabled) {
-      auto items = makeRow(trans_info, dict_info, false);
+  for (auto &[trans_info, dicts] : settings) {
+    for (auto &dict : dicts) {
+      QVector<QTableWidgetItem *> items =
+          makeRow(trans_info, dict.dictionary_info, dict.enabled);
       for (int col = 0; col != COLS; ++col) {
         table_->setItem(current_row, col, items[col]);
       }

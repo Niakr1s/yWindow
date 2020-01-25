@@ -11,8 +11,22 @@ namespace dict {
 
 class Translator;
 
-struct DictionarySettings {
-  std::set<std::string> enabled, disabled;
+struct DictionaryInfo {
+  std::string dictionary_info;
+  bool enabled;
+  fs::path path;
+
+  inline bool operator==(const DictionaryInfo& rhs) const {
+    return dictionary_info == rhs.dictionary_info;
+  }
+
+  inline bool operator==(const std::string& rhs) const {
+    return dictionary_info == rhs;
+  }
+
+  inline bool operator<(const DictionaryInfo& rhs) const {
+    return dictionary_info < rhs.dictionary_info;
+  }
 };
 
 class TranslatorsSettings {
@@ -30,6 +44,9 @@ class TranslatorsSettings {
                const std::string& dictionary_info);
 
   // don't forget to saveJson in the end
+  void addDictionary(const std::string& translator_info,
+                     const std::string& dictionary_info, const fs::path& path,
+                     bool enabled = true);
   void enableDictionary(const std::string& translator_info,
                         const std::string& dictionary_info);
   void disableDictionary(const std::string& translator_info,
@@ -39,6 +56,10 @@ class TranslatorsSettings {
   void deleteDictionary(const std::string& translator_info,
                         const std::string& dictionary_info);
 
+  void updateDictionaryPath(const std::string& translator_info,
+                            const std::string& dictionary_info,
+                            const fs::path& path);
+
   // deletes dictionaries NOT IN dictionary_infos
   void deleteOtherDictionaries(const std::string& translator_info,
                                const std::set<std::string>& dictionary_infos);
@@ -46,12 +67,12 @@ class TranslatorsSettings {
 
   int size() const;
 
-  const std::map<std::string, DictionarySettings>& settings() const;
+  const std::map<std::string, std::set<DictionaryInfo>>& settings() const;
 
  private:
   fs::path json_file_;
   fs::file_time_type last_write_time_;
-  std::map<std::string, DictionarySettings> settings_;
+  std::map<std::string, std::set<DictionaryInfo>> settings_;
 
   const std::string ENABLED = "enabled";
   const std::string DISABLED = "disabled";
@@ -61,6 +82,9 @@ class TranslatorsSettings {
 
   bool isIn(const std::string& dictionary_info,
             const std::set<std::string>& vec);
+
+  DictionaryInfo& findDictionaryInfo(const std::string& translator_info,
+                                     const std::string& dictionary_info);
 };
 
 }  // namespace dict

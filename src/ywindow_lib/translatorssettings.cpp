@@ -3,6 +3,7 @@
 #include <json/json.h>
 
 #include <fstream>
+#include <iostream>
 
 dict::TranslatorsSettings::TranslatorsSettings(
     const std::filesystem::path &json_file)
@@ -21,8 +22,8 @@ dict::TranslatorsSettings::~TranslatorsSettings() { saveJson(); }
 bool dict::TranslatorsSettings::isEnabled(const std::string &translator_info,
                                           const std::string &dictionary_info) {
   try {
-    auto &state = settings_.at(translator_info);
-    return isIn(dictionary_info, state.enabled);
+    auto info = findDictionaryInfo(translator_info, dictionary_info);
+    return info.enabled;
   } catch (std::out_of_range &) {
     return false;
   }
@@ -31,8 +32,8 @@ bool dict::TranslatorsSettings::isEnabled(const std::string &translator_info,
 bool dict::TranslatorsSettings::isDisabled(const std::string &translator_info,
                                            const std::string &dictionary_info) {
   try {
-    auto &state = settings_.at(translator_info);
-    return isIn(dictionary_info, state.disabled);
+    auto info = findDictionaryInfo(translator_info, dictionary_info);
+    return !info.enabled;
   } catch (std::out_of_range &) {
     return false;
   }
@@ -50,6 +51,20 @@ bool dict::TranslatorsSettings::isNotIn(const std::string &translator_info,
          !isDisabled(translator_info, dictionary_info);
 }
 
+void dict::TranslatorsSettings::addDictionary(
+    const std::string &translator_info, const std::string &dictionary_info,
+    const fs::path &path, bool enabled) {
+  DictionaryInfo info;
+  info.dictionary_info = dictionary_info;
+  info.path = path;
+  info.enabled = enabled;
+
+  settings_[translator_info].insert(info);
+
+  std::cout << "added dictionary: " << translator_info << ", "
+            << dictionary_info << ", enabled: " << enabled << std::endl;
+}
+
 bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
                                      const std::set<std::string> &vec) {
   if (std::find(vec.cbegin(), vec.cend(), dictionary_info) != vec.cend()) {
@@ -58,16 +73,37 @@ bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
   return false;
 }
 
+dict::DictionaryInfo &dict::TranslatorsSettings::findDictionaryInfo(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  auto &set = settings_.at(translator_info);
+  for (auto &info : set) {
+    if (info.dictionary_info == dictionary_info) {
+      return const_cast<DictionaryInfo &>(info);
+    }
+  }
+  throw(std::out_of_range("Not found dictionary info"));
+}
+
 void dict::TranslatorsSettings::enableDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
-  settings_[translator_info].disabled.erase(dictionary_info);
-  settings_[translator_info].enabled.insert(dictionary_info);
+  try {
+    auto &info = findDictionaryInfo(translator_info, dictionary_info);
+    info.enabled = true;
+    std::cout << "enabled dictionary: " << translator_info << ", "
+              << dictionary_info;
+  } catch (...) {
+  }
 }
 
 void dict::TranslatorsSettings::disableDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
-  settings_[translator_info].enabled.erase(dictionary_info);
-  settings_[translator_info].disabled.insert(dictionary_info);
+  try {
+    auto &info = findDictionaryInfo(translator_info, dictionary_info);
+    info.enabled = false;
+    std::cout << "disabled dictionary: " << translator_info << ", "
+              << dictionary_info << std::endl;
+  } catch (...) {
+  }
 }
 
 void dict::TranslatorsSettings::moveDictionary(
@@ -82,8 +118,24 @@ void dict::TranslatorsSettings::moveDictionary(
 
 void dict::TranslatorsSettings::deleteDictionary(
     const std::string &translator_info, const std::string &dictionary_info) {
-  settings_[translator_info].enabled.erase(dictionary_info);
-  settings_[translator_info].disabled.erase(dictionary_info);
+  try {
+    auto &infos = settings_.at(translator_info);
+    auto found = std::find(std::begin(infos), std::end(infos), dictionary_info);
+    if (found != std::end(infos)) {
+      settings_[translator_info].erase(found);
+    }
+  } catch (...) {
+  }
+}
+
+void dict::TranslatorsSettings::updateDictionaryPath(
+    const std::string &translator_info, const std::string &dictionary_info,
+    const fs::path &path) {
+  try {
+    auto &dict_info = findDictionaryInfo(translator_info, dictionary_info);
+    dict_info.path = path;
+  } catch (...) {
+  }
 }
 
 void dict::TranslatorsSettings::deleteOtherDictionaries(
@@ -91,22 +143,35 @@ void dict::TranslatorsSettings::deleteOtherDictionaries(
     const std::set<std::string> &dictionary_infos) {
   std::set<std::string> to_delete;
 
-  auto fill = [&](const std::set<std::string> &from) {
-    for (auto &dict_info : from) {
-      if (dictionary_infos.find(dict_info) ==
-          dictionary_infos.end()) {  // if not in
-        to_delete.insert(dict_info);
-      }
+  auto infos = settings_[translator_info];
+  for (auto &dict_info : infos) {
+    if (dictionary_infos.find(dict_info.dictionary_info) ==
+        dictionary_infos.end()) {  // if not in
+      to_delete.insert(dict_info.dictionary_info);
     }
-  };
-
-  fill(settings_[translator_info].enabled);
-  fill(settings_[translator_info].disabled);
+  }
 
   for (auto &dict_info : to_delete) {
     deleteDictionary(translator_info, dict_info);
   }
 }
+
+/*
+[
+    {
+        "translator_info": "DeinflectTranslator",
+        "dictionaries": [{
+            "dictionary_info": "deinflect.json",
+            "path": "data/blabla1",
+            "enabled": true
+        }, {
+            "dictionary_info": "other.json",
+            "path": "data/blabla2",
+            "enabled": false
+        }]
+    }
+]
+*/
 
 void dict::TranslatorsSettings::loadJson() {
   Json::Value root;
@@ -114,47 +179,43 @@ void dict::TranslatorsSettings::loadJson() {
   is >> root;
   if (root.empty()) return;
   for (int i = 0; i != root.size(); ++i) {
-    DictionarySettings state;
     std::string translator_info = root[i].get("translator_info", "").asString();
     if (translator_info.empty()) continue;
 
-    Json::Value &enabled = root[i][ENABLED];
-    Json::Value &disabled = root[i][DISABLED];
+    Json::Value &dictionaries = root[i]["dictionaries"];
 
-    if (!enabled.empty()) {
-      for (int j = 0; j != enabled.size(); ++j) {
-        state.enabled.insert(enabled[j].asString());
-      }
+    for (int j = 0; j != dictionaries.size(); ++j) {
+      std::string dictionary_info =
+          dictionaries[j].get("dictionary_info", "").asString();
+      fs::path path = dictionaries[j].get("path", "").asString();
+      bool enabled = dictionaries[j].get("enabled", true).asBool();
+
+      DictionaryInfo dict_info;
+      dict_info.dictionary_info = dictionary_info;
+      dict_info.path = path;
+      dict_info.enabled = enabled;
+
+      settings_[translator_info].insert(dict_info);
     }
-    if (!disabled.empty()) {
-      for (int j = 0; j != disabled.size(); ++j) {
-        state.disabled.insert(disabled[j].asString());
-      }
-    }
-    settings_[translator_info] = state;
   }
 }
 
 void dict::TranslatorsSettings::saveJson() {
   Json::Value root;
-  for (auto &[translator_info, state] : settings_) {
-    Json::Value item;
-    item["translator_info"] = translator_info;
-    Json::Value enabled, disabled;
+  for (auto &[translator_info, dict_infos] : settings_) {
+    Json::Value translator;
+    translator["translator_info"] = translator_info;
 
-    for (auto &it : state.enabled) {
-      enabled.append(it);
+    Json::Value &dicts = translator["dictionaries"];
+
+    for (auto &dict_info : dict_infos) {
+      Json::Value dict;
+      dict["dictionary_info"] = dict_info.dictionary_info;
+      dict["path"] = dict_info.path.string();
+      dict["enabled"] = dict_info.enabled;
+      dicts.append(dict);
     }
-    for (auto &it : state.disabled) {
-      disabled.append(it);
-    }
-    if (!enabled.empty()) {
-      item[ENABLED] = enabled;
-    }
-    if (!disabled.empty()) {
-      item[DISABLED] = disabled;
-    }
-    root.append(item);
+    root.append(translator);
   }
   {
     std::ofstream os(json_file_);
@@ -166,12 +227,12 @@ void dict::TranslatorsSettings::saveJson() {
 int dict::TranslatorsSettings::size() const {
   int res = 0;
   for (auto &[_, dict_settings] : settings_) {
-    res += dict_settings.enabled.size() + dict_settings.disabled.size();
+    res += dict_settings.size();
   }
   return res;
 }
 
-const std::map<std::string, dict::DictionarySettings>
+const std::map<std::string, std::set<dict::DictionaryInfo>>
     &dict::TranslatorsSettings::settings() const {
   return settings_;
 }

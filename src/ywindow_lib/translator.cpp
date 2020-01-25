@@ -82,7 +82,9 @@ void dict::DirectoryTranslator<Dict>::doUpdateTranslatorsSettings() {
 
   for (auto &[dir, dict] : dicts_) {
     if (translators_settings_->isNotIn(info(), *dict->info())) {
-      translators_settings_->enableDictionary(info(), *dict->info());
+      translators_settings_->addDictionary(info(), *dict->info(), dir);
+    } else {
+      translators_settings_->updateDictionaryPath(info(), *dict->info(), dir);
     }
   }
 
