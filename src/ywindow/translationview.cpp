@@ -96,7 +96,7 @@ void DefaultTranslationView::doHideDelayed() {
   auto_hide_timer->setSingleShot(true);
   connect(auto_hide_timer, &QTimer::timeout, this,
           &DefaultTranslationView::tryHideOnTimer);
-  auto_hide_timer->start(2000);
+  auto_hide_timer->start(500);
 }
 
 QRect DefaultTranslationView::fittedToDisplay(const QRect& rect) {
