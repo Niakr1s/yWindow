@@ -13,6 +13,18 @@
 
 namespace fs = std::filesystem;
 
+class PathAction : public QAction {
+ public:
+  using QAction::QAction;
+
+  QString path() const;
+  void setPath(const QString& path);
+  void setPath(const fs::path& path);
+
+ private:
+  QString path_;
+};
+
 class TranslatorsSettingsView : public QWidget {
   Q_OBJECT
 
@@ -31,7 +43,8 @@ class TranslatorsSettingsView : public QWidget {
 
   void tableItemClicked(QTableWidgetItem* item);
   void addUserDictionary();
-  void openUserDictionary(const QString& filename);
+  void openUserDictionary(const QString& path);
+  void openHoveredDictionary();
 
   void showMenu(QPoint pos);
 
@@ -42,6 +55,7 @@ class TranslatorsSettingsView : public QWidget {
   QPushButton *new_dict_btn_, *reload_btn_;
 
   QMenu* menu_;
+  PathAction* open_dict_;
 
   const int COLS = 3;
 

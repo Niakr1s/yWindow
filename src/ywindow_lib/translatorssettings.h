@@ -60,6 +60,9 @@ class TranslatorsSettings {
                             const std::string& dictionary_info,
                             const fs::path& path);
 
+  fs::path getDictionaryPath(const std::string& translator_info,
+                             const std::string& dictionary_info);
+
   // deletes dictionaries NOT IN dictionary_infos
   void deleteOtherDictionaries(const std::string& translator_info,
                                const std::set<std::string>& dictionary_infos);

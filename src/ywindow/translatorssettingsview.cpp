@@ -124,13 +124,33 @@ void TranslatorsSettingsView::addUserDictionary() {
   }
 }
 
-void TranslatorsSettingsView::openUserDictionary(const QString &filename) {
-  QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
+void TranslatorsSettingsView::openUserDictionary(const QString &path) {
+  QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
+
+void TranslatorsSettingsView::openHoveredDictionary() {
+  openUserDictionary(open_dict_->path());
 }
 
 void TranslatorsSettingsView::showMenu(QPoint pos) {
-  menu_->move(mapToGlobal(pos));
-  menu_->show();
+  QPoint mapped_pos = table_->viewport()->mapFromParent(pos);
+  QTableWidgetItem *item = table_->itemAt(mapped_pos);
+
+  if (!item) return;
+
+  int row = item->row();
+  QString transl_info = table_->item(row, 0)->data(Qt::DisplayRole).toString();
+  QString dict_info = table_->item(row, 1)->data(Qt::DisplayRole).toString();
+
+  try {
+    auto path = model_->translators_settings()->getDictionaryPath(
+        transl_info.toStdString(), dict_info.toStdString());
+    open_dict_->setPath(path);
+
+    menu_->move(mapToGlobal(pos));
+    menu_->show();
+  } catch (...) {
+  }
 }
 
 QVector<QTableWidgetItem *> TranslatorsSettingsView::makeRow(
@@ -176,12 +196,20 @@ void TranslatorsSettingsView::initLayout() {
 void TranslatorsSettingsView::initMenu() {
   menu_ = new QMenu(this);
 
-  auto open_dict_ = new QAction(tr("Open dictionary"));
-  //  connect(open_dict_, &QAction::triggered, this,
-  //          &TextView::needShowTranslatorsSettingsView);
+  open_dict_ = new PathAction(tr("Open dictionary"));
+  connect(open_dict_, &QAction::triggered, this,
+          &TranslatorsSettingsView::openHoveredDictionary);
   menu_->addAction(open_dict_);
 
   setContextMenuPolicy(Qt::CustomContextMenu);
   connect(this, &TranslatorsSettingsView::customContextMenuRequested, this,
           &TranslatorsSettingsView::showMenu);
+}
+
+QString PathAction::path() const { return path_; }
+
+void PathAction::setPath(const QString &path) { path_ = path; }
+
+void PathAction::setPath(const std::filesystem::path &path) {
+  setPath(QString::fromStdString(path.string()));
 }

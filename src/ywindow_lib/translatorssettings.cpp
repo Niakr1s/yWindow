@@ -138,6 +138,12 @@ void dict::TranslatorsSettings::updateDictionaryPath(
   }
 }
 
+fs::path dict::TranslatorsSettings::getDictionaryPath(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  auto dict = findDictionaryInfo(translator_info, dictionary_info);
+  return dict.path;
+}
+
 void dict::TranslatorsSettings::deleteOtherDictionaries(
     const std::string &translator_info,
     const std::set<std::string> &dictionary_infos) {
