@@ -22,6 +22,7 @@ TranslatorsSettingsView::TranslatorsSettingsView(QWidget *parent)
   initButtons();
   initTable();
   initLayout();
+  initMenu();
 }
 
 void TranslatorsSettingsView::setModel(TextModel *model) {
@@ -133,6 +134,11 @@ void TranslatorsSettingsView::openUserDictionary(const QString &filename) {
   QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
 }
 
+void TranslatorsSettingsView::showMenu(QPoint pos) {
+  menu_->move(mapToGlobal(pos));
+  menu_->show();
+}
+
 QVector<QTableWidgetItem *> TranslatorsSettingsView::makeRow(
     const std::string &transl_info, const std::string &dict_info,
     bool enabled) {
@@ -171,4 +177,17 @@ void TranslatorsSettingsView::initLayout() {
 
   button_hbox->addWidget(new_dict_btn_);
   button_hbox->addWidget(reload_btn_);
+}
+
+void TranslatorsSettingsView::initMenu() {
+  menu_ = new QMenu(this);
+
+  auto open_dict_ = new QAction(tr("Open dictionary"));
+  //  connect(open_dict_, &QAction::triggered, this,
+  //          &TextView::needShowTranslatorsSettingsView);
+  menu_->addAction(open_dict_);
+
+  setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(this, &TranslatorsSettingsView::customContextMenuRequested, this,
+          &TranslatorsSettingsView::showMenu);
 }

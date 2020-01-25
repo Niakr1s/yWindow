@@ -32,6 +32,8 @@ class TextController : public QObject {
   void needAddUserDictionary(const QString& filename);
   void needMoveTranslationView(QPoint point);
   void needHideTranslationView();
+  void needOpenDictionaryInDefaultApp(const std::string& translator_info,
+                                      const std::string& dictionary_info);
 
  public slots:
   void charHovered(std::pair<int, int> model_pos, bool with_shift);

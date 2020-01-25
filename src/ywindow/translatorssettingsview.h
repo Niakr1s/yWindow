@@ -1,6 +1,8 @@
 #ifndef TRANSLATORSSETTINGSVIEW_H
 #define TRANSLATORSSETTINGSVIEW_H
 
+#include <QAction>
+#include <QMenu>
 #include <QPushButton>
 #include <QTableWidget>
 #include <filesystem>
@@ -31,11 +33,15 @@ class TranslatorsSettingsView : public QWidget {
   void addUserDictionary();
   void openUserDictionary(const QString& filename);
 
+  void showMenu(QPoint pos);
+
  private:
   TextModel* model_;
   TextController* controller_;
   QTableWidget* table_;
   QPushButton *new_dict_btn_, *reload_btn_;
+
+  QMenu* menu_;
 
   const int COLS = 3;
 
@@ -46,6 +52,7 @@ class TranslatorsSettingsView : public QWidget {
   void initButtons();
   void initTable();
   void initLayout();
+  void initMenu();
 };
 
 #endif  // TRANSLATORSSETTINGSVIEW_H
