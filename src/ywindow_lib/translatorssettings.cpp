@@ -113,7 +113,7 @@ void dict::TranslatorsSettings::loadJson() {
   std::ifstream is(json_file_);
   is >> root;
   if (root.empty()) return;
-  for (size_t i = 0; i != root.size(); ++i) {
+  for (int i = 0; i != root.size(); ++i) {
     DictionarySettings state;
     std::string translator_info = root[i].get("translator_info", "").asString();
     if (translator_info.empty()) continue;
@@ -122,12 +122,12 @@ void dict::TranslatorsSettings::loadJson() {
     Json::Value &disabled = root[i][DISABLED];
 
     if (!enabled.empty()) {
-      for (size_t j = 0; j != enabled.size(); ++j) {
+      for (int j = 0; j != enabled.size(); ++j) {
         state.enabled.insert(enabled[j].asString());
       }
     }
     if (!disabled.empty()) {
-      for (size_t j = 0; j != disabled.size(); ++j) {
+      for (int j = 0; j != disabled.size(); ++j) {
         state.disabled.insert(disabled[j].asString());
       }
     }
