@@ -8,7 +8,10 @@
 
 TextModel::TextModel(QObject *parent) : QObject(parent) {}
 
-TextModel::~TextModel() { qDebug() << "TextModel destructor"; }
+TextModel::~TextModel() {
+  qDebug() << "TextModel destructor";
+  translators_settings_->saveJson();
+}
 
 QStringList TextModel::toHtml() { return doToHtml(); }
 
