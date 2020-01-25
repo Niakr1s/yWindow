@@ -172,7 +172,17 @@ void dict::DeinflectParser::doParseInto(dict::Dictionary *dict) {
     for (int i = 0, i_max = it->size(); i != i_max; ++i) {
       auto card = std::make_shared<DeinflectCard>(dict);
       card->setWord((*it)[i]["kanaIn"].asString());
-      card->setReading((*it)[i]["kanaOut"].asString());
+
+      /* Skipping some cases, for example:
+       * "kanaIn": "な",
+       * "kanaOut": "",
+       */
+      std::string reading = (*it)[i]["kanaOut"].asString();
+
+      if (reading.empty()) continue;
+
+      card->setReading(reading);
+
       dict->addCard(card);
     }
   }
