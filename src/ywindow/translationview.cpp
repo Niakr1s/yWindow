@@ -28,6 +28,8 @@ void TranslationView::setController(TextController* controller) {
   controller_ = controller;
   connect(controller_, &TextController::needMoveTranslationView, this,
           &TranslationView::move);
+  connect(controller_, &TextController::needHideTranslationView, this,
+          &TranslationView::cancelTranslation);
 }
 
 void DefaultTranslationView::move(QPoint pos) {

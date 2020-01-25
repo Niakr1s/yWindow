@@ -24,8 +24,9 @@ class TextView : public QTextBrowser {
   void setModel(TextModel* model);
 
  signals:
-  void charHovered(std::pair<int, int> model_pos, QPoint point,
-                   bool with_shift);
+  void charHovered(std::pair<int, int> model_pos, bool with_shift);
+  void charHoveredPos(const QPoint& pos);
+  void charLeaved();
   void needShowTranslatorsSettingsView();
 
  public slots:
@@ -73,9 +74,11 @@ class DefaultTextView : public TextView {
   LastHovered last_hovered_;
   HoverSyntaxHighlighter* highlighter_;
 
+  const std::pair<int, int> NULL_POS_AND_COL = {-1, -1};
+
   std::pair<int, int> innerColToModelPos(int pos);
 
-  void emitCharHovered(std::pair<int, int> model_pos, QPoint point,
+  void emitCharHovered(std::pair<int, int> model_pos, QPoint point = QPoint(),
                        bool with_shift = false);
   void initMenu();
 

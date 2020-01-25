@@ -29,8 +29,7 @@ void TextController::setModel(TextModel *model) {
           &TextModel::addUserDictionary);
 }
 
-void TextController::charHovered(std::pair<int, int> model_pos, QPoint point,
+void TextController::charHovered(std::pair<int, int> model_pos,
                                  bool with_shift) {
   emit needTranslate(model_pos, with_shift);
-  emit needMoveTranslationView(point);
 }

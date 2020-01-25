@@ -20,6 +20,10 @@ void TextView::setController(TextController *controller) {
           &TextController::charHovered);
   connect(this, &TextView::needShowTranslatorsSettingsView, controller_,
           &TextController::needShowTranslatorsSettingsView);
+  connect(this, &TextView::charHoveredPos, controller_,
+          &TextController::needMoveTranslationView);
+  connect(this, &TextView::charLeaved, controller_,
+          &TextController::needHideTranslationView);
 }
 
 void TextView::setModel(TextModel *model) {
@@ -92,17 +96,22 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
 
   auto current_line_and_col = innerColToModelPos(last_hovered_.inner_col);
   if (current_line_and_col != last_hovered_.model_pos) {
+    last_hovered_.model_pos = current_line_and_col;
     qDebug() << "mouse hovered: " << current_line_and_col;
+    if (current_line_and_col == NULL_POS_AND_COL) {
+      emit charLeaved();
+      goto theEnd;
+    }
     bool with_shift =
         QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier;
     emitCharHovered(current_line_and_col, global_pos, with_shift);
-    last_hovered_.model_pos = current_line_and_col;
   }
+theEnd:
   return QTextBrowser::mouseMoveEvent(event);
 }
 
 void DefaultTextView::leaveEvent(QEvent *event) {
-  emitCharHovered({-1, -1}, QPoint());
+  emit charLeaved();
   QTextBrowser::leaveEvent(event);
 }
 
@@ -134,7 +143,7 @@ std::pair<int, int> DefaultTextView::innerColToModelPos(int pos) {
   }
 theEnd:
   if (line >= current_text_.size() || col >= current_text_[line].size()) {
-    return {-1, -1};
+    return NULL_POS_AND_COL;
   }
   return {line, col};
 }
@@ -142,5 +151,7 @@ theEnd:
 void DefaultTextView::emitCharHovered(std::pair<int, int> model_pos,
                                       QPoint point, bool with_shift) {
   last_hovered_.model_pos = model_pos;
-  emit charHovered(last_hovered_.model_pos, point, with_shift);
+  emit charHovered(last_hovered_.model_pos, with_shift);
+  if (model_pos != NULL_POS_AND_COL && point != QPoint())
+    emit charHoveredPos(point);
 }
