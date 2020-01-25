@@ -42,7 +42,7 @@ class DefaultTranslationView : public TranslationView {
   void append(const std::string& str);
 
  public slots:
-  void move(QPoint pos);
+  void move(QPoint pos) override;
   void tryHideOnTimer();
 
  protected:
