@@ -62,6 +62,7 @@ void YWindow::initTextMVC() {
 
   translation_view_ = std::make_unique<DefaultTranslationView>();
   translation_view_->setModel(text_model_.get());
+  translation_view_->setController(text_controller_.get());
   SETTINGS->loadTranslationView(translation_view_.get());
 
   translators_settings_view_ = std::make_unique<TranslatorsSettingsView>();

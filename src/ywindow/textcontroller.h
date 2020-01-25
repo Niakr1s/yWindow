@@ -25,11 +25,16 @@ class TextController : public QObject {
 
  signals:
   void newText(QString);
-  void charHovered(std::pair<int, int> model_pos, QPoint point,
-                   bool with_shift);
+
+  void needTranslate(std::pair<int, int> model_pos, bool with_shift);
   void needReloadDicts();
   void needShowTranslatorsSettingsView();
   void needAddUserDictionary(const QString& filename);
+  void needMoveTranslationView(QPoint point);
+
+ public slots:
+  void charHovered(std::pair<int, int> model_pos, QPoint point,
+                   bool with_shift);
 
  protected:
   TextModel* model_;

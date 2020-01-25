@@ -23,8 +23,7 @@ void TextModel::setTranslatorsSettings(
   }).detach();
 }
 
-void TextModel::translate(std::pair<int, int> pos, QPoint point,
-                          bool with_shift) {
+void TextModel::translate(std::pair<int, int> pos, bool with_shift) {
   if (pos == last_pos_) return;
   last_pos_ = pos;
   qDebug() << "TextModel::translate got new " << pos;
@@ -35,7 +34,7 @@ void TextModel::translate(std::pair<int, int> pos, QPoint point,
   auto res =
       with_shift ? doTranslateFromPos(last_pos_) : doTranslate(last_pos_);
   if (res->translated()) {
-    emit gotTranslation(res, point);
+    emit gotTranslation(res);
     if (with_shift) {
       emit gotTranslationLength(
           QString::fromStdString(res->originText()).size());

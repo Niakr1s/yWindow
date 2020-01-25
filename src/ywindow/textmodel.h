@@ -31,14 +31,14 @@ class TextModel : public QObject {
 
  signals:
   void textChanged();
-  void gotTranslation(dict::TranslationChunkPtr, QPoint point);
+  void gotTranslation(dict::TranslationChunkPtr);
   void gotTranslationLength(int length);
   void cancelTranslation();
   void translatorSettingsChanged();
   void userDictionaryCreated(const QString& filename);
 
  public slots:
-  void translate(std::pair<int, int> pos, QPoint point, bool with_shift);
+  void translate(std::pair<int, int> pos, bool with_shift);
   void addText(QString text);
   void reloadDicts();
   void addUserDictionary(const QString& filename);

@@ -6,6 +6,7 @@
 #include <QMouseEvent>
 #include <QTimer>
 
+#include "textcontroller.h"
 #include "textmodel.h"
 #include "translationconverter.h"
 
@@ -23,12 +24,23 @@ void TranslationView::setModel(TextModel* model) {
           &TranslationView::cancelTranslation);
 }
 
-void TranslationView::move(QPoint pos) { return QWidget::move(pos); }
+void TranslationView::setController(TextController* controller) {
+  controller_ = controller;
+  connect(controller_, &TextController::needMoveTranslationView, this,
+          &TranslationView::move);
+}
 
-void TranslationView::displayTranslation(dict::TranslationChunkPtr translation,
-                                         QPoint point) {
+void DefaultTranslationView::move(QPoint pos) {
+  pos.setY(pos.y() - height());
+  pos.setX(pos.x() - 50);
+  QWidget::move(pos);
+  setGeometry(fittedToDisplay(geometry()));
+}
+
+void TranslationView::displayTranslation(
+    dict::TranslationChunkPtr translation) {
   active_ = true;
-  return doDisplayTranslation(translation, point);
+  return doDisplayTranslation(translation);
 }
 
 void TranslationView::cancelTranslation() {
@@ -61,9 +73,8 @@ void DefaultTranslationView::tryHideOnTimer() {
 }
 
 void DefaultTranslationView::doDisplayTranslation(
-    dict::TranslationChunkPtr translation, QPoint point) {
+    dict::TranslationChunkPtr translation) {
   translation_ = translation;
-  qDebug() << "TranslationDisplay: got pos " << point << "height " << height();
 
   auto tr = translation_->translations();
   qDebug() << "got " << tr.size() << " translations";
@@ -73,10 +84,6 @@ void DefaultTranslationView::doDisplayTranslation(
   moveCursor(QTextCursor::Start);
 
   adjustHeight(document()->size().height());
-  point.setY(point.y() - height());
-  point.setX(point.x() - 50);
-  move(point);
-  setGeometry(fittedToDisplay(geometry()));
 
   show();
 }
