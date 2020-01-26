@@ -25,6 +25,8 @@ class YWindow : public QWidget {
 
   void setOpacity(int opacity);
 
+  void showAbout();
+
  private:
   Status* status_;
 

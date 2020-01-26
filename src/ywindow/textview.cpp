@@ -59,6 +59,12 @@ void DefaultTextView::initMenu() {
   });
   menu_->addAction(open_css_file_);
 
+  menu_->addSeparator();
+
+  auto show_about = new QAction(tr("About"));
+  connect(show_about, &QAction::triggered, this, &TextView::needShowAbout);
+  menu_->addAction(show_about);
+
   setContextMenuPolicy(Qt::CustomContextMenu);
   connect(this, &DefaultTextView::customContextMenuRequested, this,
           &DefaultTextView::showMenu);

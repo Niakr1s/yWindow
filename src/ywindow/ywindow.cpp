@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QMessageBox>
 #include <QSizeGrip>
 #include <QStyle>
 #include <QTextBlock>
@@ -44,6 +45,13 @@ void YWindow::setOpacity(int opacity) {
   setWindowOpacity(static_cast<qreal>(opacity) / 100);
 }
 
+void YWindow::showAbout() {
+  QMessageBox::about(
+      this, tr("About"),
+      tr(R"***(<div>Welcome to yWindow, created by <a href="https://github.com/Niakr1s">Niakr1s</a>!</div>
+<div>You can find readme and contact author via <a href="https://github.com/Niakr1s/yWindow">github</a></div>)***"));
+}
+
 void YWindow::initTextMVC() {
   //  text_model_ = new YomiStyleTextModel(new
   //  dict::YomiTranslator("yomi_dicts"));
@@ -63,6 +71,8 @@ void YWindow::initTextMVC() {
   text_view_ = std::make_unique<DefaultTextView>(this);
   text_view_->setModel(text_model_.get());
   text_view_->setController(text_controller_.get());
+  connect(text_view_.get(), &TextView::needShowAbout, this,
+          &YWindow::showAbout);
   SETTINGS->loadTextView(text_view_.get());
 
   translation_view_ = std::make_unique<DefaultTranslationView>();

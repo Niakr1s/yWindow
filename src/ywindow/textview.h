@@ -28,6 +28,7 @@ class TextView : public QTextBrowser {
   void charHoveredPos(const QPoint& pos);
   void charLeaved();
   void needShowTranslatorsSettingsView();
+  void needShowAbout();
 
  public slots:
   void displayText();
