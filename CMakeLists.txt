@@ -27,8 +27,7 @@ add_definitions( -DBOOST_ALL_DYN_LINK )
 project ("yWindow")
 
 find_package(Boost)
-
-add_subdirectory(3rdparty/jsoncpp)
+find_package(jsoncpp CONFIG REQUIRED)
 
 add_subdirectory(src)
 
