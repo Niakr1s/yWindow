@@ -10,6 +10,10 @@ Here is my humble Textractor plugin, named yWindow. It was inspired by Yomichan 
 - User can create his own dictionaries.
 - User can temporarily turn on/off dictionary via Settings window. For example, useful for game-specific user dictionaries.
 
+## Known bugs
+
+- yWindow freezes/crashes on exit from Textractor or on delete from Textractor extensions list if dictionaries are stil in processing state (watch ```Processing...``` status in statusbar). It is because of wierd threads behaviour in Windows DLLs. If you can help me fix it, please, pull request. Solution: Don't close app while it's not in Ready state (see ```Ready``` status in statusbar). Processing stage don't take so much time. If you still got freeze just end Textractor process from Windows Task Manager.
+
 ## Useful notes
 
 ### Data
