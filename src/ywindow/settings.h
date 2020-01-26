@@ -35,6 +35,7 @@ class Settings {
   const QString DEFAULT_STYLE_SHEET = "background: black; color: lightGray;";
 
   const QString GEOMETRY = "geometry";
+  const QString OPACITY = "opacity";
   const QString TEXT_FONT = "text_font";
   const QString TRANSLATION_FONT = "translation_font";
 

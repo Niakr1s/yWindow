@@ -27,7 +27,7 @@ void Settings::loadYWindow(YWindow* w) {
   settings_.beginGroup(YWINDOW_GROUP);
   w->setWindowTitle(TITLE);
   w->setGeometry(settings_.value(GEOMETRY, QRect(0, 0, 600, 100)).toRect());
-  w->setWindowOpacity(0.8);
+  w->setWindowOpacity(settings_.value(OPACITY, 0.9).toReal());
   w->setStyleSheet(DEFAULT_STYLE_SHEET);
   settings_.endGroup();
 }
@@ -35,6 +35,7 @@ void Settings::loadYWindow(YWindow* w) {
 void Settings::saveYWindow(YWindow* w) {
   settings_.beginGroup(YWINDOW_GROUP);
   settings_.setValue(GEOMETRY, w->geometry());
+  settings_.setValue(OPACITY, w->windowOpacity());
   settings_.endGroup();
 }
 

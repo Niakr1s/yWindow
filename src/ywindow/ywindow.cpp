@@ -26,6 +26,7 @@ YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   vbox_->addWidget(text_view_.get());
 
   status_ = new Status(this);
+  connect(status_, &Status::needChangeOpacity, this, &YWindow::setOpacity);
   vbox_->addWidget(status_);
 }
 
@@ -38,6 +39,10 @@ YWindow::~YWindow() {
 }
 
 void YWindow::newText(QString text) { return text_controller_->addText(text); }
+
+void YWindow::setOpacity(int opacity) {
+  setWindowOpacity(static_cast<qreal>(opacity) / 100);
+}
 
 void YWindow::initTextMVC() {
   //  text_model_ = new YomiStyleTextModel(new

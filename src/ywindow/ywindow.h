@@ -23,6 +23,8 @@ class YWindow : public QWidget {
  public slots:
   void newText(QString text);  // entry point
 
+  void setOpacity(int opacity);
+
  private:
   Status* status_;
 
