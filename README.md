@@ -52,7 +52,7 @@ Directory: %TEXTRACTOR_ROOT%/yWindow/dicts/yomi
 Yomi dictionary should consist of next files:
 - index.json
 - tag_bank_1.json
-- some of term_bank_*.json or kanji_bank_*.json
+- some of term_bank_#.json or kanji_bank_#.json
 
 Good place to search a dictionary is [yomichan homepage](https://foosoft.net/projects/yomichan/).
 
