@@ -19,14 +19,15 @@
 
 YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   SETTINGS->loadYWindow(this);
+  status_ = new Status(this);
+
+  initTextMVC();
 
   vbox_ = new QVBoxLayout(this);
   vbox_->setMargin(0);
-
-  initTextMVC();
   vbox_->addWidget(text_view_.get());
 
-  status_ = new Status(this);
+  status_->setModel(text_model_.get());
   connect(status_, &Status::needChangeOpacity, this, &YWindow::setOpacity);
   vbox_->addWidget(status_);
 }

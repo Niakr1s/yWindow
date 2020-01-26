@@ -21,8 +21,10 @@ void TextModel::setTranslatorsSettings(
     std::shared_ptr<dict::TranslatorsSettings> translators_settings) {
   translators_settings_ = translators_settings;
   std::thread([=] {
+    emit startProcessing();
     doSetTranslatorSettings(translators_settings_);
     emit translatorSettingsChanged();
+    emit endProcessing();
   }).detach();
 }
 
@@ -54,8 +56,10 @@ void TextModel::addText(QString text) {
 
 void TextModel::reloadDicts() {
   std::thread([this] {
+    emit startProcessing();
     doReloadDicts();
     emit translatorSettingsChanged();
+    emit endProcessing();
   }).detach();
 }
 

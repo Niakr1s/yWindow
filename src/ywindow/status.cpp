@@ -5,7 +5,7 @@
 #include <QSlider>
 
 Status::Status(QWidget *parent) : QStatusBar(parent) {
-  showMessage("Ready");
+  showReady();
 
   auto opacity_label = new QLabel(tr("Opacity"));
   addPermanentWidget(opacity_label);
@@ -20,3 +20,12 @@ Status::Status(QWidget *parent) : QStatusBar(parent) {
 
   setStyleSheet("color: lightGray; border: none black; background: black");
 }
+
+void Status::setModel(TextModel *model) {
+  connect(model, &TextModel::startProcessing, this, &Status::showProcessing);
+  connect(model, &TextModel::endProcessing, this, &Status::showReady);
+}
+
+void Status::showProcessing() { showMessage(tr("Processing...")); }
+
+void Status::showReady() { showMessage(tr("Ready")); }

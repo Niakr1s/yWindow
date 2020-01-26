@@ -34,6 +34,8 @@ class TextModel : public QObject {
   void gotTranslation(dict::TranslationChunkPtr);
   void gotTranslationLength(int length);
   void cancelTranslation();
+  void startProcessing();
+  void endProcessing();
   void translatorSettingsChanged();
   void userDictionaryCreated(const QString& filename);
 
