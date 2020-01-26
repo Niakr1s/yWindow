@@ -90,10 +90,16 @@ if __name__ == "__main__":
     x86 = Architecture(X86_ARCH)
     x64 = Architecture(X64_ARCH)
 
-    # clean()
+    if "clean" in sys.argv:
+        clean()
 
-    cmake(x86)
-    cmake(x64)
+    if "x86" in sys.argv:
+        cmake(x86)
+    elif "x64" in sys.argv:
+        cmake(x64)
+    else:
+        cmake(x86)
+        cmake(x64)
 
     addToZip(x86, getProjectVersion(x86))
     addToZip(x64, getProjectVersion(x64))
