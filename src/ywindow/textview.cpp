@@ -103,7 +103,8 @@ void DefaultTextView::mouseMoveEvent(QMouseEvent *event) {
       goto theEnd;
     }
     bool with_shift =
-        QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier;
+        QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier ||
+        event->buttons() == Qt::MiddleButton;
     emitCharHovered(current_line_and_col, global_pos, with_shift);
   }
 theEnd:
