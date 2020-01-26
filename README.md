@@ -12,13 +12,25 @@ Here is my humble Textractor plugin, named yWindow. It was inspired by Yomichan 
 
 ## Known bugs
 
-- yWindow freezes/crashes on exit from Textractor or on delete from Textractor extensions list if dictionaries are stil in processing state (watch ```Processing...``` status in statusbar). It is because of wierd threads behaviour in Windows DLLs. If you can help me fix it, please, pull request. Solution: Don't close app while it's not in Ready state (see ```Ready``` status in statusbar). Processing stage don't take so much time. If you still got freeze just end Textractor process from Windows Task Manager.
+- yWindow freezes/crashes on exit from Textractor or on delete from Textractor extensions list if dictionaries are stil in processing state (watch `Processing...` status in statusbar). It is because of wierd threads behaviour in Windows DLLs. If you can help me fix it, please, pull request. Solution: Don't close app while it's not in Ready state (see `Ready` status in statusbar). Processing stage don't take so much time. If you still got freeze just end Textractor process from Windows Task Manager.
 
 ## Build
 
-I am using vcpkg.
+I am using vcpkg. Deps: Qt5, Boost, jsoncpp, Gtest(for tests). If you are building x64, make sure you had installed dep with postfix `:x64-windows`.
 
-```cmake -Bbin32 -A Win32``` or ```cmake -Bbin64 -A x64```
+### x32
+
+```
+cmake -Bbin32 -A Win32
+cmake --build bin32 --config MinSizeRel -j4
+```
+
+### x64
+
+```
+cmake -Bbin64 -A x64`
+cmake --build bin64 --config MinSizeRel -j4
+```
 
 ## Data
 - All yWindow data is stored in %TEXTRACTOR_ROOT%/yWindow folder.
@@ -52,7 +64,7 @@ Directory: %TEXTRACTOR_ROOT%/yWindow/dicts/user
 
 You can add your own dictionary. Just create %YOUR_DICT%.txt in directory and fill it.
 
-User dictionary should consist of bunch of lines, each has following structure: ```word = reading, meaning```. You can comment-out a line by addint ```#``` into the beginning of it. ```, meaning``` part is optional.
+User dictionary should consist of bunch of lines, each has following structure: `word = reading, meaning`. You can comment-out a line by addint `#` into the beginning of it. `, meaning` part is optional.
 
 ### Deinflector dictionaries
 
