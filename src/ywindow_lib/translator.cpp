@@ -218,14 +218,21 @@ dict::TranslationChunkPtr dict::DirectoryTranslator<Dict>::doTranslateFullStr(
   if (translations.empty()) return std::make_shared<UntranslatedChunk>(str);
 
   CardPtrs sub_translations;
-  for (auto it = transl_result.chunks().end() - 1,
-            it_begin = transl_result.chunks().begin();
-       it != it_begin; --it) {
-    CardPtrs inner_sub_translations =
-        queryAllNonDisabledDicts(TranslationResult{it_begin, it}.orig_text());
-    sub_translations.insert(sub_translations.end(),
-                            inner_sub_translations.cbegin(),
-                            inner_sub_translations.cend());
+  for (auto it_begin = transl_result.chunks().begin();
+       it_begin != transl_result.chunks().end(); ++it_begin) {
+    for (auto it = transl_result.chunks().end(); it != it_begin; --it) {
+      // skipping full text, because it is already in translations
+      if (it_begin == transl_result.chunks().begin() &&
+          it == transl_result.chunks().end()) {
+        continue;
+      }
+
+      CardPtrs inner_sub_translations =
+          queryAllNonDisabledDicts(TranslationResult{it_begin, it}.orig_text());
+      sub_translations.insert(sub_translations.end(),
+                              inner_sub_translations.cbegin(),
+                              inner_sub_translations.cend());
+    }
   }
   return std::make_shared<TranslatedChunk_T>(str, std::move(translations),
                                              std::move(sub_translations));
