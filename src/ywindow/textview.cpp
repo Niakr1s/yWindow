@@ -47,8 +47,7 @@ DefaultTextView::DefaultTextView(QWidget *parent) : TextView(parent) {
 void DefaultTextView::initMenu() {
   menu_ = new QMenu(this);
 
-  auto show_translators_settings_view_ =
-      new QAction(tr("Show dictionaries settings"));
+  auto show_translators_settings_view_ = new QAction(tr("Settings"));
   connect(show_translators_settings_view_, &QAction::triggered, this,
           &TextView::needShowTranslatorsSettingsView);
   menu_->addAction(show_translators_settings_view_);
