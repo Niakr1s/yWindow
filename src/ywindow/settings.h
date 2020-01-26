@@ -3,6 +3,8 @@
 
 #include <QSettings>
 
+#include "version.h"
+
 #define SETTINGS Settings::getInstance()
 
 class YWindow;
@@ -30,7 +32,7 @@ class Settings {
 
  private:
   Settings();
-  const QString TITLE = "yWindow";
+  const QString TITLE = "yWindow v" + QString(PROJECT_VER);
 
   const QString DEFAULT_STYLE_SHEET = "background: black; color: lightGray;";
 

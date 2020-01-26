@@ -30,8 +30,6 @@ class YWindow : public QWidget {
  private:
   Status* status_;
 
-  const QString TITLE = "yWindow";
-
   QVBoxLayout* vbox_;
 
   std::unique_ptr<TextModel> text_model_;

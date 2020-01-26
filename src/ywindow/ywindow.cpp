@@ -16,6 +16,7 @@
 #include "textmodel.h"
 #include "textview.h"
 #include "translator.h"
+#include "version.h"
 
 YWindow::YWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   SETTINGS->loadYWindow(this);
@@ -48,7 +49,7 @@ void YWindow::setOpacity(int opacity) {
 
 void YWindow::showAbout() {
   QMessageBox::about(
-      this, tr("About"),
+      this, windowTitle(),
       tr(R"***(<div>Welcome to yWindow, created by <a href="https://github.com/Niakr1s">Niakr1s</a>!</div>
 <div>You can find readme and contact author via <a href="https://github.com/Niakr1s/yWindow">github</a></div>)***"));
 }

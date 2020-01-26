@@ -46,5 +46,6 @@ target_link_libraries(ywindow
 target_include_directories(ywindow
     PRIVATE
     ${Boost_INCLUDE_DIRS}
+    ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
 )
 
