@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <map>
+#include <set>
 #include <vector>
 
 #include "NLTemplate.h"
@@ -27,15 +28,20 @@ class YTranslationConverter : public TranslationConverter {
  public:
   YTranslationConverter() {}
 
+  using word = std::string;
+  using dict_info = std::string;
+  using reading = std::string;
+  using meanings = std::set<std::string>;
+
   using DictCardPtrMap =
-      std::map<std::string,
-               std::map<std::string, std::vector<std::shared_ptr<dict::Card>>>>;
+      std::map<word, std::map<dict_info, std::map<reading, meanings>>>;
 
  protected:
   std::string doToHtml(const dict::TranslationChunk& translation) override;
 
  private:
-  static DictCardPtrMap toDictCardPtrMap(const dict::CardPtrs& input);
+  static DictCardPtrMap toDictCardPtrMap(const dict::CardPtrs& input,
+                                         bool with_proxy = true);
   static void appendDictCardPtrMap(Block& word_block,
                                    const DictCardPtrMap& cards);
 };

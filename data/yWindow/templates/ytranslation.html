@@ -3,25 +3,23 @@
 </head>
 
 {% block cards %}
-<div class="word">{{ name }}</div>
+<div class="word">{{ word }}</div>
 {% block dict %}
 <div class="dict">{{ dict }}</div>
 {% block row %}
 <div class="reading">{{ reading }}</div>
+{% block meaning %}
 <div class="meaning">{{ meaning }}</div>
-{% endblock %}
-{% endblock %}
-<br>
-{% endblock %}
-
-{% block sub_cards %}
-<div class="word">{{ name }}</div>
+{% endblock %} {% endblock %} {% endblock %}
+<br> {% endblock %} {% block div %}
+<div>--------------</div>
+{% endblock %} {% block sub_cards %}
+<div class="word">{{ word }}</div>
 {% block dict %}
 <div class="dict">{{ dict }}</div>
 {% block row %}
 <div class="reading">{{ reading }}</div>
+{% block meaning %}
 <div class="meaning">{{ meaning }}</div>
-{% endblock %}
-{% endblock %}
-<br>
-{% endblock %}
+{% endblock %} {% endblock %} {% endblock %}
+<br> {% endblock %}
