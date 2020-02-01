@@ -50,6 +50,7 @@ void TextModel::translate(std::pair<int, int> pos, bool with_shift) {
 void TextModel::addText(QString text) {
   qDebug() << " TextModel: adding text: " << text;
   current_pos_ = -1;
+  text.remove(' ');
   doAddText(text);
   emit textChanged();
 }
