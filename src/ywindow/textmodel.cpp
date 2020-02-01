@@ -50,7 +50,7 @@ void TextModel::translate(std::pair<int, int> pos, bool with_shift) {
 void TextModel::addText(QString text) {
   qDebug() << " TextModel: adding text: " << text;
   current_pos_ = -1;
-  text.remove(' ');
+  text = removeWhiteSpaces(text);
   doAddText(text);
   emit textChanged();
 }
@@ -66,6 +66,15 @@ void TextModel::reloadDicts() {
 
 void TextModel::addUserDictionary(const QString &filename) {
   doAddUserDictionary(filename);
+}
+
+QString TextModel::removeWhiteSpaces(const QString &str) {
+  QString res = str;
+  res.remove("　");
+  res.remove(" ");
+  res.remove("\n");
+  res.remove("\r");
+  return res;
 }
 
 std::shared_ptr<dict::TranslatorsSettings> DefaultModel::translators_settings()

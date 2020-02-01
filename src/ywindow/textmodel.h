@@ -50,6 +50,8 @@ class TextModel : public QObject {
   int current_pos_ = -1;
   std::shared_ptr<dict::TranslatorsSettings> translators_settings_;
 
+  QString removeWhiteSpaces(const QString& str);
+
   virtual QStringList doToHtml() = 0;
   virtual QStringList doToPlainText() = 0;
   virtual dict::TranslationChunkPtr doTranslate(std::pair<int, int> pos) = 0;
