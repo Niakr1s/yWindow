@@ -24,7 +24,14 @@ class TranslationChunk {
   virtual bool user() const;
 
   const CardPtrs& translations() const;
+  void addTranslations(const TranslationChunk& rhs);
+  void addTranslation(const CardPtr& translation);
+  void addTranslations(const CardPtrs& translations);
+
   const CardPtrs& subTranslations() const;
+  void addSubTranslations(const TranslationChunk& rhs);
+  void addSubTranslation(const CardPtr& sub_translation);
+  void addSubTranslations(const CardPtrs& sub_translations);
 
   virtual std::shared_ptr<TranslationChunk> copy() const = 0;
 
@@ -127,6 +134,7 @@ class TranslationResult {
   std::vector<TranslationText> toTexts() const;
   std::vector<TranslationResult> splitByFinal() const;
   bool final() const;
+  bool user() const;
 
   void insertChunk(TranslationChunkPtr chunk);
   const TranslationChunkPtrs& chunks() const;

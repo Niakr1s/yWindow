@@ -360,22 +360,28 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
   while (++translator_it != translator_it_end) {
     std::vector<TranslationResult> splitted = res.splitByFinal();
     std::vector<TranslationResult> buffer;
-    for (auto &ch : splitted) {
-      if (ch.final()) {
-        buffer.push_back(ch);
+    for (auto &transl_res : splitted) {
+      if (transl_res.user()) {
+        for (auto &ch : transl_res.chunks()) {
+          auto translated = (*translator_it)->translate(ch->originText());
+          for (auto &translated_ch : translated.chunks()) {
+            ch->addTranslations(*translated_ch);
+            ch->addSubTranslations(*translated_ch);
+          }
+        }
+        buffer.push_back(transl_res);
+      } else if (transl_res.final()) {
+        buffer.push_back(transl_res);
       } else {
-        auto texts = ch.toTexts();
+        auto texts = transl_res.toTexts();
         std::vector<TranslationResult> merged;
         for (auto &text : texts) {
           auto ch_translated = (*translator_it)->translate(text.string());
 
           std::vector<TranslationResult> merged_inner =
-              ch.mergeWithNextTranslation(ch_translated);
+              transl_res.mergeWithNextTranslation(ch_translated);
           merged.insert(merged.end(), merged_inner.begin(), merged_inner.end());
         }
-        //        auto ch_translated =
-        //        (*translator_it)->translate(ch.orig_text()); auto merged =
-        //        ch.mergeWithNextTranslation(ch_translated);
         buffer.push_back(TranslationResult::bestTranslation(merged));
       }
     }

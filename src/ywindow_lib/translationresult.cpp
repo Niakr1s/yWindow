@@ -28,8 +28,38 @@ const dict::CardPtrs &dict::TranslationChunk::translations() const {
   return translations_;
 }
 
+void dict::TranslationChunk::addTranslations(
+    const dict::TranslationChunk &rhs) {
+  addTranslations(rhs.translations());
+}
+
+void dict::TranslationChunk::addTranslation(const dict::CardPtr &translation) {
+  translations_.push_back(translation);
+}
+
+void dict::TranslationChunk::addTranslations(
+    const dict::CardPtrs &translations) {
+  for (auto &translation : translations) addTranslation(translation);
+}
+
 const dict::CardPtrs &dict::TranslationChunk::subTranslations() const {
   return sub_translations_;
+}
+
+void dict::TranslationChunk::addSubTranslations(
+    const dict::TranslationChunk &rhs) {
+  addSubTranslations(rhs.subTranslations());
+}
+
+void dict::TranslationChunk::addSubTranslation(
+    const dict::CardPtr &sub_translation) {
+  sub_translations_.push_back(sub_translation);
+}
+
+void dict::TranslationChunk::addSubTranslations(
+    const dict::CardPtrs &sub_translations) {
+  for (auto &sub_translation : sub_translations)
+    addSubTranslation(sub_translation);
 }
 
 void dict::TranslationChunk::setOriginText(const std::string &origin_text) {
@@ -171,10 +201,15 @@ std::vector<dict::TranslationResult> dict::TranslationResult::splitByFinal()
 }
 
 bool dict::TranslationResult::final() const {
-  for (auto &ch : chunks_) {
-    if (!ch->final()) return false;
-  }
-  return true;
+  return std::all_of(
+      std::cbegin(chunks_), std::cend(chunks_),
+      [](const TranslationChunkPtr &chunk) { return chunk->final(); });
+}
+
+bool dict::TranslationResult::user() const {
+  return std::all_of(
+      std::cbegin(chunks_), std::cend(chunks_),
+      [](const TranslationChunkPtr &chunk) { return chunk->user(); });
 }
 
 std::vector<dict::TranslationText> dict::TranslationResult::toTextsInner(
