@@ -110,13 +110,6 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
     }
 
     dict->addCard(card);
-
-    for (auto &reading : card->readings()) {
-      if (reading != card->word()) {
-        auto reading_card = std::make_shared<ProxyCard>(card, reading);
-        dict->addCard(reading_card);
-      }
-    }
   }
 }
 
@@ -149,13 +142,6 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
       card->addMeaning(root[i][4][j].asString());
     }
     dict->addCard(card);
-
-    for (auto &reading : card->readings()) {
-      if (reading != card->word()) {
-        auto reading_card = std::make_shared<ProxyCard>(card, reading);
-        dict->addCard(reading_card);
-      }
-    }
   }
 }
 

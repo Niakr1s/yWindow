@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "translator.h"
+
 dict::TranslatorsSettings::TranslatorsSettings(
     const std::filesystem::path &json_file)
     : json_file_(json_file) {
@@ -39,6 +41,16 @@ bool dict::TranslatorsSettings::isDisabled(const std::string &translator_info,
   }
 }
 
+bool dict::TranslatorsSettings::isAllowProxy(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  try {
+    auto info = findDictionaryInfo(translator_info, dictionary_info);
+    return info.allow_proxy;
+  } catch (...) {
+    return false;
+  }
+}
+
 bool dict::TranslatorsSettings::isIn(const std::string &translator_info,
                                      const std::string &dictionary_info) {
   return settings_.find(translator_info) != settings_.end() &&
@@ -61,6 +73,7 @@ void dict::TranslatorsSettings::addDictionary(
   info.dictionary_info = dictionary_info;
   info.path = path;
   info.enabled = enabled;
+  info.allow_proxy = defaultAllowProxy(translator_info, dictionary_info);
 
   settings_[translator_info].insert(info);
 }
@@ -82,6 +95,28 @@ dict::DictionaryInfo &dict::TranslatorsSettings::findDictionaryInfo(
     }
   }
   throw(std::out_of_range("Not found dictionary info"));
+}
+
+bool dict::TranslatorsSettings::defaultAllowProxy(
+    const std::string &translator_info, const std::string &dictionary_info) {
+  bool res = (DEFAULT_ALLOWED_PROXY_TRANSLATORS.find(translator_info) !=
+              DEFAULT_ALLOWED_PROXY_TRANSLATORS.cend())
+                 ? true
+                 : false;
+
+  res &= !std::any_of(
+      DEFAULT_NOT_ALLOWED_PROXY_DICTIONARIES.cbegin(),
+      DEFAULT_NOT_ALLOWED_PROXY_DICTIONARIES.cend(),
+      [&](const std::pair<std::string, std::set<std::string>> &pair) {
+        return (translator_info == pair.first) &&
+               std::any_of(
+                   std::cbegin(pair.second), std::cend(pair.second),
+                   [&](const std::string &not_allowed_dict_info) {
+                     return dictionary_info.find(not_allowed_dict_info) !=
+                            std::string::npos;
+                   });
+      });
+  return res;
 }
 
 void dict::TranslatorsSettings::enableDictionary(
@@ -195,11 +230,13 @@ void dict::TranslatorsSettings::loadJson() {
           dictionaries[j].get("dictionary_info", "").asString();
       fs::path path = dictionaries[j].get("path", "").asString();
       bool enabled = dictionaries[j].get("enabled", true).asBool();
+      bool allow_proxy = dictionaries[j].get("allow_proxy", true).asBool();
 
       DictionaryInfo dict_info;
       dict_info.dictionary_info = dictionary_info;
       dict_info.path = path;
       dict_info.enabled = enabled;
+      dict_info.allow_proxy = allow_proxy;
 
       settings_[translator_info].insert(dict_info);
     }
@@ -219,6 +256,7 @@ void dict::TranslatorsSettings::saveJson() {
       dict["dictionary_info"] = dict_info.dictionary_info;
       dict["path"] = dict_info.path.string();
       dict["enabled"] = dict_info.enabled;
+      dict["allow_proxy"] = dict_info.allow_proxy;
       dicts.append(dict);
     }
     root.append(translator);

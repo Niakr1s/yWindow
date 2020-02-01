@@ -29,6 +29,8 @@ class Dictionary {
     return doUpdateInfo(info);
   }
 
+  void makeProxyCards();
+
   virtual std::shared_ptr<std::string> info() const = 0;
   virtual size_t size() const = 0;
 
@@ -38,7 +40,11 @@ class Dictionary {
   virtual CardPtrs doQuery(const std::string& text) const = 0;
   virtual void doAddCard(std::shared_ptr<Card> card) = 0;
   virtual void doUpdateInfo(const std::string& info) = 0;
+  virtual void doMakeProxyCards() = 0;
   std::mutex mutex_;
+
+ private:
+  bool made_proxy_cards_ = false;
 };
 
 class DefaultDictionary : public Dictionary {
@@ -55,6 +61,7 @@ class DefaultDictionary : public Dictionary {
   CardPtrs doQuery(const std::string& text) const override;
   virtual void doAddCard(std::shared_ptr<Card> card) override;
   void doUpdateInfo(const std::string& info) override;
+  void doMakeProxyCards() override;
 };
 
 class YomiDictionary : public DefaultDictionary {

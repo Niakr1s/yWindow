@@ -9,11 +9,13 @@ namespace fs = std::filesystem;
 
 namespace dict {
 
+extern const std::string YOMI_TRANSLATOR_INFO;
+
 class Translator;
 
 struct DictionaryInfo {
   std::string dictionary_info;
-  bool enabled;
+  bool enabled, allow_proxy;
   fs::path path;
 
   inline bool operator==(const DictionaryInfo& rhs) const {
@@ -38,6 +40,8 @@ class TranslatorsSettings {
                  const std::string& dictionary_info);
   bool isDisabled(const std::string& translator_info,
                   const std::string& dictionary_info);
+  bool isAllowProxy(const std::string& translator_info,
+                    const std::string& dictionary_info);
   bool isIn(const std::string& translator_info,
             const std::string& dictionary_info);
   bool isNotIn(const std::string& translator_info,
@@ -88,6 +92,15 @@ class TranslatorsSettings {
 
   DictionaryInfo& findDictionaryInfo(const std::string& translator_info,
                                      const std::string& dictionary_info);
+
+  bool defaultAllowProxy(const std::string& translator_info,
+                         const std::string& dictionary_info);
+
+  const std::set<std::string> DEFAULT_ALLOWED_PROXY_TRANSLATORS = {
+      dict::YOMI_TRANSLATOR_INFO};
+  const std::map<std::string, std::set<std::string>>
+      DEFAULT_NOT_ALLOWED_PROXY_DICTIONARIES = {
+          {dict::YOMI_TRANSLATOR_INFO, {"JMnedict"}}};
 };
 
 }  // namespace dict

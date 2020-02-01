@@ -63,6 +63,7 @@ dict::DirectoryTranslator<Dict>::DirectoryTranslator(
 template <class Dict>
 void dict::DirectoryTranslator<Dict>::doPrepareDictionaries() {
   futuresToDicts();
+  makeProxyCards();
 }
 
 template <class Dict>
@@ -134,6 +135,13 @@ void dict::DirectoryTranslator<Dict>::futuresToDicts() {
     }
   }
   dicts_futures_.clear();
+}
+
+template <class Dict>
+void dict::DirectoryTranslator<Dict>::makeProxyCards() {
+  for (auto &[_, dict] : dicts_) {
+    dict->makeProxyCards();
+  }
 }
 
 template <class Dict>

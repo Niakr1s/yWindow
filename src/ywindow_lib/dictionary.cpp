@@ -1,11 +1,21 @@
 #include "dictionary.h"
 
+#include <iostream>
+
 dict::Dictionary::Dictionary() {}
 
 dict::Dictionary::~Dictionary() {}
 
 dict::CardPtrs dict::Dictionary::query(const std::string &text) const {
   return doQuery(text);
+}
+
+void dict::Dictionary::makeProxyCards() {
+  if (!made_proxy_cards_) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    made_proxy_cards_ = true;
+    doMakeProxyCards();
+  }
 }
 
 dict::DefaultDictionary::DefaultDictionary()
@@ -16,6 +26,19 @@ dict::YomiDictionary::YomiDictionary()
 
 void dict::DefaultDictionary::doUpdateInfo(const std::string &info) {
   *info_ = info;
+}
+
+void dict::DefaultDictionary::doMakeProxyCards() {
+  CardPtrs proxy_cards;
+  for (auto &[_, card] : cards_) {
+    for (auto &reading : card->readings()) {
+      auto proxy_card = std::make_shared<ProxyCard>(card, reading);
+      proxy_cards.push_back(proxy_card);
+    }
+  }
+  for (auto &proxy_card : proxy_cards) {
+    doAddCard(proxy_card);
+  }
 }
 
 void dict::YomiDictionary::addTag(const Tag &tag) {

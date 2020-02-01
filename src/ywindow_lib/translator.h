@@ -100,6 +100,7 @@ class DirectoryTranslator : public Translator {
   TranslationChunkPtr doDeinflectAndTranslateFullStr(const std::string& str);
 
   void futuresToDicts();
+  void makeProxyCards();
 };
 
 class YomiTranslator : public DirectoryTranslator<YomiDictionary> {
