@@ -234,7 +234,9 @@ dict::TranslationChunkPtr dict::DirectoryTranslator<Dict>::doTranslateFullStr(
       std::copy_if(std::cbegin(inner_sub_translations),
                    std::cend(inner_sub_translations),
                    std::back_inserter(inner_sub_translations_filtered),
-                   [](const CardPtr &card) { return !card->isProxy(); });
+                   [](const CardPtr &card) {
+                     return !card->isProxy() && card->isKanji();
+                   });
 
       sub_translations.insert(sub_translations.end(),
                               inner_sub_translations_filtered.cbegin(),

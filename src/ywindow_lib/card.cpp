@@ -30,6 +30,12 @@ std::string dict::Card::originWord() const { return word(); }
 
 std::string dict::Card::etc() const { return ""; }
 
+bool dict::Card::isProxy() const { return false; }
+
+bool dict::Card::isKanji() const { return false; }
+
+bool dict::Card::isTerm() const { return false; }
+
 std::string dict::DefaultCard::dictionaryInfo() const { return *dict_info_; }
 
 void dict::DefaultCard::setDictionaryInfo(std::shared_ptr<std::string> info) {
@@ -97,3 +103,11 @@ void dict::ProxyCard::setDictionaryInfo(std::shared_ptr<std::string> info) {
 }
 
 bool dict::ProxyCard::isProxy() const { return true; }
+
+bool dict::ProxyCard::isTerm() const { return card_->isTerm(); }
+
+bool dict::ProxyCard::isKanji() const { return card_->isKanji(); }
+
+bool dict::YomiKanjiCard::isKanji() const { return true; }
+
+bool dict::YomiTermCard::isTerm() const { return true; }

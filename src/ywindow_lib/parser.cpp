@@ -86,7 +86,7 @@ void dict::YomiTermParser::doParseInto(Dictionary *dict) {
 
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    auto card = std::make_shared<YomiCard>(dict);
+    auto card = std::make_shared<YomiTermCard>(dict);
     card->setWord(root[i][0].asString());
 
     auto json_readings = root[i][1].asString();
@@ -125,7 +125,7 @@ void dict::YomiKanjiParser::doParseInto(Dictionary *dict) {
 
   Json::Value root = getRoot();
   for (int i = 0, i_max = root.size(); i != i_max; ++i) {
-    auto card = std::make_shared<YomiCard>(dict);
+    auto card = std::make_shared<YomiKanjiCard>(dict);
     card->setWord(root[i][0].asString());
 
     auto json_readings = root[i][1].asString() + " " + root[i][2].asString();

@@ -23,7 +23,7 @@ TEST(yomi_translator, test1) {
   ASSERT_EQ(res.chunks().size(), 1);
   ASSERT_EQ(res.chunks()[0]->translations().size(), 2);
   ASSERT_TRUE(res.chunks()[0]->translated());
-  ASSERT_EQ(res.chunks()[0]->subTranslations().size(), 1);
+  ASSERT_EQ(res.chunks()[0]->subTranslations().size(), 0);
   ASSERT_TRUE(res.chunks()[0]->translated());
   ASSERT_TRUE(res.chunks()[0]->final());
 }

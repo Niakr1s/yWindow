@@ -36,7 +36,9 @@ class Card {
   virtual void setDictionaryInfo(std::shared_ptr<std::string> info) = 0;
   virtual std::string etc() const;
 
-  virtual bool isProxy() const { return false; }
+  virtual bool isProxy() const;
+  virtual bool isKanji() const;
+  virtual bool isTerm() const;
 };
 
 class DefaultCard : public Card {
@@ -74,6 +76,20 @@ class YomiCard : public DefaultCard {
   std::vector<std::string> meanings_;
   std::vector<std::string> tags_;
   std::vector<std::string> readings_;
+};
+
+class YomiTermCard : public YomiCard {
+ public:
+  using YomiCard::YomiCard;
+
+  virtual bool isTerm() const override;
+};
+
+class YomiKanjiCard : public YomiCard {
+ public:
+  using YomiCard::YomiCard;
+
+  virtual bool isKanji() const override;
 };
 
 class DeinflectDictionary;
@@ -118,6 +134,8 @@ class ProxyCard : public Card {
   void setDictionaryInfo(std::shared_ptr<std::string> info) override;
 
   virtual bool isProxy() const override;
+  virtual bool isTerm() const override;
+  virtual bool isKanji() const override;
 
  private:
   std::shared_ptr<Card> card_;
