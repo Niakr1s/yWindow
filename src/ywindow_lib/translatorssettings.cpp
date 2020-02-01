@@ -24,7 +24,7 @@ bool dict::TranslatorsSettings::isEnabled(const std::string &translator_info,
   try {
     auto info = findDictionaryInfo(translator_info, dictionary_info);
     return info.enabled;
-  } catch (std::out_of_range &) {
+  } catch (...) {
     return false;
   }
 }
@@ -34,21 +34,24 @@ bool dict::TranslatorsSettings::isDisabled(const std::string &translator_info,
   try {
     auto info = findDictionaryInfo(translator_info, dictionary_info);
     return !info.enabled;
-  } catch (std::out_of_range &) {
+  } catch (...) {
     return false;
   }
 }
 
 bool dict::TranslatorsSettings::isIn(const std::string &translator_info,
                                      const std::string &dictionary_info) {
-  return isEnabled(translator_info, dictionary_info) ||
-         isDisabled(translator_info, dictionary_info);
+  return settings_.find(translator_info) != settings_.end() &&
+         std::find_if(std::begin(settings_[translator_info]),
+                      std::end(settings_[translator_info]),
+                      [&](const DictionaryInfo &info) {
+                        return info.dictionary_info == dictionary_info;
+                      }) != settings_[translator_info].end();
 }
 
 bool dict::TranslatorsSettings::isNotIn(const std::string &translator_info,
                                         const std::string &dictionary_info) {
-  return !isEnabled(translator_info, dictionary_info) &&
-         !isDisabled(translator_info, dictionary_info);
+  return !isIn(translator_info, dictionary_info);
 }
 
 void dict::TranslatorsSettings::addDictionary(
@@ -60,9 +63,6 @@ void dict::TranslatorsSettings::addDictionary(
   info.enabled = enabled;
 
   settings_[translator_info].insert(info);
-
-  std::cout << "added dictionary: " << translator_info << ", "
-            << dictionary_info << ", enabled: " << enabled << std::endl;
 }
 
 bool dict::TranslatorsSettings::isIn(const std::string &dictionary_info,
