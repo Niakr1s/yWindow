@@ -374,8 +374,10 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
       if (transl_res.user()) {
         for (auto &ch : transl_res.chunks()) {
           auto translated = (*translator_it)->translate(ch->originText());
+          if (translated.size() == 1) {
+            ch->addTranslations(*translated.chunks().front());
+          }
           for (auto &translated_ch : translated.chunks()) {
-            ch->addTranslations(*translated_ch);
             ch->addSubTranslations(*translated_ch);
           }
         }
