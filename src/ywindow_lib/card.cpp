@@ -95,3 +95,5 @@ std::string dict::ProxyCard::etc() const { return card_->etc(); }
 void dict::ProxyCard::setDictionaryInfo(std::shared_ptr<std::string> info) {
   card_->setDictionaryInfo(info);
 }
+
+bool dict::ProxyCard::isProxy() const { return true; }

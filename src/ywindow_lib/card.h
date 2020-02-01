@@ -35,6 +35,8 @@ class Card {
   virtual std::string dictionaryInfo() const = 0;
   virtual void setDictionaryInfo(std::shared_ptr<std::string> info) = 0;
   virtual std::string etc() const;
+
+  virtual bool isProxy() const { return false; }
 };
 
 class DefaultCard : public Card {
@@ -115,13 +117,16 @@ class ProxyCard : public Card {
   std::string etc() const override;
   void setDictionaryInfo(std::shared_ptr<std::string> info) override;
 
+  virtual bool isProxy() const override;
+
  private:
   std::shared_ptr<Card> card_;
   std::string word_;
 };
 
-using CardPtrMap = std::multimap<std::string, std::shared_ptr<Card>>;
-using CardPtrs = std::vector<std::shared_ptr<Card>>;
+using CardPtr = std::shared_ptr<Card>;
+using CardPtrMap = std::multimap<std::string, CardPtr>;
+using CardPtrs = std::vector<CardPtr>;
 
 }  // namespace dict
 

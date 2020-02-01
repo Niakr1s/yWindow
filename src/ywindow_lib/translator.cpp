@@ -229,9 +229,16 @@ dict::TranslationChunkPtr dict::DirectoryTranslator<Dict>::doTranslateFullStr(
 
       CardPtrs inner_sub_translations =
           queryAllNonDisabledDicts(TranslationResult{it_begin, it}.orig_text());
+
+      CardPtrs inner_sub_translations_filtered;
+      std::copy_if(std::cbegin(inner_sub_translations),
+                   std::cend(inner_sub_translations),
+                   std::back_inserter(inner_sub_translations_filtered),
+                   [](const CardPtr &card) { return !card->isProxy(); });
+
       sub_translations.insert(sub_translations.end(),
-                              inner_sub_translations.cbegin(),
-                              inner_sub_translations.cend());
+                              inner_sub_translations_filtered.cbegin(),
+                              inner_sub_translations_filtered.cend());
     }
   }
   return std::make_shared<TranslatedChunk_T>(str, std::move(translations),
