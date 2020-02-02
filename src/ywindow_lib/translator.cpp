@@ -378,7 +378,12 @@ dict::TranslationResult dict::ChainTranslator::doTranslate(
             ch->addTranslations(*translated.chunks().front());
           }
           for (auto &translated_ch : translated.chunks()) {
-            ch->addSubTranslations(*translated_ch);
+            for (auto &transl : translated_ch->translations()) {
+              if (transl->isKanji()) ch->addSubTranslation(transl);
+            }
+            for (auto &transl : translated_ch->subTranslations()) {
+              if (transl->isKanji()) ch->addSubTranslation(transl);
+            }
           }
         }
         buffer.push_back(transl_res);
