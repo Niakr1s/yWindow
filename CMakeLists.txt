@@ -24,7 +24,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/a")
 
 add_definitions( -DBOOST_ALL_DYN_LINK )
 
-project (yWindow LANGUAGES CXX VERSION 0.1.0)
+project (yWindow LANGUAGES CXX VERSION 0.1.1)
 
 find_package(Boost)
 find_package(jsoncpp CONFIG REQUIRED)
